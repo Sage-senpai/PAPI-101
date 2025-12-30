@@ -18,16 +18,17 @@ A simple Node.js/TypeScript project to get started with Polkadot-API (PAPI), fea
 1. Clone the repo:
    ```bash
    git clone https://github.com/Sage-senpai/PAPI-101.git
+   cd 30-Days-of-PAPI
    cd papi-day1-hello-world
 
-Install dependencies:bash
+Install dependencies:bash (copy the package.json)
 
 npm install
 
 Generate types for Polkadot:bash
 
-npx papi add dot -n polkadot
-npx papi
+-- npx papi add dot -n polkadot
+-- npx papi
 
 Run the script:bash
 
@@ -52,7 +53,7 @@ License: MIT
 Author: Sage_senpeak
 #Polkadot #Web3 #TypeScript #Blockchain
 
-If you want a separate SETUP.md, here's that – add it alongside README for detailed steps:
+SETUP GUIDE BELOW
 
 ```markdown
 # Setup Guide: PAPI Hello World
@@ -62,15 +63,16 @@ Follow these to build from scratch or tweak the cloned repo.
 ### Step 1: Project Init
 ```bash
 mkdir papi-day1-hello-world
+cd 30-Days-of-PAPI
 cd papi-day1-hello-world
 npm init -y
 mkdir src public
 touch src/index.ts public/styles.css public/index.html
 
-Step 2: Config FilesCopy package.json, tsconfig.json from above.
+Step 2: Config Files: Copy package.json, tsconfig.json from above.
 Install: npm install
 
-Step 3: Code & GeneratePaste src/index.ts code.
+Step 3: Code & Generate: Paste src/index.ts code.
 Run npx papi add dot -n polkadot && npx papi
 
 Step 4: Optional WebCompile SCSS: Install sass globally (npm i -g sass), then sass src/styles.scss public/styles.css if using scss
