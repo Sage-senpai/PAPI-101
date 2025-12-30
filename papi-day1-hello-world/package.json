@@ -1,0 +1,29 @@
+{
+  "name": "papi-day1-hello-world",
+  "version": "1.0.0",
+  "description": "Day 1 PAPI 30 Days Challenge - Hello World",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "keywords": [
+    "polkadot",
+    "papi",
+    "blockchain",
+    "web3"
+  ],
+  "author": "Sage_senpeak",
+  "license": "MIT",
+  "dependencies": {
+    "@polkadot-api/descriptors": "file:.papi\\descriptors",
+    "polkadot-api": "^1.23.1"
+  },
+  "devDependencies": {
+    "sass": "^1.97.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

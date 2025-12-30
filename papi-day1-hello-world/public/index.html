@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PAPI Day 1 – Hello World</title>
+
+  <!-- Compiled CSS output -->
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="card">
+      <header class="header">
+        <h1 class="title">PAPI Day 1: Hello World</h1>
+        <p class="subtitle">
+          Polkadot-API · 30 Days Challenge · Light Client Edition
+        </p>
+      </header>
+
+      <section class="console">
+        <div class="line command">$ npx papi add dot -n polkadot</div>
+        <div class="line success">✔ Metadata downloaded & types generated</div>
+
+        <div class="line command">$ npm run dev</div>
+        <div class="line">Kicking off PAPI Day 1 – Hello World</div>
+        <div class="line dim">────────────────────────────────────────</div>
+        <div class="line">Starting smoldot light client…</div>
+        <div class="line">Connecting to Polkadot relay chain…</div>
+        <div class="line success">✔ Connection established</div>
+        <div class="line success">
+          Latest finalized block: #12,345,678
+        </div>
+
+        <div class="line highlight">🚀 PAPI READY</div>
+      </section>
+
+      <section class="steps">
+        <div class="step">
+          <span class="badge">1</span>
+          <span>Initialize project & install dependencies</span>
+        </div>
+
+        <div class="step">
+          <span class="badge">2</span>
+          <span>
+            Generate types:
+            <code>npx papi add dot -n polkadot</code>
+          </span>
+        </div>
+
+        <div class="step">
+          <span class="badge">3</span>
+          <span>Connect via smoldot & query chain state</span>
+        </div>
+
+        <div class="step">
+          <span class="badge">4</span>
+          <span>
+            Run & celebrate:
+            <code>npm run dev</code>
+          </span>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>Share your progress with <strong>#PAPI30Days</strong></p>
+        <div class="tags">
+          <span>#Polkadot</span>
+          <span>#Web3</span>
+          <span>#TypeScript</span>
+          <span>#LightClient</span>
+        </div>
+      </footer>
+    </section>
+  </main>
+</body>
+</html>

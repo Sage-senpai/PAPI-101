@@ -1,0 +1,133 @@
+/* Polkadot-inspired base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, Segoe UI, system-ui, sans-serif;
+  background: radial-gradient(
+      circle at top,
+      #2a0036 0%,
+      #0b0b0e 45%
+    ),
+    linear-gradient(135deg, #e6007a, #552bbf);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.app {
+  width: 100%;
+  max-width: 900px;
+  padding: 24px;
+}
+
+.card {
+  background: rgba(15, 15, 20, 0.7);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  padding: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  margin-top: 10px;
+  opacity: 0.75;
+  font-size: 1.1rem;
+}
+
+/* Console */
+.console {
+  background: #0d0f12;
+  border-radius: 14px;
+  padding: 24px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9rem;
+  border: 1px solid #1f232a;
+  margin-bottom: 32px;
+}
+
+.line {
+  margin: 6px 0;
+  color: #c7c9d3;
+}
+
+.command {
+  color: #6fb9ff;
+}
+
+.success {
+  color: #5cff9d;
+}
+
+.dim {
+  opacity: 0.4;
+}
+
+.highlight {
+  margin-top: 12px;
+  color: #e6007a;
+  font-weight: 700;
+}
+
+/* Steps */
+.steps {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.badge {
+  width: 32px;
+  height: 32px;
+  background: #e6007a;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+/* Footer */
+.footer {
+  margin-top: 32px;
+  text-align: center;
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.tags {
+  margin-top: 12px;
+}
+
+.tags span {
+  display: inline-block;
+  margin: 4px 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.75rem;
+}
