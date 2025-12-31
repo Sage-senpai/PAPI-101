@@ -1,0 +1,128 @@
+/* src/styles/styles.scss */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', 'Monaco', monospace;
+}
+
+body {
+  background: linear-gradient(135deg, #E6007A 0%, #552BBF 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  color: white;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 900px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.title {
+  font-size: 2.8em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.subtitle {
+  font-size: 1.3em;
+  opacity: 0.9;
+  margin-top: 10px;
+}
+
+.console {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 20px;
+  font-family: 'Courier New', monospace;
+  color: #00ff00;
+  margin: 30px 0;
+  min-height: 200px;
+  border: 2px solid #333;
+  overflow-y: auto;
+}
+
+.console-line {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.console-output { color: #00ff88; }
+.console-warning { color: #ffb74d; }
+.console-error { color: #ff5252; }
+
+.status {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 10px;
+  margin: 20px 0;
+  font-size: 1.1em;
+}
+
+.status p { margin: 8px 0; }
+
+#status-text { font-weight: bold; color: #ffb74d; }
+#block-number { font-weight: bold; color: #00ff88; }
+
+.steps {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 25px;
+  margin-top: 30px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  color: white;
+}
+
+.step-number {
+  background: #E6007A;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 18px;
+  flex-shrink: 0;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  opacity: 0.8;
+}
+
+.tag {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 14px;
+  border-radius: 30px;
+  margin: 6px;
+  font-size: 0.9em;
+}

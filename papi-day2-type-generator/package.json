@@ -1,0 +1,46 @@
+{
+  "name": "papi-type-generator",
+  "version": "1.0.0",
+  "description": "Day 2 PAPI Challenge - Type Gen & Explorer",
+  "main": "dist/index.ts",
+  "type": "module",
+  "scripts": {
+    "build:node": "tsc",
+    "start": "node dist/index.ts",
+    "setup": "npx papi add dot -n polkadot && npx papi",
+    "explore": "node dist/utils/explorer.ts",
+    "dev:node": "ts-node src/index.ts",
+    "clean": "rm -rf node_modules package-lock.json .papi dist && npm install",
+    "dev:frontend": "vite",
+    "build:frontend": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "polkadot",
+    "papi",
+    "typescript",
+    "blockchain",
+    "web3"
+  ],
+  "author": "Sage_senpeak",
+  "license": "MIT",
+  "dependencies": {
+    "@polkadot-api/descriptors": "file:.papi\\descriptors",
+    "@polkadot-api/sm-provider": "^0.1.15",
+    "@polkadot-api/smoldot": "^0.3.15",
+    "chalk": "^5.3.0",
+    "figlet": "^1.7.0",
+    "polkadot-api": "^1.23.1"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.5.8",
+    "@types/node": "^20.0.0",
+    "sass": "^1.70.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
