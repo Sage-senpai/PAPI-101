@@ -1,0 +1,42 @@
+{
+  "name": "papi-day3-provider-playground",
+  "version": "1.0.0",
+  "description": "Day 3 PAPI 30 Days Challenge - Smoldot vs WSS Provider Comparison",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf node_modules dist",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "polkadot-api": "^1.17.2"
+     },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "sass": "^1.69.0"
+  },
+  "keywords": [
+    "polkadot",
+    "papi",
+    "smoldot",
+    "websocket",
+    "blockchain",
+    "typescript",
+    "web3"
+  ],
+  "author": "Sage_senpeak",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

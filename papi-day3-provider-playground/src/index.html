@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Playground - PAPI Day 3</title>
+    <link rel="stylesheet" href="./src/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <h1>Provider Playground</h1>
+            </div>
+            <div class="badge">Day 3 • #PAPI30Days</div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h2>Smoldot vs WSS Provider</h2>
+            <p class="subtitle">Connect to Polkadot using different providers and compare performance in real-time</p>
+            <div class="chain-info">
+                <span class="chain-badge">Polkadot</span>
+                <span class="chain-badge">TypeScript</span>
+                <span class="chain-badge">PAPI v1.17.2</span>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="providers-grid">
+                <!-- Smoldot Provider Card -->
+                <div class="provider-card" id="smoldot-card">
+                    <div class="card-header">
+                        <div class="provider-icon">🍃</div>
+                        <h3>Smoldot Provider</h3>
+                        <span class="provider-tag light">Light Client</span>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="provider-info">
+                            <div class="info-item">
+                                <span class="info-label">Type:</span>
+                                <span class="info-value">Browser-based light client</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Decentralization:</span>
+                                <span class="info-value">★★★★★</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Resource Usage:</span>
+                                <span class="info-value">Low</span>
+                            </div>
+                        </div>
+
+                        <div class="connection-status" id="smoldot-status">
+                            <div class="status-indicator disconnected"></div>
+                            <span class="status-text">Disconnected</span>
+                        </div>
+
+                        <button class="connect-btn" id="smoldot-connect">
+                            Connect with Smoldot
+                        </button>
+
+                        <div class="metrics" id="smoldot-metrics">
+                            <div class="metric">
+                                <span class="metric-label">Latency:</span>
+                                <span class="metric-value">-</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Block Height:</span>
+                                <span class="metric-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WSS Provider Card -->
+                <div class="provider-card" id="wss-card">
+                    <div class="card-header">
+                        <div class="provider-icon">⚡</div>
+                        <h3>WSS Provider</h3>
+                        <span class="provider-tag fast">WebSocket</span>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="provider-info">
+                            <div class="info-item">
+                                <span class="info-label">Type:</span>
+                                <span class="info-value">WebSocket endpoint</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Speed:</span>
+                                <span class="info-value">★★★★★</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Infrastructure:</span>
+                                <span class="info-value">External RPC</span>
+                            </div>
+                        </div>
+
+                        <div class="connection-status" id="wss-status">
+                            <div class="status-indicator disconnected"></div>
+                            <span class="status-text">Disconnected</span>
+                        </div>
+
+                        <button class="connect-btn" id="wss-connect">
+                            Connect with WSS
+                        </button>
+
+                        <div class="metrics" id="wss-metrics">
+                            <div class="metric">
+                                <span class="metric-label">Latency:</span>
+                                <span class="metric-value">-</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Block Height:</span>
+                                <span class="metric-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Section -->
+            <div class="comparison-section">
+                <h3>Performance Comparison</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-item">
+                        <span class="comparison-label">Connection Time:</span>
+                        <div class="comparison-bar">
+                            <div class="bar smoldot-bar" id="smoldot-time-bar" style="width: 0%">
+                                <span class="bar-label">Smoldot: -</span>
+                            </div>
+                            <div class="bar wss-bar" id="wss-time-bar" style="width: 0%">
+                                <span class="bar-label">WSS: -</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-item">
+                        <span class="comparison-label">Resource Usage:</span>
+                        <div class="resource-dots">
+                            <div class="dot-group">
+                                <span>Smoldot:</span>
+                                <div class="dots" id="smoldot-resource-dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
+                            </div>
+                            <div class="dot-group">
+                                <span>WSS:</span>
+                                <div class="dots" id="wss-resource-dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="console-output" id="console-output">
+                    <div class="console-header">
+                        <span>📟 Connection Log</span>
+                        <button class="clear-btn" id="clear-log">Clear</button>
+                    </div>
+                    <div class="console-content" id="console-content">
+                        <div class="log-entry">
+                            <span class="log-time">[10:30:00]</span>
+                            <span class="log-text">Welcome to Provider Playground! Click a provider to connect.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>Built with PAPI • Polkadot-API v1.17.2 • TypeScript</p>
+                <p class="footer-links">
+                    <a href="https://docs.polkadot.com/develop/toolkit/api-libraries/papi/" target="_blank">PAPI Docs</a>
+                    •
+                    <a href="https://github.com/polkadot-api" target="_blank">GitHub</a>
+                    •
+                    <a href="https://polkadot.network" target="_blank">Polkadot</a>
+                </p>
+                <p class="challenge-info">#PAPI30Days Challenge • Day 3: Provider Choice</p>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+</body>
+</html>
