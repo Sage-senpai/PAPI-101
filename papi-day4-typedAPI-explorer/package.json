@@ -1,0 +1,38 @@
+{
+  "name": "typedapi-explorer",
+  "version": "1.0.0",
+  "description": "Day 4 PAPI 30 Days Challenge - TypedApi Instance Explorer",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf node_modules dist",
+    "format": "prettier --write \"src/**/*.ts\" \"*.json\"",
+    "setup": "npx papi add dot -n polkadot && npx papi"
+  },
+  "dependencies": {
+    "@polkadot-api/descriptors": "file:.papi\\descriptors",
+    "polkadot-api": "^1.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.4.1",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "vite": "^7.3.0"
+  },
+  "keywords": [
+    "polkadot",
+    "papi",
+    "typedapi",
+    "typescript",
+    "blockchain",
+    "web3"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

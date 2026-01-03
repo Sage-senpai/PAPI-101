@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypedApi Explorer - PAPI Day 4</title>
+    <link rel="stylesheet" href="./src/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🔮</div>
+                <h1>TypedApi Explorer</h1>
+            </div>
+            <div class="badge">Day 4 • #PAPI30Days</div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero">
+            <h2>Your First TypedApi Instance</h2>
+            <p class="subtitle">Harness fully typed blockchain power</p>
+            <div class="chain-info">
+                <span class="chain-badge">Polkadot</span>
+                <span class="chain-badge">TypeScript</span>
+                <span class="chain-badge">PAPI v1.23.1</span>
+                <span class="chain-badge">Auto-Types</span>
+            </div>
+        </section>
+
+        <!-- Main -->
+        <main class="main-content">
+            <!-- Connection -->
+            <div class="connection-section">
+                <h3><span class="icon">🔌</span> Polkadot Connection</h3>
+                <div class="connection-card">
+                    <div class="connection-info">
+                        <div class="info-row">
+                            <span class="label">Provider:</span>
+                            <span class="value">WebSocket (WSS)</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Endpoint:</span>
+                            <span class="value code">wss://rpc.polkadot.io</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Status:</span>
+                            <span class="status-indicator" id="connection-status">Disconnected</span>
+                        </div>
+                    </div>
+                    <button class="connect-btn" id="connect-btn">Initialize TypedApi</button>
+                </div>
+            </div>
+
+            <!-- TypedApi Code -->
+            <div class="typedapi-section">
+                <h3><span class="icon">🎯</span> TypedApi Setup</h3>
+                <div class="code-preview">
+                    <div class="code-header">
+                        <span>First TypedApi Snippet</span>
+                        <button class="copy-btn" onclick="copyCode()">Copy</button>
+                    </div>
+                    <pre class="code-block"><code id="typedapi-code">// Import descriptors
+import { dot } from '@polkadot-api/descriptors';
+
+// Client with provider
+const client = createClient(getWsProvider('wss://rpc.polkadot.io'));
+
+// TypedApi!
+const dotApi = client.getTypedApi(dot);
+
+console.log("TypedApi ready for Polkadot!");</code></pre>
+                </div>
+            </div>
+
+            <!-- Explore -->
+            <div class="explore-section">
+                <h3><span class="icon">🔍</span> Chain Constants Explorer</h3>
+                <p class="section-description">Click constants for typed fetches</p>
+                <div class="constants-grid" id="constants-grid"></div>
+
+                <div class="result-section" id="result-section">
+                    <h4><span class="icon">📊</span> Results</h4>
+                    <div class="result-card">
+                        <div class="result-header">
+                            <span class="result-name" id="result-name">Select a constant</span>
+                            <span class="result-type" id="result-type">-</span>
+                        </div>
+                        <div class="result-body">
+                            <pre class="result-json" id="result-json">Pick one to view...</pre>
+                        </div>
+                        <div class="result-footer">
+                            <div class="result-meta">
+                                <span class="meta-item">
+                                    <span class="meta-label">Type Safety:</span>
+                                    <span class="meta-value success">✅ Guaranteed</span>
+                                </span>
+                                <span class="meta-item">
+                                    <span class="meta-label">Autocomplete:</span>
+                                    <span class="meta-value success">✅ Full</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Types -->
+            <div class="type-info-section">
+                <h3><span class="icon">🧠</span> Type Insights</h3>
+                <div class="type-cards">
+                    <div class="type-card">
+                        <div class="type-icon">✨</div>
+                        <h4>Auto-Generated</h4>
+                        <p>Types from metadata, always fresh</p>
+                    </div>
+                    <div class="type-card">
+                        <div class="type-icon">🔒</div>
+                        <h4>Safe</h4>
+                        <p>Compile-time checks prevent crashes</p>
+                    </div>
+                    <div class="type-card">
+                        <div class="type-icon">⚡</div>
+                        <h4>Autocomplete</h4>
+                        <p>IDE suggests as you code</p>
+                    </div>
+                    <div class="type-card">
+                        <div class="type-icon">🔄</div>
+                        <h4>Adaptive</h4>
+                        <p>Updates with chain upgrades</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Console -->
+            <div class="console-section">
+                <h3><span class="icon">📟</span> Console</h3>
+                <div class="console-card">
+                    <div class="console-header">
+                        <span>TS Console</span>
+                        <button class="clear-btn" id="clear-console">Clear</button>
+                    </div>
+                    <div class="console-content" id="console-content">
+                        <div class="console-entry">
+                            <span class="console-time">[00:00:00]</span>
+                            <span class="console-text">🚀 Welcome!</span>
+                        </div>
+                        <div class="console-entry">
+                            <span class="console-time">[00:00:00]</span>
+                            <span class="console-text">Initialize to explore...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>Powered by <span class="highlight">TypedApi</span> • PAPI v1.23.1 • TS 5.5</p>
+                <p class="footer-links">
+                    <a href="https://polkadot-api.dev/" target="_blank">PAPI Docs</a>
+                    •
+                    <a href="https://github.com/polkadot-api/polkadot-api" target="_blank">GitHub</a>
+                    •
+                    <a href="https://polkadot.network" target="_blank">Polkadot</a>
+                </p>
+                <p class="challenge-info">#PAPI30Days • Day 4: TypedApi</p>
+            </div>
+        </footer>
+    </div>
+    <script type="module" src="./src/main.ts"></script>
+</body>
+</html>
