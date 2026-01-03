@@ -66,9 +66,9 @@ class TypedApiExplorer {
     },
     {
       pallet: 'Staking',
-      constant: 'MaxNominatorRewardedPerValidator',
-      description: 'Maximum number of nominators that can receive rewards per validator',
-      method: 'Staking.MaxNominatorRewardedPerValidator'
+      constant: 'SessionsPerEra',
+      description: 'Number of sessions per era (1 era = 6 sessions = 1 day on Polkadot)',
+      method: 'Staking.SessionsPerEra'
     }
   ];
 
@@ -274,6 +274,11 @@ class TypedApiExplorer {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.log(`❌ Failed to fetch ${constant.constant}: ${errorMessage}`, 'error');
+      
+      // Check if constant doesn't exist
+      if (errorMessage.includes('not found')) {
+        this.log(`💡 This constant may not exist in the current Polkadot runtime`, 'info');
+      }
     }
   }
 
@@ -301,7 +306,18 @@ class TypedApiExplorer {
       }
     }
     
-    resultJson.textContent = JSON.stringify(formattedValue, null, 2);
+    // Handle BigInt serialization
+    try {
+      resultJson.textContent = JSON.stringify(formattedValue, (key, value) => {
+        if (typeof value === 'bigint') {
+          return value.toString() + 'n'; // Convert BigInt to string with 'n' suffix
+        }
+        return value;
+      }, 2);
+    } catch (error) {
+      // Fallback: convert to string
+      resultJson.textContent = String(formattedValue);
+    }
   }
 
   /**
