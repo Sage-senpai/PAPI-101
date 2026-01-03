@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Provider Playground - PAPI Day 3</title>
-    <link rel="stylesheet" href="./src/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -28,7 +27,7 @@
             <div class="chain-info">
                 <span class="chain-badge">Polkadot</span>
                 <span class="chain-badge">TypeScript</span>
-                <span class="chain-badge">PAPI v1.17.2</span>
+                <span class="chain-badge">PAPI v1.23.1</span>
             </div>
         </section>
 
@@ -71,11 +70,11 @@
                         <div class="metrics" id="smoldot-metrics">
                             <div class="metric">
                                 <span class="metric-label">Latency:</span>
-                                <span class="metric-value">-</span>
+                                <span class="metric-value" data-metric="latency">-</span>
                             </div>
                             <div class="metric">
                                 <span class="metric-label">Block Height:</span>
-                                <span class="metric-value">-</span>
+                                <span class="metric-value" data-metric="blockHeight">-</span>
                             </div>
                         </div>
                     </div>
@@ -117,11 +116,11 @@
                         <div class="metrics" id="wss-metrics">
                             <div class="metric">
                                 <span class="metric-label">Latency:</span>
-                                <span class="metric-value">-</span>
+                                <span class="metric-value" data-metric="latency">-</span>
                             </div>
                             <div class="metric">
                                 <span class="metric-label">Block Height:</span>
-                                <span class="metric-value">-</span>
+                                <span class="metric-value" data-metric="blockHeight">-</span>
                             </div>
                         </div>
                     </div>
@@ -178,7 +177,7 @@
                     </div>
                     <div class="console-content" id="console-content">
                         <div class="log-entry">
-                            <span class="log-time">[10:30:00]</span>
+                            <span class="log-time">[Ready]</span>
                             <span class="log-text">Welcome to Provider Playground! Click a provider to connect.</span>
                         </div>
                     </div>
@@ -189,7 +188,7 @@
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
-                <p>Built with PAPI • Polkadot-API v1.17.2 • TypeScript</p>
+                <p>Built with PAPI • Polkadot-API v1.23.1 • TypeScript</p>
                 <p class="footer-links">
                     <a href="https://docs.polkadot.com/develop/toolkit/api-libraries/papi/" target="_blank">PAPI Docs</a>
                     •
@@ -202,6 +201,6 @@
         </footer>
     </div>
 
-    <script type="module" src="./src/main.ts"></script>
+    <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

@@ -12,6 +12,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    sourcemap: true,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html')
@@ -24,6 +25,9 @@ export default defineConfig({
     cors: true
   },
   optimizeDeps: {
-    exclude: ['polkadot-api', 'polkadot-api/sm-provider', 'polkadot-api/ws-provider']
+    exclude: ['polkadot-api']
+  },
+  worker: {
+    format: 'es'
   }
 })

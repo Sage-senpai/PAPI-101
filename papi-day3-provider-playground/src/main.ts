@@ -2,10 +2,10 @@
 import { createClient } from 'polkadot-api'
 import { getSmProvider } from 'polkadot-api/sm-provider'
 import { getWsProvider } from 'polkadot-api/ws-provider'
-import { dot } from '@polkadot-api/descriptors'
 import { chainSpec } from 'polkadot-api/chains/polkadot'
 import { startFromWorker } from 'polkadot-api/smoldot/from-worker'
 import SmWorker from 'polkadot-api/smoldot/worker?worker'
+import './style.css'
 
 // Type definitions for our components
 interface ConnectionMetrics {
@@ -22,11 +22,11 @@ interface ProviderStats {
 class ProviderPlayground {
   private smoldotClient: any = null
   private wssClient: any = null
-  private dotApi: any = null
   private stats: ProviderStats = {
     smoldot: { latency: 0, blockHeight: 0, connectionTime: 0 },
     wss: { latency: 0, blockHeight: 0, connectionTime: 0 }
   }
+  private monitoringIntervals: { smoldot?: NodeJS.Timeout; wss?: NodeJS.Timeout } = {}
 
   constructor() {
     this.initializeUI()
@@ -71,7 +71,13 @@ class ProviderPlayground {
 
     const metricElement = element.querySelector(`[data-metric="${metric}"]`)
     if (metricElement) {
-      metricElement.textContent = metric === 'latency' ? `${value}ms` : value.toString()
+      if (metric === 'latency') {
+        metricElement.textContent = `${value}ms`
+      } else if (metric === 'blockHeight') {
+        metricElement.textContent = value.toLocaleString()
+      } else {
+        metricElement.textContent = value.toString()
+      }
     }
   }
 
@@ -148,7 +154,7 @@ class ProviderPlayground {
   private clearLog(): void {
     const consoleContent = document.getElementById('console-content')
     if (consoleContent) {
-      consoleContent.innerHTML = '<div class="log-entry"><span class="log-time">[10:30:00]</span><span class="log-text">Log cleared. Ready for new connections.</span></div>'
+      consoleContent.innerHTML = '<div class="log-entry"><span class="log-time">[Ready]</span><span class="log-text">Log cleared. Ready for new connections.</span></div>'
     }
   }
 
@@ -157,48 +163,79 @@ class ProviderPlayground {
   }
 
   async connectSmoldot(): Promise<void> {
+    // Prevent multiple connections
+    if (this.smoldotClient) {
+      this.log('Already connected to Smoldot', 'info')
+      return
+    }
+
     this.updateStatus('smoldot', 'connecting')
     this.log('Starting Smoldot connection...', 'smoldot')
+    this.log('⏳ This may take 30-60 seconds for first connection', 'info')
 
     const startTime = Date.now()
 
     try {
       // Initialize Smoldot worker
+      this.log('🔧 Initializing Smoldot worker...', 'smoldot')
       const worker = new SmWorker()
       const smoldot = startFromWorker(worker)
       
-      this.log('Smoldot worker initialized', 'smoldot')
+      this.log('✓ Smoldot worker initialized', 'smoldot')
 
       // Add Polkadot chain
+      this.log('🔗 Adding Polkadot chain to Smoldot...', 'smoldot')
       const chain = await smoldot.addChain({ chainSpec })
-      this.log('Polkadot chain added to Smoldot', 'smoldot')
+      this.log('✓ Polkadot chain added', 'smoldot')
 
       // Create client with Smoldot provider
-      const client = createClient(getSmProvider(chain))
-      this.log('PAPI client created with Smoldot provider', 'smoldot')
+      this.log('🚀 Creating PAPI client...', 'smoldot')
+      this.smoldotClient = createClient(getSmProvider(chain))
+      this.log('✓ PAPI client created', 'smoldot')
 
-      // Get typed API
-      this.dotApi = client.getTypedApi(dot)
-      this.log('Typed API obtained. Testing connection...', 'smoldot')
-
-      // Test connection by getting chain version
-      const version = await this.dotApi.constants.System.Version()
-      this.log(`Connected! Chain version: ${version.specVersion}`, 'success')
+      // Test connection - subscribe to get first finalized block
+      this.log('🔍 Testing connection...', 'smoldot')
+      
+      // Wait for first block using Promise wrapper
+      const firstBlock = await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Connection timeout')), 120000)
+        const subscription = this.smoldotClient.finalizedBlock$.subscribe({
+          next: (block: any) => {
+            clearTimeout(timeout)
+            subscription.unsubscribe()
+            resolve(block)
+          },
+          error: (err: Error) => {
+            clearTimeout(timeout)
+            reject(err)
+          }
+        })
+      })
+      
+      this.log(`✓ Connected! Block #${(firstBlock as any).number}`, 'success')
 
       const connectionTime = Date.now() - startTime
       this.updateMetric('smoldot', 'connectionTime', connectionTime)
+      this.updateMetric('smoldot', 'blockHeight', (firstBlock as any).number)
       this.updateStatus('smoldot', 'connected')
 
       // Start monitoring
       this.startMonitoring('smoldot')
 
     } catch (error) {
-      this.log(`Smoldot connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
+      this.log(`❌ Smoldot connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
       this.updateStatus('smoldot', 'disconnected')
+      this.smoldotClient = null
     }
   }
 
   async connectWSS(): Promise<void> {
+    // Prevent multiple connections
+    if (this.wssClient) {
+      this.log('Already connected to WSS', 'info')
+      return
+    }
+
     this.updateStatus('wss', 'connecting')
     this.log('Starting WSS connection...', 'wss')
 
@@ -206,51 +243,103 @@ class ProviderPlayground {
 
     try {
       // Create client with WSS provider
-      const client = createClient(
+      this.log('🔧 Creating WSS provider...', 'wss')
+      this.wssClient = createClient(
         getWsProvider('wss://rpc.polkadot.io')
       )
-      this.log('PAPI client created with WSS provider', 'wss')
+      this.log('✓ WSS provider created', 'wss')
 
-      // Get typed API
-      this.dotApi = client.getTypedApi(dot)
-      this.log('Typed API obtained. Testing connection...', 'wss')
+      // Test connection - subscribe to get first finalized block
+      this.log('🔍 Testing connection...', 'wss')
+      
+      // Wait for first block using Promise wrapper
+      const firstBlock = await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Connection timeout')), 30000)
+        const subscription = this.wssClient.finalizedBlock$.subscribe({
+          next: (block: any) => {
+            clearTimeout(timeout)
+            subscription.unsubscribe()
+            resolve(block)
+          },
+          error: (err: Error) => {
+            clearTimeout(timeout)
+            reject(err)
+          }
+        })
+      })
 
-      // Test connection by getting chain version
-      const version = await this.dotApi.constants.System.Version()
-      this.log(`Connected! Chain version: ${version.specVersion}`, 'success')
+      this.log(`✓ Connected! Block #${(firstBlock as any).number}`, 'success')
 
       const connectionTime = Date.now() - startTime
       this.updateMetric('wss', 'connectionTime', connectionTime)
+      this.updateMetric('wss', 'blockHeight', (firstBlock as any).number)
       this.updateStatus('wss', 'connected')
 
       // Start monitoring
       this.startMonitoring('wss')
 
     } catch (error) {
-      this.log(`WSS connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
+      this.log(`❌ WSS connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
       this.updateStatus('wss', 'disconnected')
+      this.wssClient = null
     }
   }
 
   private async startMonitoring(provider: 'smoldot' | 'wss'): Promise<void> {
-    // Monitor latency
-    setInterval(async () => {
-      try {
-        const start = Date.now()
-        await this.dotApi.constants.System.Version()
-        const latency = Date.now() - start
-        
-        this.updateMetric(provider, 'latency', latency)
-        
-        // Update block height periodically
-        if (Math.random() < 0.2) { // 20% chance each interval
-          const header = await this.dotApi.query.System.Header.getValue()
-          this.updateMetric(provider, 'blockHeight', header.number)
+    const client = provider === 'smoldot' ? this.smoldotClient : this.wssClient
+    
+    if (!client) return
+
+    // Clear existing interval if any
+    if (this.monitoringIntervals[provider]) {
+      clearInterval(this.monitoringIntervals[provider])
+    }
+
+    this.log(`📊 Starting ${provider.toUpperCase()} monitoring...`, 'info')
+
+    // Subscribe to new blocks for continuous updates
+    try {
+      client.finalizedBlock$.subscribe({
+        next: (block: any) => {
+          this.updateMetric(provider, 'blockHeight', block.number)
+        },
+        error: (err: Error) => {
+          this.log(`${this.capitalize(provider)} block subscription error: ${err.message}`, 'error')
         }
-      } catch (error) {
-        this.log(`${this.capitalize(provider)} monitoring error`, 'error')
-      }
-    }, 2000)
+      })
+
+      // Monitor latency periodically
+      this.monitoringIntervals[provider] = setInterval(async () => {
+        try {
+          const start = Date.now()
+          
+          // Get single block value for latency test
+          await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => reject(new Error('Latency test timeout')), 5000)
+            const subscription = client.finalizedBlock$.subscribe({
+              next: (block: any) => {
+                clearTimeout(timeout)
+                subscription.unsubscribe()
+                resolve(block)
+              },
+              error: (err: Error) => {
+                clearTimeout(timeout)
+                reject(err)
+              }
+            })
+          })
+          
+          const latency = Date.now() - start
+          this.updateMetric(provider, 'latency', latency)
+        } catch (error) {
+          // Silently handle monitoring errors to avoid spam
+          console.warn(`${provider} latency check failed:`, error)
+        }
+      }, 5000) // Check every 5 seconds
+
+    } catch (error) {
+      this.log(`${this.capitalize(provider)} monitoring setup failed`, 'error')
+    }
   }
 }
 
