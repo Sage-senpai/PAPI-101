@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive TypedApi Explorer - Learn type-safe blockchain development with Polkadot PAPI">
+    <meta name="keywords" content="Polkadot, PAPI, TypeScript, TypedApi, blockchain, Web3, tutorial">
+    <meta name="author" content="PAPI 30 Days Challenge">
+    <title>TypedApi Explorer | Day 4 - PAPI 30 Days</title>
+    
+    <!-- Stylesheets -->
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="TypedApi Explorer - PAPI Day 4">
+    <meta property="og:description" content="Experience the power of fully typed blockchain interactions with Polkadot">
+    <meta property="og:url" content="https://your-domain.com">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TypedApi Explorer - PAPI Day 4">
+    <meta name="twitter:description" content="Learn type-safe blockchain development with Polkadot PAPI">
+  <script type="module" crossorigin src="./assets/main-B0rnL88g.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/main-IDSsR3of.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon" aria-label="TypedApi Explorer Logo">🎯</div>
+                <h1>TypedApi Explorer</h1>
+            </div>
+            <div class="badge" aria-label="Challenge day indicator">Day 4 • #PAPI30Days</div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h2>Your First TypedApi Instance</h2>
+            <p class="subtitle">Experience fully typed blockchain interactions with compile-time safety</p>
+            <div class="chain-info" role="list" aria-label="Technology stack">
+                <span class="chain-badge" role="listitem">Polkadot</span>
+                <span class="chain-badge" role="listitem">TypeScript</span>
+                <span class="chain-badge" role="listitem">PAPI v1.23.1</span>
+                <span class="chain-badge" role="listitem">Auto-Generated Types</span>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Connection Section -->
+            <section class="connection-section">
+                <h3><span class="icon" aria-hidden="true">🔌</span> Polkadot Connection</h3>
+                <div class="connection-card">
+                    <div class="connection-info">
+                        <div class="info-row">
+                            <span class="label">Provider:</span>
+                            <span class="value">WebSocket (WSS)</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Endpoint:</span>
+                            <span class="value code">wss://rpc.polkadot.io</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Status:</span>
+                            <span class="status-indicator" id="connection-status" role="status" aria-live="polite">Disconnected</span>
+                        </div>
+                    </div>
+                    <button class="connect-btn" id="connect-btn" type="button" aria-label="Initialize TypedApi connection">
+                        Initialize TypedApi
+                    </button>
+                </div>
+            </section>
+
+            <!-- TypedApi Code Section -->
+            <section class="typedapi-section">
+                <h3><span class="icon" aria-hidden="true">🎯</span> TypedApi Setup</h3>
+                <div class="code-preview">
+                    <div class="code-header">
+                        <span>Creating Your First TypedApi Instance</span>
+                        <button class="copy-btn" type="button" aria-label="Copy code snippet">Copy Code</button>
+                    </div>
+                    <pre class="code-block" role="region" aria-label="Code example"><code id="typedapi-code">// Import the generated descriptors
+import { dot } from '@polkadot-api/descriptors';
+
+// Create client with WebSocket provider
+const client = createClient(
+  getWsProvider('wss://rpc.polkadot.io')
+);
+
+// Get TypedApi instance - fully typed!
+const dotApi = client.getTypedApi(dot);
+
+console.log("TypedApi ready for Polkadot!");</code></pre>
+                </div>
+            </section>
+
+            <!-- Constants Explorer Section -->
+            <section class="explore-section">
+                <h3><span class="icon" aria-hidden="true">🔍</span> Chain Constants Explorer</h3>
+                <p class="section-description">
+                    Click on any constant below to fetch its value with full type safety.
+                    Each constant is fetched using TypedApi with compile-time type checking!
+                </p>
+                <div class="constants-grid" id="constants-grid" role="list" aria-label="Available chain constants">
+                    <!-- Constants will be rendered here by JavaScript -->
+                </div>
+
+                <!-- Results Display -->
+                <div class="result-section" id="result-section">
+                    <h4><span class="icon" aria-hidden="true">📊</span> Fetched Data</h4>
+                    <div class="result-card" role="region" aria-label="Constant value display">
+                        <div class="result-header">
+                            <span class="result-name" id="result-name">No constant selected</span>
+                            <span class="result-type" id="result-type">-</span>
+                        </div>
+                        <div class="result-body">
+                            <pre class="result-json" id="result-json" role="code">Click a constant above to fetch its value...</pre>
+                        </div>
+                        <div class="result-footer">
+                            <div class="result-meta">
+                                <span class="meta-item">
+                                    <span class="meta-label">Type Safety:</span>
+                                    <span class="meta-value success">✅ Compile-Time</span>
+                                </span>
+                                <span class="meta-item">
+                                    <span class="meta-label">Autocomplete:</span>
+                                    <span class="meta-value success">✅ Full IDE Support</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Type Benefits Section -->
+            <section class="type-info-section">
+                <h3><span class="icon" aria-hidden="true">🧠</span> TypedApi Benefits</h3>
+                <div class="type-cards">
+                    <div class="type-card">
+                        <span class="type-icon" aria-hidden="true">✨</span>
+                        <h4>Auto-Generated</h4>
+                        <p>Types generated directly from chain metadata, always in sync with the runtime</p>
+                    </div>
+                    <div class="type-card">
+                        <span class="type-icon" aria-hidden="true">🔒</span>
+                        <h4>Type Safe</h4>
+                        <p>Catch errors at compile-time, not runtime. No more broken API calls</p>
+                    </div>
+                    <div class="type-card">
+                        <span class="type-icon" aria-hidden="true">⚡</span>
+                        <h4>IDE Support</h4>
+                        <p>Full autocomplete and inline documentation in your favorite IDE</p>
+                    </div>
+                    <div class="type-card">
+                        <span class="type-icon" aria-hidden="true">🔄</span>
+                        <h4>Future-Proof</h4>
+                        <p>Automatically adapts to chain upgrades and runtime changes</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Developer Console Section -->
+            <section class="console-section">
+                <h3><span class="icon" aria-hidden="true">📟</span> Developer Console</h3>
+                <div class="console-card">
+                    <div class="console-header">
+                        <span>Operation Log</span>
+                        <button class="clear-btn" id="clear-console" type="button" aria-label="Clear console log">Clear</button>
+                    </div>
+                    <div class="console-content" id="console-content" role="log" aria-live="polite" aria-atomic="false">
+                        <!-- Console entries will be added here by JavaScript -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>
+                    Powered by <span class="highlight">Polkadot API (PAPI)</span> • 
+                    v1.23.1 • TypeScript 5.5
+                </p>
+                <nav class="footer-links" aria-label="External links">
+                    <a href="https://papi.how" target="_blank" rel="noopener noreferrer">PAPI Docs</a>
+                    <span aria-hidden="true">•</span>
+                    <a href="https://github.com/polkadot-api/polkadot-api" target="_blank" rel="noopener noreferrer">GitHub</a>
+                    <span aria-hidden="true">•</span>
+                    <a href="https://polkadot.network" target="_blank" rel="noopener noreferrer">Polkadot Network</a>
+                    <span aria-hidden="true">•</span>
+                    <a href="https://wiki.polkadot.network/" target="_blank" rel="noopener noreferrer">Wiki</a>
+                </nav>
+                <p class="challenge-info">#PAPI30Days • Day 4: TypedApi Introduction</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Main Application Script -->
+</body>
+</html>
