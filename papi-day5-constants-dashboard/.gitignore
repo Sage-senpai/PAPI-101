@@ -1,6 +1,10 @@
 # Dependencies
 node_modules/
 .pnpm-store/
+package-lock.json
+
+# PAPI Auto-generated
+.papi/
 
 # Build outputs
 dist/
