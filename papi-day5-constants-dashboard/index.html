@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chain Constants Dashboard - PAPI Day 5</title>
+    <link rel="stylesheet" href="./src/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔢</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🔢</div>
+                <div class="logo-text">
+                    <h1>Chain Constants Dashboard</h1>
+                    <p class="logo-subtitle">Live Polkadot insights</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="badge">Day 5 • #PAPI30Days</div>
+                <div class="connection-status">
+                    <span class="status-label">Chain:</span>
+                    <span class="status-value" id="chain-status">Connecting...</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-label">Fetched</span>
+                <span class="stat-value" id="constants-count">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Updated</span>
+                <span class="stat-value" id="last-updated">--:--:--</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Block</span>
+                <span class="stat-value" id="block-height">-</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Version</span>
+                <span class="stat-value" id="runtime-version">-</span>
+            </div>
+        </div>
+
+        <main class="main-content">
+            <div class="controls-section">
+                <h2><i class="fas fa-sliders-h"></i> Controls</h2>
+                <div class="controls">
+                    <button class="btn btn-primary" id="fetch-all-btn">
+                        <i class="fas fa-sync-alt"></i> Fetch All
+                    </button>
+                    <button class="btn btn-secondary" id="export-btn">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <label class="switch">
+                        <input type="checkbox" id="auto-refresh-toggle" checked>
+                        <span class="slider"></span>
+                        <span class="switch-label">Auto (30s)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="constants-section">
+                <h2><i class="fas fa-cogs"></i> Live Constants</h2>
+                <p class="section-description">Direct from chain—fresh and accurate</p>
+                <div class="constants-grid" id="constants-grid"></div>
+            </div>
+
+            <div class="comparison-section">
+                <h2><i class="fas fa-balance-scale"></i> Hardcoded vs. Live</h2>
+                <div class="comparison-cards">
+                    <div class="comparison-card outdated">
+                        <div class="comparison-header">
+                            <i class="fas fa-times-circle"></i>
+                            <h3>Hardcoded</h3>
+                        </div>
+                        <div class="comparison-content">
+                            <ul class="outdated-list" id="outdated-values"></ul>
+                            <div class="comparison-footer">
+                                <span class="warning-badge"><i class="fas fa-exclamation-triangle"></i> Debt Risk</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comparison-card live">
+                        <div class="comparison-header">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Live</h3>
+                        </div>
+                        <div class="comparison-content">
+                            <ul class="live-list" id="live-values"></ul>
+                            <div class="comparison-footer">
+                                <span class="success-badge"><i class="fas fa-check"></i> Reliable</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="examples-section">
+                <h2><i class="fas fa-code"></i> Examples</h2>
+                <div class="code-examples">
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span>Hardcoded (Avoid)</span>
+                            <button class="copy-btn" data-target="bad-code"><i class="far fa-copy"></i></button>
+                        </div>
+                        <pre class="code-block" id="bad-code"><code>// ❌ Avoid
+const EXISTENTIAL_DEPOSIT = 10000000000n;
+const MIN_PERIOD = 6000;
+const MAX_NOMINATORS_COUNT = 22500;
+
+// Breaks on upgrades</code></pre>
+                    </div>
+                    <div class="code-example">
+                        <div class="code-header">
+                            <span>Live (Best)</span>
+                            <button class="copy-btn" data-target="good-code"><i class="far fa-copy"></i></button>
+                        </div>
+                        <pre class="code-block" id="good-code"><code>// ✅ Prefer
+const existentialDeposit = await dotApi.constants.Balances.ExistentialDeposit();
+const minPeriod = await dotApi.constants.Timestamp.MinimumPeriod();
+const maxNominatorsCount = await dotApi.constants.Staking.MaxNominatorsCount();
+
+// Always current</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="console-section">
+                <h2><i class="fas fa-terminal"></i> Console</h2>
+                <div class="console-card">
+                    <div class="console-header">
+                        <span>Fetch Log</span>
+                        <button class="btn btn-small" id="clear-console">
+                            <i class="fas fa-trash-alt"></i> Clear
+                        </button>
+                    </div>
+                    <div class="console-content" id="console-content">
+                        <div class="console-entry">
+                            <span class="console-time">[00:00:00]</span>
+                            <span class="console-text">🚀 Initialized</span>
+                        </div>
+                        <div class="console-entry">
+                            <span class="console-time">[00:00:00]</span>
+                            <span class="console-text">Fetch to start...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p><i class="fas fa-info-circle"></i> Live via PAPI</p>
+                    <p class="footer-links">
+                        <a href="https://polkadot-api.dev/" target="_blank">
+                            <i class="fas fa-book"></i> Docs
+                        </a>
+                        <a href="https://github.com/polkadot-api/polkadot-api" target="_blank">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                        <a href="https://polkadot.network" target="_blank">
+                            <i class="fas fa-link"></i> Polkadot
+                        </a>
+                    </p>
+                </div>
+                <div class="challenge-info">
+                    <p>#PAPI30Days • Day 5: Constants</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script type="module" src="./src/main.ts"></script>
+</body>
+</html>
