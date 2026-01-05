@@ -1,0 +1,23 @@
+{
+  "name": "papi-day5-storage-explorer",
+  "version": "1.0.0",
+  "description": "PAPI Day 6: Typed Storage Queries",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "setup": "npx papi add dot -n polkadot && npx papi"
+  },
+  "dependencies": {
+    "@polkadot-api/descriptors": "file:.papi\\descriptors",
+    "polkadot-api": "^1.23.1",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.4.1",
+    "typescript": "^5.5.4",
+    "vite": "^7.3.0"
+  },
+  "license": "MIT"
+}
