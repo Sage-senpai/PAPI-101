@@ -150,7 +150,9 @@ class RuntimeExplorer {
       const endTime = Date.now();
       const responseTime = endTime - startTime;
       
-      // Update stats
+      console.log('Raw metadata:', metadata);
+      
+      // Update stats with proper parsing
       this.updateRuntimeStats(metadata, responseTime);
       
       // Display results
@@ -166,12 +168,13 @@ class RuntimeExplorer {
     } catch (error) {
       const errorTime = Date.now() - startTime;
       this.log(`❌ Metadata API call failed after ${errorTime}ms: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      console.error('Metadata API Error:', error);
     }
   }
 
   private async executeRuntimeCall(): Promise<void> {
     if (!this.dotApi) {
-      this.log('Please wait for connection to establish', 'error');
+      this.log('⚠️ Please wait for connection to establish', 'error');
       return;
     }
 
@@ -190,21 +193,28 @@ class RuntimeExplorer {
         case 'metadata':
           result = await this.dotApi.apis.Metadata.metadata();
           responseTime = Date.now() - startTime;
+          this.updateRuntimeStats(result, responseTime);
           this.displayMetadataResults(result, responseTime);
           break;
           
         case 'transaction-queue':
-          // This would require transaction data - for demo, we'll show a message
           this.log('ℹ️ Transaction Queue API requires transaction data for full demo', 'info');
-          result = { message: 'Transaction Queue API available - requires tx data for full call' };
+          result = { 
+            info: 'Transaction Queue API available',
+            note: 'Requires tx data for full call',
+            example: 'TaggedTransactionQueue.validate_transaction(tx)'
+          };
           responseTime = Date.now() - startTime;
           this.displayGenericResults(result, responseTime, 'Transaction Queue API');
           break;
           
         case 'account-nonce':
-          // This would require account parameter - for demo, we'll show a message
           this.log('ℹ️ Account Nonce API requires account parameter for full demo', 'info');
-          result = { message: 'Account Nonce API available - requires account parameter for full call' };
+          result = { 
+            info: 'Account Nonce API available',
+            note: 'Requires account parameter for full call',
+            example: 'AccountNonceApi.account_nonce(account)'
+          };
           responseTime = Date.now() - startTime;
           this.displayGenericResults(result, responseTime, 'Account Nonce API');
           break;
@@ -215,9 +225,11 @@ class RuntimeExplorer {
             responseTime = Date.now() - startTime;
             this.displayGenericResults(result, responseTime, 'Core API');
           } catch (coreError) {
-            // Core API might not be available in all runtimes
             this.log(`⚠️ Core API not available: ${coreError instanceof Error ? coreError.message : 'Unknown error'}`, 'info');
-            result = { message: 'Core API not available in this runtime version' };
+            result = { 
+              info: 'Core API not available in this runtime version',
+              alternative: 'Use Metadata API for version information'
+            };
             responseTime = Date.now() - startTime;
             this.displayGenericResults(result, responseTime, 'Core API');
           }
@@ -232,56 +244,113 @@ class RuntimeExplorer {
     } catch (error) {
       const errorTime = Date.now() - startTime;
       this.log(`❌ Runtime API call failed after ${errorTime}ms: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
-      
-      // Display error in results
       this.displayError(error, errorTime);
     }
   }
 
   private updateRuntimeStats(metadata: any, responseTime: number): void {
-    // Update runtime version
+    console.log('Updating stats with metadata:', metadata);
+    
+    // Parse metadata - handle different possible structures
+    let specVersion = '-';
+    let specName = '-';
+    let palletsCount = '-';
+    
+    try {
+      // Try direct access first
+      if (metadata?.metadata) {
+        const meta = metadata.metadata;
+        
+        // Get spec version
+        if (meta.specVersion !== undefined) {
+          specVersion = String(meta.specVersion);
+        } else if (meta.spec_version !== undefined) {
+          specVersion = String(meta.spec_version);
+        }
+        
+        // Get spec name
+        if (meta.specName) {
+          specName = String(meta.specName);
+        } else if (meta.spec_name) {
+          specName = String(meta.spec_name);
+        }
+        
+        // Get pallets count
+        if (meta.pallets && Array.isArray(meta.pallets)) {
+          palletsCount = String(meta.pallets.length);
+        } else if (meta.lookup?.types && Array.isArray(meta.lookup.types)) {
+          // Fallback: estimate from types
+          palletsCount = '~' + String(Math.floor(meta.lookup.types.length / 10));
+        }
+      } else {
+        // Try alternative structure
+        if (metadata.specVersion !== undefined) {
+          specVersion = String(metadata.specVersion);
+        }
+        if (metadata.specName) {
+          specName = String(metadata.specName);
+        }
+        if (metadata.pallets && Array.isArray(metadata.pallets)) {
+          palletsCount = String(metadata.pallets.length);
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing metadata for stats:', error);
+    }
+    
+    // Update UI elements
     const versionElement = document.getElementById('runtime-version');
-    if (versionElement && metadata.specVersion) {
-      versionElement.textContent = metadata.specVersion.toString();
+    if (versionElement) {
+      versionElement.textContent = specVersion;
     }
     
-    // Update spec name
     const specElement = document.getElementById('spec-name');
-    if (specElement && metadata.specName) {
-      specElement.textContent = metadata.specName.toString();
+    if (specElement) {
+      specElement.textContent = specName;
     }
     
-    // Update pallets count (estimate)
     const palletsElement = document.getElementById('pallets-count');
-    if (palletsElement && metadata.pallets) {
-      palletsElement.textContent = metadata.pallets.length?.toString() || '?';
+    if (palletsElement) {
+      palletsElement.textContent = palletsCount;
     }
     
-    // Update response time
     const timeElement = document.getElementById('response-time');
     if (timeElement) {
-      timeElement.textContent = `${responseTime} ms`;
+      timeElement.textContent = `${responseTime}`;
     }
+    
+    console.log('Stats updated:', { specVersion, specName, palletsCount, responseTime });
   }
 
   private displayMetadataResults(metadata: any, responseTime: number): void {
     // Format the metadata for display
     let formattedMetadata: any = metadata;
     
-    if (metadata && typeof metadata === 'object') {
-      if ('toJSON' in metadata && typeof metadata.toJSON === 'function') {
-        formattedMetadata = metadata.toJSON();
-      } else if ('toHuman' in metadata && typeof metadata.toHuman === 'function') {
-        formattedMetadata = metadata.toHuman();
+    try {
+      if (metadata && typeof metadata === 'object') {
+        if ('toJSON' in metadata && typeof metadata.toJSON === 'function') {
+          formattedMetadata = metadata.toJSON();
+        } else if ('toHuman' in metadata && typeof metadata.toHuman === 'function') {
+          formattedMetadata = metadata.toHuman();
+        }
       }
+    } catch (error) {
+      console.warn('Could not format metadata:', error);
     }
     
-    // Display in JSON view
+    // Display in JSON view with size limit for readability
     const resultElement = document.getElementById('runtime-result');
     if (resultElement) {
-      resultElement.textContent = JSON.stringify(formattedMetadata, (key, val) => 
-        typeof val === 'bigint' ? val.toString() : val, 2
-      );
+      const jsonString = JSON.stringify(formattedMetadata, (key, val) => {
+        if (typeof val === 'bigint') return val.toString();
+        // Truncate very long arrays for readability
+        if (Array.isArray(val) && val.length > 5) {
+          return [...val.slice(0, 5), `... (${val.length - 5} more items)`];
+        }
+        return val;
+      }, 2);
+      
+      resultElement.textContent = jsonString;
     }
     
     // Update insights
@@ -290,23 +359,25 @@ class RuntimeExplorer {
     // Update response time
     const timeElement = document.getElementById('response-time');
     if (timeElement) {
-      timeElement.textContent = `${responseTime} ms`;
+      timeElement.textContent = `${responseTime}`;
     }
   }
 
   private displayGenericResults(result: any, responseTime: number, apiName: string): void {
-    // Format the result for display
     let formattedResult: any = result;
     
-    if (result && typeof result === 'object') {
-      if ('toJSON' in result && typeof result.toJSON === 'function') {
-        formattedResult = result.toJSON();
-      } else if ('toHuman' in result && typeof result.toHuman === 'function') {
-        formattedResult = result.toHuman();
+    try {
+      if (result && typeof result === 'object') {
+        if ('toJSON' in result && typeof result.toJSON === 'function') {
+          formattedResult = result.toJSON();
+        } else if ('toHuman' in result && typeof result.toHuman === 'function') {
+          formattedResult = result.toHuman();
+        }
       }
+    } catch (error) {
+      console.warn('Could not format result:', error);
     }
     
-    // Display in JSON view
     const resultElement = document.getElementById('runtime-result');
     if (resultElement) {
       resultElement.textContent = JSON.stringify(formattedResult, (key, val) => 
@@ -314,56 +385,67 @@ class RuntimeExplorer {
       );
     }
     
-    // Update insights for generic API
     this.updateGenericInsights(apiName);
     
-    // Update response time
     const timeElement = document.getElementById('response-time');
     if (timeElement) {
-      timeElement.textContent = `${responseTime} ms`;
+      timeElement.textContent = `${responseTime}`;
     }
   }
 
   private updateMetadataInsights(metadata: any): void {
-    // Update chain spec
     const chainSpecElement = document.getElementById('chain-spec');
-    if (chainSpecElement && metadata.specName && metadata.specVersion) {
-      chainSpecElement.textContent = `${metadata.specName} v${metadata.specVersion}`;
-    }
-    
-    // Update runtime capabilities
     const capabilitiesElement = document.getElementById('runtime-capabilities');
-    if (capabilitiesElement) {
-      let capabilities = '';
+    
+    try {
+      let specName = 'Unknown';
+      let specVersion = 'Unknown';
+      let capabilities = 'Runtime structure loaded';
       
-      if (metadata.pallets && Array.isArray(metadata.pallets)) {
-        capabilities = `${metadata.pallets.length} pallets available`;
+      // Parse metadata for insights
+      if (metadata?.metadata) {
+        const meta = metadata.metadata;
+        specName = meta.specName || meta.spec_name || 'Unknown';
+        specVersion = meta.specVersion || meta.spec_version || 'Unknown';
         
-        // Add some notable pallets if available
-        const notablePallets = metadata.pallets
-          .filter((p: any) => ['Balances', 'Staking', 'Identity', 'Democracy'].includes(p.name))
-          .map((p: any) => p.name)
-          .join(', ');
-        
-        if (notablePallets) {
-          capabilities += ` (including: ${notablePallets})`;
+        if (meta.pallets && Array.isArray(meta.pallets)) {
+          const notablePallets = meta.pallets
+            .filter((p: any) => ['Balances', 'Staking', 'Identity', 'Democracy', 'System'].includes(p.name))
+            .map((p: any) => p.name)
+            .slice(0, 4)
+            .join(', ');
+          
+          capabilities = `${meta.pallets.length} pallets available`;
+          if (notablePallets) {
+            capabilities += ` (e.g., ${notablePallets})`;
+          }
         }
-      } else {
-        capabilities = 'Runtime structure loaded';
       }
       
-      capabilitiesElement.textContent = capabilities;
+      if (chainSpecElement) {
+        chainSpecElement.textContent = `${specName} v${specVersion}`;
+      }
+      
+      if (capabilitiesElement) {
+        capabilitiesElement.textContent = capabilities;
+      }
+    } catch (error) {
+      console.error('Error updating insights:', error);
+      if (chainSpecElement) {
+        chainSpecElement.textContent = 'Metadata received';
+      }
+      if (capabilitiesElement) {
+        capabilitiesElement.textContent = 'Runtime structure available';
+      }
     }
   }
 
   private updateGenericInsights(apiName: string): void {
-    // Update chain spec (generic)
     const chainSpecElement = document.getElementById('chain-spec');
     if (chainSpecElement) {
       chainSpecElement.textContent = `${apiName} response received`;
     }
     
-    // Update runtime capabilities
     const capabilitiesElement = document.getElementById('runtime-capabilities');
     if (capabilitiesElement) {
       capabilitiesElement.textContent = `Direct ${apiName} access confirmed`;
@@ -378,7 +460,7 @@ class RuntimeExplorer {
     
     const timeElement = document.getElementById('response-time');
     if (timeElement) {
-      timeElement.textContent = `${responseTime} ms (failed)`;
+      timeElement.textContent = `${responseTime} (failed)`;
     }
   }
 
@@ -391,8 +473,8 @@ class RuntimeExplorer {
       .then(() => {
         this.log('✅ Runtime call code copied to clipboard!', 'success');
       })
-      .catch(err => {
-        this.log(`❌ Failed to copy: ${err}`, 'error');
+      .catch(() => {
+        this.log('❌ Failed to copy to clipboard', 'error');
       });
   }
 
@@ -432,9 +514,14 @@ class RuntimeExplorer {
   private clearConsole(): void {
     const consoleContent = document.getElementById('console-content');
     if (consoleContent) {
+      const timestamp = new Date().toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit' 
+      });
       consoleContent.innerHTML = `
         <div class="console-entry">
-          <span class="console-time">[${new Date().toLocaleTimeString()}]</span>
+          <span class="console-time">[${timestamp}]</span>
           <span class="console-text info">Console cleared</span>
         </div>
       `;

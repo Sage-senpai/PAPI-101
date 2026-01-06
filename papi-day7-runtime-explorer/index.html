@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="./src/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
 </head>
@@ -34,20 +34,20 @@
         <!-- Stats Bar -->
         <div class="stats-bar">
             <div class="stat">
-                <span class="stat-label">Runtime Version</span>
-                <span class="stat-value" id="runtime-version">-</span>
+                <div class="stat-label">Runtime Version</div>
+                <div class="stat-value" id="runtime-version">-</div>
             </div>
             <div class="stat">
-                <span class="stat-label">Spec Name</span>
-                <span class="stat-value" id="spec-name">-</span>
+                <div class="stat-label">Spec Name</div>
+                <div class="stat-value" id="spec-name">-</div>
             </div>
             <div class="stat">
-                <span class="stat-label">Pallets Count</span>
-                <span class="stat-value" id="pallets-count">-</span>
+                <div class="stat-label">Pallets Count</div>
+                <div class="stat-value" id="pallets-count">-</div>
             </div>
             <div class="stat">
-                <span class="stat-label">Connection Type</span>
-                <span class="stat-value success">Direct</span>
+                <div class="stat-label">Connection Type</div>
+                <div class="stat-value success">Direct</div>
             </div>
         </div>
 
@@ -105,10 +105,12 @@
                         <h3 id="selected-api-title">Metadata API</h3>
                         <div class="call-actions">
                             <button class="btn btn-primary" id="execute-call">
-                                <i class="fas fa-play"></i> Execute Runtime Call
+                                <i class="fas fa-play"></i>
+                                <span>Execute Runtime Call</span>
                             </button>
                             <button class="btn btn-secondary" id="copy-call">
-                                <i class="far fa-copy"></i> Copy Call
+                                <i class="far fa-copy"></i>
+                                <span>Copy Call</span>
                             </button>
                         </div>
                     </div>
@@ -139,21 +141,17 @@ const metadata = await dotApi.apis.Metadata.metadata();
                             <span class="badge success">Direct from Runtime</span>
                         </div>
                         <div class="result-body">
-                            <pre class="result-json" id="runtime-result">
-Execute a runtime call to see results...
-                            </pre>
+                            <pre class="result-json" id="runtime-result">Execute a runtime call to see results...</pre>
                         </div>
                         <div class="result-footer">
                             <div class="result-meta">
                                 <span class="meta-item">
                                     <i class="fas fa-bolt"></i>
-                                    <span>Response Time: </span>
-                                    <span id="response-time">- ms</span>
+                                    <span>Response Time: <span id="response-time">-</span> ms</span>
                                 </span>
                                 <span class="meta-item">
                                     <i class="fas fa-layer-group"></i>
-                                    <span>Layers: </span>
-                                    <span class="success">1 (Direct)</span>
+                                    <span>Layers: <span style="color: var(--polkadot-success);">1 (Direct)</span></span>
                                 </span>
                             </div>
                         </div>
@@ -190,7 +188,7 @@ Execute a runtime call to see results...
                                     </div>
                                     <div class="insight-content">
                                         <h4>Security Level</h4>
-                                        <p class="success">Maximum (Direct Runtime)</p>
+                                        <p style="color: var(--polkadot-success); font-weight: 600;">Maximum (Direct Runtime)</p>
                                     </div>
                                 </div>
                             </div>
@@ -219,7 +217,7 @@ Execute a runtime call to see results...
                             </div>
                             
                             <div class="arch-arrow">
-                                <i class="fas fa-arrow-right"></i>
+                                <i class="fas fa-arrow-down"></i>
                                 <span class="arrow-label">HTTP Request</span>
                             </div>
                             
@@ -231,7 +229,7 @@ Execute a runtime call to see results...
                             </div>
                             
                             <div class="arch-arrow">
-                                <i class="fas fa-arrow-right"></i>
+                                <i class="fas fa-arrow-down"></i>
                                 <span class="arrow-label">RPC Call</span>
                             </div>
                             
@@ -243,7 +241,7 @@ Execute a runtime call to see results...
                             </div>
                             
                             <div class="arch-arrow">
-                                <i class="fas fa-arrow-right"></i>
+                                <i class="fas fa-arrow-down"></i>
                                 <span class="arrow-label">Chain Access</span>
                             </div>
                             
@@ -281,7 +279,7 @@ Execute a runtime call to see results...
                             
                             <div class="arch-arrow direct-arrow">
                                 <i class="fas fa-bolt"></i>
-                                <span class="arrow-label">Runtime Call</span>
+                                <span class="arrow-label">Direct Runtime Call</span>
                             </div>
                             
                             <div class="arch-node">
@@ -403,8 +401,9 @@ Execute a runtime call to see results...
                 <div class="console-card">
                     <div class="console-header">
                         <span>Direct Runtime Communication Log</span>
-                        <button class="btn btn-small" id="clear-console">
-                            <i class="fas fa-trash-alt"></i> Clear
+                        <button class="btn btn-small btn-secondary" id="clear-console">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>Clear</span>
                         </button>
                     </div>
                     <div class="console-content" id="console-content">
