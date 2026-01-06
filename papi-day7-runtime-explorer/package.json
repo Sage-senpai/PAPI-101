@@ -1,0 +1,40 @@
+{
+  "name": "papi-day7-runtime-explorer",
+  "version": "1.0.0",
+  "description": "Day 7 PAPI 30 Days Challenge - Runtime API Explorer",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf node_modules dist",
+    "format": "prettier --write \"src/**/*.ts\" \"*.{json,md}\"",
+    "setup": "npx papi add dot -n polkadot && npx papi"
+  },
+  "dependencies": {
+    "@polkadot-api/descriptors": "file:.papi\\descriptors",
+    "polkadot-api": "^1.17.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10"
+  },
+  "keywords": [
+    "polkadot",
+    "papi",
+    "runtime",
+    "apis",
+    "blockchain",
+    "typescript",
+    "explorer",
+    "web3"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

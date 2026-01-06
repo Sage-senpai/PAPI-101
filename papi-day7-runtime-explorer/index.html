@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Runtime Explorer - PAPI Day 7</title>
+    <link rel="stylesheet" href="./src/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🧠</div>
+                <div class="logo-text">
+                    <h1>Runtime Explorer</h1>
+                    <p class="logo-subtitle">Direct line to the blockchain's brain</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="badge">Day 7 • #PAPI30Days</div>
+                <div class="connection-status">
+                    <span class="status-label">Runtime:</span>
+                    <span class="status-value" id="runtime-status">Connecting...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-label">Runtime Version</span>
+                <span class="stat-value" id="runtime-version">-</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Spec Name</span>
+                <span class="stat-value" id="spec-name">-</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Pallets Count</span>
+                <span class="stat-value" id="pallets-count">-</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Connection Type</span>
+                <span class="stat-value success">Direct</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Runtime Call Section -->
+            <div class="runtime-call-section">
+                <h2><i class="fas fa-phone-alt"></i> Direct Runtime Calls</h2>
+                <p class="section-description">Make direct calls to the blockchain's runtime APIs</p>
+                
+                <div class="api-selector">
+                    <div class="api-card active" data-api="metadata">
+                        <div class="api-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="api-info">
+                            <h3>Metadata API</h3>
+                            <p>Get chain self-description and capabilities</p>
+                        </div>
+                    </div>
+                    
+                    <div class="api-card" data-api="transaction-queue">
+                        <div class="api-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="api-info">
+                            <h3>Transaction Queue</h3>
+                            <p>Direct access to transaction processing logic</p>
+                        </div>
+                    </div>
+                    
+                    <div class="api-card" data-api="account-nonce">
+                        <div class="api-icon">
+                            <i class="fas fa-list-ol"></i>
+                        </div>
+                        <div class="api-info">
+                            <h3>Account Nonce</h3>
+                            <p>Get account sequence numbers from runtime</p>
+                        </div>
+                    </div>
+                    
+                    <div class="api-card" data-api="core">
+                        <div class="api-icon">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <div class="api-info">
+                            <h3>Core API</h3>
+                            <p>Fundamental blockchain operations</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="call-container">
+                    <div class="call-header">
+                        <h3 id="selected-api-title">Metadata API</h3>
+                        <div class="call-actions">
+                            <button class="btn btn-primary" id="execute-call">
+                                <i class="fas fa-play"></i> Execute Runtime Call
+                            </button>
+                            <button class="btn btn-secondary" id="copy-call">
+                                <i class="far fa-copy"></i> Copy Call
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="code-preview">
+                        <div class="code-header">
+                            <span>TypeScript Runtime Call</span>
+                            <span class="code-badge direct">Direct Runtime Access</span>
+                        </div>
+                        <pre class="code-block" id="runtime-code"><code>// Direct call to runtime Metadata API
+const metadata = await dotApi.apis.Metadata.metadata();
+
+// TypeScript knows the exact return type
+// No middlemen, no wrappers, no proxies
+// Just your code talking directly to the chain's brain</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Display -->
+            <div class="results-section">
+                <h2><i class="fas fa-poll"></i> Runtime Results</h2>
+                
+                <div class="results-container">
+                    <div class="result-card">
+                        <div class="result-header">
+                            <h3>Raw Runtime Response</h3>
+                            <span class="badge success">Direct from Runtime</span>
+                        </div>
+                        <div class="result-body">
+                            <pre class="result-json" id="runtime-result">
+Execute a runtime call to see results...
+                            </pre>
+                        </div>
+                        <div class="result-footer">
+                            <div class="result-meta">
+                                <span class="meta-item">
+                                    <i class="fas fa-bolt"></i>
+                                    <span>Response Time: </span>
+                                    <span id="response-time">- ms</span>
+                                </span>
+                                <span class="meta-item">
+                                    <i class="fas fa-layer-group"></i>
+                                    <span>Layers: </span>
+                                    <span class="success">1 (Direct)</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-header">
+                            <h3>Runtime Insights</h3>
+                            <span class="badge info">Analysis</span>
+                        </div>
+                        <div class="result-body">
+                            <div class="insights" id="runtime-insights">
+                                <div class="insight-item">
+                                    <div class="insight-icon">
+                                        <i class="fas fa-code-branch"></i>
+                                    </div>
+                                    <div class="insight-content">
+                                        <h4>Chain Specification</h4>
+                                        <p id="chain-spec">Not loaded</p>
+                                    </div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="insight-icon">
+                                        <i class="fas fa-cogs"></i>
+                                    </div>
+                                    <div class="insight-content">
+                                        <h4>Runtime Capabilities</h4>
+                                        <p id="runtime-capabilities">Execute a call to discover</p>
+                                    </div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="insight-icon">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                    <div class="insight-content">
+                                        <h4>Security Level</h4>
+                                        <p class="success">Maximum (Direct Runtime)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Architecture Visualization -->
+            <div class="architecture-section">
+                <h2><i class="fas fa-project-diagram"></i> Runtime Architecture</h2>
+                <p class="section-description">Visualizing the difference between direct and indirect access</p>
+                
+                <div class="architecture-comparison">
+                    <div class="architecture-card indirect">
+                        <div class="arch-header">
+                            <i class="fas fa-random"></i>
+                            <h3>Indirect Access (Traditional)</h3>
+                        </div>
+                        <div class="arch-visualization">
+                            <div class="arch-node">
+                                <div class="node-icon">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                                <div class="node-label">Your Code</div>
+                            </div>
+                            
+                            <div class="arch-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                                <span class="arrow-label">HTTP Request</span>
+                            </div>
+                            
+                            <div class="arch-node">
+                                <div class="node-icon">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="node-label">API Server</div>
+                            </div>
+                            
+                            <div class="arch-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                                <span class="arrow-label">RPC Call</span>
+                            </div>
+                            
+                            <div class="arch-node">
+                                <div class="node-icon">
+                                    <i class="fas fa-network-wired"></i>
+                                </div>
+                                <div class="node-label">Node Client</div>
+                            </div>
+                            
+                            <div class="arch-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                                <span class="arrow-label">Chain Access</span>
+                            </div>
+                            
+                            <div class="arch-node">
+                                <div class="node-icon">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                                <div class="node-label">Blockchain</div>
+                            </div>
+                        </div>
+                        <div class="arch-problems">
+                            <h4>Problems:</h4>
+                            <ul>
+                                <li>❌ 4+ layers of abstraction</li>
+                                <li>❌ Each layer can fail</li>
+                                <li>❌ Added latency at each step</li>
+                                <li>❌ Data can be cached/stale</li>
+                                <li>❌ Translation errors possible</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="architecture-card direct">
+                        <div class="arch-header">
+                            <i class="fas fa-bolt"></i>
+                            <h3>Direct Access (Runtime APIs)</h3>
+                        </div>
+                        <div class="arch-visualization direct-flow">
+                            <div class="arch-node">
+                                <div class="node-icon">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                                <div class="node-label">Your Code</div>
+                            </div>
+                            
+                            <div class="arch-arrow direct-arrow">
+                                <i class="fas fa-bolt"></i>
+                                <span class="arrow-label">Runtime Call</span>
+                            </div>
+                            
+                            <div class="arch-node">
+                                <div class="node-icon">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <div class="node-label">Blockchain Runtime</div>
+                            </div>
+                        </div>
+                        <div class="arch-benefits">
+                            <h4>Benefits:</h4>
+                            <ul>
+                                <li>✅ 1 layer (direct connection)</li>
+                                <li>✅ Minimal failure points</li>
+                                <li>✅ Lowest possible latency</li>
+                                <li>✅ Always fresh data</li>
+                                <li>✅ No translation errors</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Details -->
+            <div class="api-details-section">
+                <h2><i class="fas fa-list-alt"></i> Available Runtime APIs</h2>
+                
+                <div class="api-details-grid">
+                    <div class="api-detail-card">
+                        <div class="detail-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h3>Metadata API</h3>
+                        </div>
+                        <div class="detail-body">
+                            <p>Provides self-description of the blockchain runtime including version, pallets, and capabilities.</p>
+                            <div class="detail-code">
+                                <code>await dotApi.apis.Metadata.metadata()</code>
+                            </div>
+                            <div class="detail-returns">
+                                <strong>Returns:</strong>
+                                <ul>
+                                    <li>specVersion - Runtime specification version</li>
+                                    <li>specName - Chain specification name</li>
+                                    <li>pallets - Available runtime modules</li>
+                                    <li>extrinsic - Transaction format</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="api-detail-card">
+                        <div class="detail-header">
+                            <i class="fas fa-exchange-alt"></i>
+                            <h3>TaggedTransactionQueue</h3>
+                        </div>
+                        <div class="detail-body">
+                            <p>Direct access to transaction validation and processing logic within the runtime.</p>
+                            <div class="detail-code">
+                                <code>await dotApi.apis.TaggedTransactionQueue.method()</code>
+                            </div>
+                            <div class="detail-returns">
+                                <strong>Enables:</strong>
+                                <ul>
+                                    <li>Direct transaction validation</li>
+                                    <li>Fee calculation at runtime level</li>
+                                    <li>Transaction priority management</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="api-detail-card">
+                        <div class="detail-header">
+                            <i class="fas fa-list-ol"></i>
+                            <h3>AccountNonceApi</h3>
+                        </div>
+                        <div class="detail-body">
+                            <p>Retrieves account transaction sequence numbers directly from runtime state.</p>
+                            <div class="detail-code">
+                                <code>await dotApi.apis.AccountNonceApi.method(account)</code>
+                            </div>
+                            <div class="detail-returns">
+                                <strong>Returns:</strong>
+                                <ul>
+                                    <li>Current nonce for account</li>
+                                    <li>Direct from runtime (not cached)</li>
+                                    <li>Guaranteed to be correct</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="api-detail-card">
+                        <div class="detail-header">
+                            <i class="fas fa-microchip"></i>
+                            <h3>Core APIs</h3>
+                        </div>
+                        <div class="detail-body">
+                            <p>Fundamental blockchain operations exposed directly by the runtime.</p>
+                            <div class="detail-code">
+                                <code>await dotApi.apis.Core.method()</code>
+                            </div>
+                            <div class="detail-returns">
+                                <strong>Includes:</strong>
+                                <ul>
+                                    <li>Block execution logic</li>
+                                    <li>State transition functions</li>
+                                    <li>Runtime core utilities</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Console Output -->
+            <div class="console-section">
+                <h2><i class="fas fa-terminal"></i> Runtime Console</h2>
+                <div class="console-card">
+                    <div class="console-header">
+                        <span>Direct Runtime Communication Log</span>
+                        <button class="btn btn-small" id="clear-console">
+                            <i class="fas fa-trash-alt"></i> Clear
+                        </button>
+                    </div>
+                    <div class="console-content" id="console-content">
+                        <div class="console-entry">
+                            <span class="console-time">[00:00:00]</span>
+                            <span class="console-text">🧠 Runtime Explorer initialized</span>
+                        </div>
+                        <div class="console-entry">
+                            <span class="console-time">[00:00:00]</span>
+                            <span class="console-text">Click "Execute Runtime Call" to talk directly to the chain's brain</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p><i class="fas fa-info-circle"></i> All calls are direct runtime API calls via PAPI</p>
+                    <p class="footer-links">
+                        <a href="https://docs.polkadot.com/develop/toolkit/api-libraries/papi/" target="_blank">
+                            <i class="fas fa-book"></i> PAPI Docs
+                        </a>
+                        <a href="https://github.com/polkadot-api" target="_blank">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                        <a href="https://wiki.polkadot.network/docs/learn-runtime" target="_blank">
+                            <i class="fas fa-brain"></i> Runtime Guide
+                        </a>
+                    </p>
+                </div>
+                <div class="challenge-info">
+                    <p>#PAPI30Days Challenge • Day 7: Runtime APIs</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+</body>
+</html>

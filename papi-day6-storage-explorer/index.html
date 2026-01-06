@@ -7,9 +7,8 @@
     <link rel="stylesheet" href="./src/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗄️</text></svg>">
 </head>
 <body>
     <div class="container">
@@ -19,339 +18,331 @@
                 <div class="logo-icon">🗄️</div>
                 <div class="logo-text">
                     <h1>Storage Explorer</h1>
-                    <p class="logo-subtitle">Type-safe blockchain data queries</p>
+                    <p class="logo-subtitle">Type-safe blockchain data queries with PAPI</p>
                 </div>
             </div>
             <div class="header-actions">
                 <div class="badge">Day 6 • #PAPI30Days</div>
-                <div class="connection-status">
-                    <span class="status-label">Chain:</span>
-                    <span class="status-value" id="chain-status">Connecting...</span>
+                <div class="connection-status" id="connection-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Connecting...</span>
                 </div>
             </div>
         </header>
 
         <!-- Stats Bar -->
         <div class="stats-bar">
-            <div class="stat">
-                <span class="stat-label">Active Queries</span>
-                <span class="stat-value" id="active-queries">0</span>
+            <div class="stat-card">
+                <div class="stat-icon">📡</div>
+                <div class="stat-content">
+                    <span class="stat-label">Active Queries</span>
+                    <span class="stat-value" id="active-queries">0</span>
+                </div>
             </div>
-            <div class="stat">
-                <span class="stat-label">Block Height</span>
-                <span class="stat-value" id="block-height">-</span>
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-content">
+                    <span class="stat-label">Block Height</span>
+                    <span class="stat-value" id="block-height">-</span>
+                </div>
             </div>
-            <div class="stat">
-                <span class="stat-label">Response Time</span>
-                <span class="stat-value" id="response-time">- ms</span>
+            <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-content">
+                    <span class="stat-label">Response Time</span>
+                    <span class="stat-value" id="response-time">- ms</span>
+                </div>
             </div>
-            <div class="stat">
-                <span class="stat-label">Data Type Safety</span>
-                <span class="stat-value success">100%</span>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-content">
+                    <span class="stat-label">Type Safety</span>
+                    <span class="stat-value success">100%</span>
+                </div>
             </div>
         </div>
 
         <!-- Main Content -->
         <main class="main-content">
             <!-- Query Section -->
-            <div class="query-section">
-                <h2><i class="fas fa-search"></i> Storage Query Builder</h2>
-                <p class="section-description">Query any storage item with full TypeScript type safety</p>
+            <section class="query-section card">
+                <div class="card-header">
+                    <h2><i class="fas fa-search"></i> Storage Query Builder</h2>
+                    <p class="section-description">Query any storage item with full TypeScript type safety</p>
+                </div>
                 
                 <div class="query-builder">
-                    <div class="query-inputs">
-                        <div class="input-group">
-                            <label for="account-address">
-                                <i class="fas fa-wallet"></i> Account Address
-                            </label>
-                            <div class="input-with-button">
-                                <input 
-                                    type="text" 
-                                    id="account-address" 
-                                    placeholder="Enter Polkadot address (e.g. 15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5)"
-                                    value="15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5"
-                                >
-                                <button class="btn btn-small" id="random-address">
-                                    <i class="fas fa-dice"></i> Random
-                                </button>
-                            </div>
+                    <div class="input-group">
+                        <label for="account-address">
+                            <i class="fas fa-wallet"></i> Account Address
+                        </label>
+                        <div class="input-with-button">
+                            <input 
+                                type="text" 
+                                id="account-address" 
+                                placeholder="Enter Polkadot address"
+                                value="15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5"
+                            >
+                            <button class="btn btn-secondary btn-icon" id="random-address" title="Random Address">
+                                <i class="fas fa-dice"></i>
+                            </button>
                         </div>
-                        
-                        <div class="input-group">
-                            <label for="storage-item">
-                                <i class="fas fa-database"></i> Storage Item
-                            </label>
-                            <select id="storage-item">
-                                <option value="balances-account">Balances.Account</option>
-                                <option value="system-account">System.Account</option>
-                                <option value="timestamp-now">Timestamp.Now</option>
-                                <option value="staking-bonded">Staking.Bonded</option>
-                                <option value="identity-identity-of">Identity.IdentityOf</option>
-                            </select>
-                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="storage-item">
+                            <i class="fas fa-database"></i> Storage Item
+                        </label>
+                        <select id="storage-item">
+                            <option value="balances-account">Balances.Account - Account balance info</option>
+                            <option value="system-account">System.Account - Full account data</option>
+                            <option value="timestamp-now">Timestamp.Now - Current block timestamp</option>
+                            <option value="staking-bonded">Staking.Bonded - Staking controller</option>
+                            <option value="identity-identity-of">Identity.IdentityOf - On-chain identity</option>
+                        </select>
                     </div>
                     
                     <div class="query-actions">
                         <button class="btn btn-primary" id="query-btn">
                             <i class="fas fa-play"></i> Execute Query
                         </button>
-                        <button class="btn btn-secondary" id="subscribe-btn">
+                        <button class="btn btn-accent" id="subscribe-btn">
                             <i class="fas fa-satellite-dish"></i> Subscribe to Updates
                         </button>
                         <button class="btn btn-secondary" id="clear-results">
-                            <i class="fas fa-trash"></i> Clear Results
+                            <i class="fas fa-trash"></i> Clear
                         </button>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <!-- Results Display -->
-            <div class="results-section">
+            <section class="results-section">
                 <div class="results-header">
-                    <h2><i class="fas fa-poll"></i> Query Results</h2>
+                    <h2><i class="fas fa-chart-bar"></i> Query Results</h2>
                     <div class="results-actions">
                         <button class="btn btn-small" id="export-json">
-                            <i class="fas fa-download"></i> Export JSON
+                            <i class="fas fa-download"></i> Export
                         </button>
-                        <button class="btn btn-small" id="copy-query">
-                            <i class="far fa-copy"></i> Copy Query
+                        <button class="btn btn-small" id="copy-result">
+                            <i class="far fa-copy"></i> Copy
                         </button>
                     </div>
                 </div>
                 
-                <div class="results-container">
-                    <div class="result-card">
+                <div class="results-grid">
+                    <div class="result-card card">
                         <div class="result-header">
                             <h3>Typed Query Result</h3>
                             <span class="badge success">Type-safe</span>
                         </div>
                         <div class="result-body">
-                            <pre class="result-json" id="typed-result">
-Click "Execute Query" to see typed results...
-                            </pre>
+                            <pre class="code-block" id="typed-result">Click "Execute Query" to see results...</pre>
                         </div>
                         <div class="result-footer">
                             <div class="result-meta">
                                 <span class="meta-item">
                                     <i class="fas fa-code"></i>
-                                    <span>Query: </span>
                                     <code id="typed-query">-</code>
                                 </span>
                                 <span class="meta-item">
                                     <i class="fas fa-clock"></i>
-                                    <span>Time: </span>
                                     <span id="typed-time">- ms</span>
                                 </span>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="result-card">
+                    <div class="type-info-card card">
                         <div class="result-header">
                             <h3>Type Information</h3>
                             <span class="badge info">TypeScript</span>
                         </div>
                         <div class="result-body">
-                            <div class="type-info" id="type-info">
-                                <div class="type-item">
-                                    <span class="type-label">Return Type:</span>
-                                    <code class="type-value">Not yet queried</code>
+                            <div class="type-section">
+                                <div class="type-label">Return Type:</div>
+                                <code class="type-value" id="return-type">Not yet queried</code>
+                            </div>
+                            <div class="type-section">
+                                <div class="type-label">Properties:</div>
+                                <div class="type-properties" id="type-properties">
+                                    Properties will appear after query
                                 </div>
-                                <div class="type-item">
-                                    <span class="type-label">Properties:</span>
-                                    <div class="type-properties" id="type-properties">
-                                        Properties will appear here after query
-                                    </div>
-                                </div>
-                                <div class="type-item">
-                                    <span class="type-label">Autocomplete:</span>
-                                    <span class="type-value success">✅ Fully supported</span>
+                            </div>
+                            <div class="type-section">
+                                <div class="type-label">IDE Support:</div>
+                                <div class="type-features">
+                                    <span class="feature-badge">✅ Autocomplete</span>
+                                    <span class="feature-badge">✅ Type Checking</span>
+                                    <span class="feature-badge">✅ Intellisense</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <!-- Visualization Section -->
-            <div class="visualization-section">
-                <h2><i class="fas fa-project-diagram"></i> Storage Structure</h2>
-                <p class="section-description">Visual representation of how storage queries work</p>
+            <section class="visualization-section card">
+                <h2><i class="fas fa-sitemap"></i> How Storage Queries Work</h2>
+                <p class="section-description">Visual representation of the PAPI query lifecycle</p>
                 
-                <div class="visualization">
-                    <div class="viz-step">
-                        <div class="viz-number">1</div>
-                        <div class="viz-content">
+                <div class="query-flow">
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
                             <h4>Your Query</h4>
-                            <code class="viz-code">dotApi.query.Balances.Account(address)</code>
+                            <code>dotApi.query.Balances.Account(address)</code>
+                            <p>Simple, typed TypeScript call</p>
                         </div>
                     </div>
                     
-                    <div class="viz-arrow">
+                    <div class="flow-arrow">
                         <i class="fas fa-arrow-down"></i>
                     </div>
                     
-                    <div class="viz-step">
-                        <div class="viz-number">2</div>
-                        <div class="viz-content">
-                            <h4>PAPI Translates</h4>
-                            <p>Generates correct storage key and encoding</p>
+                    <div class="flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>PAPI Translation</h4>
+                            <p>Generates correct storage key & encoding</p>
                         </div>
                     </div>
                     
-                    <div class="viz-arrow">
+                    <div class="flow-arrow">
                         <i class="fas fa-arrow-down"></i>
                     </div>
                     
-                    <div class="viz-step">
-                        <div class="viz-number">3</div>
-                        <div class="viz-content">
-                            <h4>Blockchain Response</h4>
-                            <p>Returns encoded data from storage</p>
+                    <div class="flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Blockchain Query</h4>
+                            <p>Fetches encoded data from storage</p>
                         </div>
                     </div>
                     
-                    <div class="viz-arrow">
+                    <div class="flow-arrow">
                         <i class="fas fa-arrow-down"></i>
                     </div>
                     
-                    <div class="viz-step">
-                        <div class="viz-number">4</div>
-                        <div class="viz-content">
-                            <h4>PAPI Decodes</h4>
+                    <div class="flow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>PAPI Decoding</h4>
                             <p>Automatically decodes to TypeScript types</p>
                         </div>
                     </div>
                     
-                    <div class="viz-arrow">
+                    <div class="flow-arrow">
                         <i class="fas fa-arrow-down"></i>
                     </div>
                     
-                    <div class="viz-step">
-                        <div class="viz-number">5</div>
-                        <div class="viz-content">
+                    <div class="flow-step active">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
                             <h4>Your Result</h4>
-                            <p>Fully typed object ready to use</p>
+                            <p>Fully typed object, ready to use!</p>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <!-- Comparison Section -->
-            <div class="comparison-section">
+            <section class="comparison-section">
                 <h2><i class="fas fa-balance-scale"></i> Typed vs Untyped Queries</h2>
                 
-                <div class="comparison-cards">
-                    <div class="comparison-card outdated">
+                <div class="comparison-grid">
+                    <div class="comparison-card old">
                         <div class="comparison-header">
                             <i class="fas fa-times-circle"></i>
-                            <h3>Untyped Approach</h3>
+                            <h3>Traditional Approach</h3>
                         </div>
-                        <div class="comparison-content">
-                            <pre class="comparison-code"><code>// 1. Construct storage key (complex)
-const key = api.query.balances.account.key(address);
+                        <pre class="code-block"><code>// Step 1: Construct storage key
+const key = api.query.balances
+  .account.key(address);
 
-// 2. Fetch raw hex data
-const raw = await api.rpc.state.getStorage(key);
+// Step 2: Fetch raw hex
+const raw = await api.rpc.state
+  .getStorage(key);
 
-// 3. Manually decode (error-prone)
-const decoded = api.registry.createType(
-  'AccountData',
-  raw
-);
+// Step 3: Manual decode
+const decoded = api.registry
+  .createType('AccountData', raw);
 
-// 4. Hope the structure is right
+// Step 4: Hope it works!
 const balance = decoded.free;
-// Is it .free? .data.free? Who knows!</code></pre>
-                            <div class="comparison-problems">
-                                <h4>Problems:</h4>
-                                <ul>
-                                    <li>❌ Manual key construction</li>
-                                    <li>❌ Raw hex handling</li>
-                                    <li>❌ No type safety</li>
-                                    <li>❌ Breaks on runtime upgrades</li>
-                                    <li>❌ No autocomplete</li>
-                                </ul>
-                            </div>
+// Is it .free? .data.free? 🤷</code></pre>
+                        <div class="comparison-problems">
+                            <h4>Problems:</h4>
+                            <ul>
+                                <li>❌ Manual key construction</li>
+                                <li>❌ Raw hex handling</li>
+                                <li>❌ No type safety</li>
+                                <li>❌ Breaks on upgrades</li>
+                                <li>❌ No autocomplete</li>
+                            </ul>
                         </div>
                     </div>
                     
-                    <div class="comparison-card modern">
+                    <div class="comparison-card new">
                         <div class="comparison-header">
                             <i class="fas fa-check-circle"></i>
-                            <h3>PAPI Typed Queries</h3>
+                            <h3>PAPI Approach</h3>
                         </div>
-                        <div class="comparison-content">
-                            <pre class="comparison-code"><code>// One line, fully typed
+                        <pre class="code-block"><code>// One line, fully typed!
 const account = await dotApi
   .query.Balances.Account(address);
 
 // TypeScript knows everything
-const freeBalance = account.data.free;
+const free = account.data.free;
 const reserved = account.data.reserved;
 
-// Autocomplete shows all properties
+// Autocomplete works
 // Type safety guaranteed
-// Updates automatically with runtime</code></pre>
-                            <div class="comparison-benefits">
-                                <h4>Benefits:</h4>
-                                <ul>
-                                    <li>✅ One-line queries</li>
-                                    <li>✅ Automatic encoding/decoding</li>
-                                    <li>✅ Full TypeScript support</li>
-                                    <li>✅ Runtime upgrade resilient</li>
-                                    <li>✅ Complete autocomplete</li>
-                                </ul>
-                            </div>
+// Updates with runtime ✨</code></pre>
+                        <div class="comparison-benefits">
+                            <h4>Benefits:</h4>
+                            <ul>
+                                <li>✅ One-line queries</li>
+                                <li>✅ Auto encode/decode</li>
+                                <li>✅ Full TypeScript</li>
+                                <li>✅ Upgrade resilient</li>
+                                <li>✅ Complete autocomplete</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Console Output -->
-            <div class="console-section">
-                <h2><i class="fas fa-terminal"></i> Query Console</h2>
-                <div class="console-card">
-                    <div class="console-header">
-                        <span>Real-time Query Log</span>
-                        <button class="btn btn-small" id="clear-console">
-                            <i class="fas fa-trash-alt"></i> Clear
-                        </button>
-                    </div>
-                    <div class="console-content" id="console-content">
-                        <div class="console-entry">
-                            <span class="console-time">[00:00:00]</span>
-                            <span class="console-text">🚀 Storage Explorer initialized</span>
-                        </div>
-                        <div class="console-entry">
-                            <span class="console-time">[00:00:00]</span>
-                            <span class="console-text">Enter an address and click "Execute Query"</span>
-                        </div>
-                    </div>
+            <!-- Console Section -->
+            <section class="console-section card">
+                <div class="console-header">
+                    <h2><i class="fas fa-terminal"></i> Query Console</h2>
+                    <button class="btn btn-small" id="clear-console">
+                        <i class="fas fa-trash-alt"></i> Clear
+                    </button>
                 </div>
-            </div>
+                <div class="console-body" id="console-content">
+                    <!-- Console entries will be added here -->
+                </div>
+            </section>
         </main>
 
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
-                <div class="footer-info">
-                    <p><i class="fas fa-info-circle"></i> All queries use PAPI's typed storage interface</p>
-                    <p class="footer-links">
-                        <a href="https://docs.polkadot.com/develop/toolkit/api-libraries/papi/" target="_blank">
-                            <i class="fas fa-book"></i> PAPI Docs
-                        </a>
-                        <a href="https://github.com/polkadot-api" target="_blank">
-                            <i class="fab fa-github"></i> GitHub
-                        </a>
-                        <a href="https://wiki.polkadot.network/docs/learn-storage" target="_blank">
-                            <i class="fas fa-database"></i> Storage Guide
-                        </a>
-                    </p>
+                <div class="footer-links">
+                    <a href="https://papi.how/" target="_blank">
+                        <i class="fas fa-book"></i> PAPI Docs
+                    </a>
+                    <a href="https://github.com/polkadot-api/polkadot-api" target="_blank">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                    <a href="https://wiki.polkadot.network/docs/learn-storage" target="_blank">
+                        <i class="fas fa-database"></i> Storage Guide
+                    </a>
                 </div>
-                <div class="challenge-info">
-                    <p>#PAPI30Days Challenge • Day 6: Querying Storage</p>
-                </div>
+                <p class="footer-text">#PAPI30Days Challenge • Day 6: Querying Storage</p>
             </div>
         </footer>
     </div>

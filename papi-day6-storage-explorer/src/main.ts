@@ -3,7 +3,6 @@ import { createClient } from 'polkadot-api';
 import { getWsProvider } from 'polkadot-api/ws-provider';
 import { dot } from '@polkadot-api/descriptors';
 
-// Types
 interface QueryResult {
   query: string;
   result: any;
@@ -17,92 +16,110 @@ class StorageExplorer {
   private dotApi: any = null;
   private activeSubscriptions: Map<string, () => void> = new Map();
   private queryHistory: QueryResult[] = [];
+  private blockHeightSubscription: (() => void) | null = null;
   
-  // Sample addresses for demonstration
   private sampleAddresses = [
-    '15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5',
-    '1hCMdtRsaTFjVjS9Q9pZkY5v8qBvYQf8zJQcKp8qKp8qKp8q',
-    '14Ns6kKbCoka3MS4Hn6b7oRw9fFejG8RH5rq5j63U3WZ3Jp',
-    '12gX8C6q4p8qKp8qKp8qKp8qKp8qKp8qKp8qKp8qKp8qKp'
+    '15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5', // Polkadot Foundation
+    '16hp43x8DUZtU8L3cJy9Z8JMwTzuu8ZZRWqDZnpMhp464oEd', // Sample staking account
+    '14Gn7SEmKhp2SEj7DDBgaPCAiXbWE5LUAN8hg8D9JYmMi7BY', // Sample account
+    '13UVJyLnbVp9RBZYFwFGyDvVd1y27Tt8tkntv6Q7JVPhFsTB'  // Sample account
   ];
 
   constructor() {
-    this.initializeUI();
     this.log('🚀 Storage Explorer initialized', 'info');
+    this.initializeUI();
     this.connectToPolkadot();
   }
 
   private initializeUI(): void {
-    // Setup buttons
+    // Query buttons
     document.getElementById('query-btn')?.addEventListener('click', () => this.executeQuery());
     document.getElementById('subscribe-btn')?.addEventListener('click', () => this.toggleSubscription());
     document.getElementById('clear-results')?.addEventListener('click', () => this.clearResults());
+    
+    // Export/Copy buttons
     document.getElementById('export-json')?.addEventListener('click', () => this.exportResults());
-    document.getElementById('copy-query')?.addEventListener('click', () => this.copyQuery());
+    document.getElementById('copy-result')?.addEventListener('click', () => this.copyResult());
+    
+    // Console controls
     document.getElementById('clear-console')?.addEventListener('click', () => this.clearConsole());
+    
+    // Address controls
     document.getElementById('random-address')?.addEventListener('click', () => this.randomAddress());
-
-    // Setup address input
+    
+    // Enter key support
     const addressInput = document.getElementById('account-address') as HTMLInputElement;
-    if (addressInput) {
-      addressInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          this.executeQuery();
-        }
-      });
-    }
+    addressInput?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') this.executeQuery();
+    });
   }
 
   private async connectToPolkadot(): Promise<void> {
-    const statusElement = document.getElementById('chain-status');
-    if (statusElement) {
-      statusElement.textContent = 'Connecting...';
-    }
+    this.updateConnectionStatus('connecting');
+    this.log('🔌 Connecting to Polkadot...', 'info');
 
     try {
-      // Create client with WSS provider
-      this.client = createClient(
-        getWsProvider('wss://rpc.polkadot.io')
-      );
-
-      // Get TypedApi instance
+      // Create WebSocket provider
+      const wsProvider = getWsProvider('wss://rpc.polkadot.io');
+      
+      // Create client
+      this.client = createClient(wsProvider);
+      
+      // Get TypedApi
       this.dotApi = this.client.getTypedApi(dot);
       
-      this.log('✅ Connected to Polkadot via WSS', 'success');
-      this.log('🎯 TypedApi ready for storage queries', 'success');
+      this.updateConnectionStatus('connected');
+      this.log('✅ Connected to Polkadot mainnet', 'success');
       
-      // Update UI
-      if (statusElement) {
-        statusElement.textContent = 'Connected';
-        statusElement.style.color = '#10B981';
-      }
-      
-      // Get initial block height
-      await this.updateBlockHeight();
+      // Subscribe to block height
+      await this.subscribeToBlockHeight();
       
     } catch (error) {
+      this.updateConnectionStatus('disconnected');
       this.log(`❌ Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
-      if (statusElement) {
-        statusElement.textContent = 'Disconnected';
-        statusElement.style.color = '#EF4444';
-      }
+      
+      // Retry after 5 seconds
+      setTimeout(() => this.connectToPolkadot(), 5000);
     }
   }
 
-  private async updateBlockHeight(): Promise<void> {
+  private async subscribeToBlockHeight(): Promise<void> {
     try {
-      const header = await this.dotApi.query.System.Header.getValue();
-      if (header && header.number) {
-        document.getElementById('block-height')!.textContent = header.number.toString();
-      }
+      this.blockHeightSubscription = this.dotApi.query.System.Number.watchValue().subscribe(
+        (blockNumber: number) => {
+          const blockHeightEl = document.getElementById('block-height');
+          if (blockHeightEl) {
+            blockHeightEl.textContent = blockNumber.toLocaleString();
+          }
+        }
+      );
     } catch (error) {
-      // Silently fail - non-critical
+      console.error('Failed to subscribe to block height:', error);
+    }
+  }
+
+  private updateConnectionStatus(status: 'connecting' | 'connected' | 'disconnected'): void {
+    const statusEl = document.getElementById('connection-status');
+    if (!statusEl) return;
+    
+    const dot = statusEl.querySelector('.status-dot') as HTMLElement;
+    const text = statusEl.querySelector('.status-text') as HTMLElement;
+    
+    if (status === 'connecting') {
+      dot.className = 'status-dot connecting';
+      text.textContent = 'Connecting...';
+    } else if (status === 'connected') {
+      dot.className = 'status-dot connected';
+      text.textContent = 'Connected';
+    } else {
+      dot.className = 'status-dot disconnected';
+      text.textContent = 'Disconnected';
     }
   }
 
   private async executeQuery(): Promise<void> {
     if (!this.dotApi) {
-      this.log('Please wait for connection to establish', 'error');
+      this.log('⏳ Please wait for connection to establish', 'warning');
       return;
     }
 
@@ -114,18 +131,12 @@ class StorageExplorer {
     const address = addressInput.value.trim();
     const storageItem = storageSelect.value;
     
-    if (!address) {
+    if (!address && !storageItem.includes('timestamp')) {
       this.log('Please enter an account address', 'error');
       return;
     }
 
-    // Validate address format (basic validation)
-    if (address.length < 40) {
-      this.log('Address appears to be invalid', 'error');
-      return;
-    }
-
-    this.log(`🔍 Querying ${storageItem} for address: ${address.substring(0, 16)}...`, 'info');
+    this.log(`🔍 Querying ${storageSelect.selectedOptions[0].text}...`, 'info');
     
     const startTime = Date.now();
     
@@ -135,28 +146,28 @@ class StorageExplorer {
       
       switch (storageItem) {
         case 'balances-account':
-          result = await this.dotApi.query.Balances.Account(address);
-          queryString = `await dotApi.query.Balances.Account("${address}")`;
+          result = await this.dotApi.query.Balances.Account.getValue(address);
+          queryString = `await dotApi.query.Balances.Account.getValue("${address}")`;
           break;
           
         case 'system-account':
-          result = await this.dotApi.query.System.Account(address);
-          queryString = `await dotApi.query.System.Account("${address}")`;
+          result = await this.dotApi.query.System.Account.getValue(address);
+          queryString = `await dotApi.query.System.Account.getValue("${address}")`;
           break;
           
         case 'timestamp-now':
-          result = await this.dotApi.query.Timestamp.Now();
-          queryString = `await dotApi.query.Timestamp.Now()`;
+          result = await this.dotApi.query.Timestamp.Now.getValue();
+          queryString = `await dotApi.query.Timestamp.Now.getValue()`;
           break;
           
         case 'staking-bonded':
-          result = await this.dotApi.query.Staking.Bonded(address);
-          queryString = `await dotApi.query.Staking.Bonded("${address}")`;
+          result = await this.dotApi.query.Staking.Bonded.getValue(address);
+          queryString = `await dotApi.query.Staking.Bonded.getValue("${address}")`;
           break;
           
         case 'identity-identity-of':
-          result = await this.dotApi.query.Identity.IdentityOf(address);
-          queryString = `await dotApi.query.Identity.IdentityOf("${address}")`;
+          result = await this.dotApi.query.Identity.IdentityOf.getValue(address);
+          queryString = `await dotApi.query.Identity.IdentityOf.getValue("${address}")`;
           break;
           
         default:
@@ -186,31 +197,31 @@ class StorageExplorer {
       
     } catch (error) {
       const errorTime = Date.now() - startTime;
-      this.log(`❌ Query failed after ${errorTime}ms: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
-      
-      // Display error in result
+      this.log(`❌ Query failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
       this.displayError(error, errorTime);
     }
   }
 
   private displayResult(result: any, queryString: string, queryTime: number, storageItem: string): void {
-    // Format the result
+    // Format the result for display
     let formattedResult: any = result;
     
-    if (result && typeof result === 'object') {
-      if ('toJSON' in result && typeof result.toJSON === 'function') {
-        formattedResult = result.toJSON();
-      } else if ('toHuman' in result && typeof result.toHuman === 'function') {
-        formattedResult = result.toHuman();
+    // Convert BigInts to strings for JSON display
+    const jsonReplacer = (key: string, value: any) => {
+      if (typeof value === 'bigint') {
+        return value.toString() + 'n';
       }
-    }
+      return value;
+    };
     
     // Display in JSON view
     const resultElement = document.getElementById('typed-result');
     if (resultElement) {
-      resultElement.textContent = JSON.stringify(formattedResult, (key, val) => 
-        typeof val === 'bigint' ? val.toString() : val, 2
-      );
+      if (result === undefined || result === null) {
+        resultElement.textContent = 'null (no data at this storage location)';
+      } else {
+        resultElement.textContent = JSON.stringify(formattedResult, jsonReplacer, 2);
+      }
     }
     
     // Update query info
@@ -225,80 +236,61 @@ class StorageExplorer {
       timeElement.textContent = `${queryTime} ms`;
     }
     
-    // Update response time in stats
-    const responseTimeElement = document.getElementById('response-time');
-    if (responseTimeElement) {
-      responseTimeElement.textContent = `${queryTime} ms`;
-    }
-    
     // Display type information
     this.displayTypeInfo(result, storageItem);
     
-    // Special handling for balance display
+    // Special formatting for balance data
     if (storageItem === 'balances-account' && result && result.data) {
-      this.displayBalanceBreakdown(result.data);
+      this.logBalanceInfo(result.data);
+    }
+    
+    // Special formatting for timestamp
+    if (storageItem === 'timestamp-now' && result) {
+      const date = new Date(Number(result));
+      this.log(`🕐 Block timestamp: ${date.toLocaleString()}`, 'info');
     }
   }
 
   private displayTypeInfo(result: any, storageItem: string): void {
-    const typeInfoElement = document.getElementById('type-info');
-    const propertiesElement = document.getElementById('type-properties');
+    const returnTypeEl = document.getElementById('return-type');
+    const propertiesEl = document.getElementById('type-properties');
     
-    if (!typeInfoElement || !propertiesElement) return;
+    if (!returnTypeEl || !propertiesEl) return;
     
     // Determine return type
-    let returnType = 'unknown';
-    if (result && typeof result === 'object') {
-      if (result.constructor && result.constructor.name) {
-        returnType = result.constructor.name;
-      } else if (result.$type) {
-        returnType = result.$type;
-      }
+    let returnType = typeof result;
+    if (result === null || result === undefined) {
+      returnType = 'undefined | null';
+    } else if (typeof result === 'object') {
+      returnType = 'AccountInfo | Balance | Identity';
+    } else if (typeof result === 'bigint') {
+      returnType = 'bigint (Timestamp)';
     }
     
-    // Update return type
-    const typeValueElements = typeInfoElement.querySelectorAll('.type-value');
-    if (typeValueElements[0]) {
-      typeValueElements[0].textContent = returnType;
-    }
+    returnTypeEl.textContent = returnType;
     
-    // Extract and display properties
-    propertiesElement.innerHTML = '';
+    // Display properties
+    propertiesEl.innerHTML = '';
     
     if (result && typeof result === 'object') {
-      const properties = Object.keys(result).slice(0, 10); // Limit to first 10
+      const properties = Object.keys(result).slice(0, 10);
       
       properties.forEach(prop => {
-        const propElement = document.createElement('span');
-        propElement.className = 'type-property';
-        propElement.textContent = prop;
-        
-        // Add click to show value
-        propElement.addEventListener('click', () => {
-          this.log(`Property "${prop}": ${JSON.stringify(result[prop])}`, 'info');
-        });
-        
-        propertiesElement.appendChild(propElement);
+        const propBadge = document.createElement('span');
+        propBadge.className = 'property-badge';
+        propBadge.textContent = prop;
+        propBadge.title = `Type: ${typeof result[prop]}`;
+        propertiesEl.appendChild(propBadge);
       });
       
       if (Object.keys(result).length > 10) {
-        const moreElement = document.createElement('span');
-        moreElement.className = 'type-property';
-        moreElement.textContent = `+${Object.keys(result).length - 10} more`;
-        propertiesElement.appendChild(moreElement);
+        const moreBadge = document.createElement('span');
+        moreBadge.className = 'property-badge more';
+        moreBadge.textContent = `+${Object.keys(result).length - 10} more`;
+        propertiesEl.appendChild(moreBadge);
       }
-    }
-  }
-
-  private displayBalanceBreakdown(balanceData: any): void {
-    // This would display a visual breakdown of the balance
-    // For now, just log it
-    if (balanceData.free) {
-      const free = typeof balanceData.free === 'bigint' ? balanceData.free : BigInt(balanceData.free || 0);
-      const reserved = typeof balanceData.reserved === 'bigint' ? balanceData.reserved : BigInt(balanceData.reserved || 0);
-      const total = free + reserved;
-      
-      this.log(`💰 Balance breakdown: Total: ${this.formatBalance(total)}, Free: ${this.formatBalance(free)}, Reserved: ${this.formatBalance(reserved)}`, 'info');
+    } else {
+      propertiesEl.textContent = 'Primitive type (no properties)';
     }
   }
 
@@ -316,7 +308,7 @@ class StorageExplorer {
 
   private async toggleSubscription(): Promise<void> {
     if (!this.dotApi) {
-      this.log('Please wait for connection to establish', 'error');
+      this.log('⏳ Please wait for connection to establish', 'warning');
       return;
     }
 
@@ -335,7 +327,9 @@ class StorageExplorer {
         unsubscribe();
         this.activeSubscriptions.delete(subscriptionId);
         subscribeBtn.innerHTML = '<i class="fas fa-satellite-dish"></i> Subscribe to Updates';
-        this.log(`📡 Unsubscribed from balance updates for ${address.substring(0, 16)}...`, 'info');
+        subscribeBtn.classList.remove('active');
+        this.log(`📡 Unsubscribed from balance updates`, 'info');
+        this.updateActiveQueriesCount();
       }
     } else {
       // Subscribe
@@ -345,57 +339,76 @@ class StorageExplorer {
       }
 
       try {
-        const unsubscribe = this.dotApi.query.Balances.Account
-          .watchValue(address)
-          .subscribe((update: any) => {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            
+        this.log(`📡 Subscribing to balance updates for ${address.substring(0, 16)}...`, 'info');
+        
+        const unsubscribe = this.dotApi.query.Balances.Account.watchValue(address).subscribe(
+          (update: any) => {
             if (update && update.data) {
-              const free = update.data.free || 0n;
-              const reserved = update.data.reserved || 0n;
-              const total = free + reserved;
+              const free = update.data.free;
+              const reserved = update.data.reserved;
               
-              this.log(`[${timeStr}] Balance update: ${this.formatBalance(total)} (Free: ${this.formatBalance(free)})`, 'info');
+              this.log(
+                `💰 Balance update: Free: ${this.formatBalance(free)}, Reserved: ${this.formatBalance(reserved)}`,
+                'info'
+              );
             }
-          });
+          }
+        );
         
         this.activeSubscriptions.set(subscriptionId, unsubscribe);
-        subscribeBtn.innerHTML = '<i class="fas fa-ban"></i> Stop Subscription';
-        this.log(`📡 Subscribed to balance updates for ${address.substring(0, 16)}...`, 'success');
-        
-        // Update active queries count
+        subscribeBtn.innerHTML = '<i class="fas fa-ban"></i> Unsubscribe';
+        subscribeBtn.classList.add('active');
+        this.log(`✅ Subscribed to balance updates`, 'success');
         this.updateActiveQueriesCount();
         
       } catch (error) {
-        this.log(`❌ Failed to subscribe: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+        this.log(`❌ Subscription failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
       }
     }
   }
 
   private updateStats(queryTime: number): void {
-    // Update response time
-    const responseTimeElement = document.getElementById('response-time');
-    if (responseTimeElement) {
-      responseTimeElement.textContent = `${queryTime} ms`;
+    const responseTimeEl = document.getElementById('response-time');
+    if (responseTimeEl) {
+      responseTimeEl.textContent = `${queryTime} ms`;
     }
-    
-    // Update active queries
-    this.updateActiveQueriesCount();
   }
 
   private updateActiveQueriesCount(): void {
-    const activeQueriesElement = document.getElementById('active-queries');
-    if (activeQueriesElement) {
-      activeQueriesElement.textContent = this.activeSubscriptions.size.toString();
+    const activeQueriesEl = document.getElementById('active-queries');
+    if (activeQueriesEl) {
+      activeQueriesEl.textContent = this.activeSubscriptions.size.toString();
+    }
+  }
+
+  private logBalanceInfo(balanceData: any): void {
+    if (!balanceData) return;
+    
+    const free = balanceData.free || 0n;
+    const reserved = balanceData.reserved || 0n;
+    const frozen = balanceData.frozen || 0n;
+    
+    this.log(`💰 Free: ${this.formatBalance(free)} DOT`, 'info');
+    this.log(`🔒 Reserved: ${this.formatBalance(reserved)} DOT`, 'info');
+    this.log(`❄️ Frozen: ${this.formatBalance(frozen)} DOT`, 'info');
+  }
+
+  private formatBalance(balance: bigint | number): string {
+    const bal = typeof balance === 'bigint' ? balance : BigInt(balance || 0);
+    const dotAmount = Number(bal) / 1e10;
+    
+    if (dotAmount >= 1) {
+      return `${dotAmount.toFixed(4)}`;
+    } else if (dotAmount > 0) {
+      return `${dotAmount.toFixed(8)}`;
+    } else {
+      return '0.0000';
     }
   }
 
   private addToHistory(queryResult: QueryResult): void {
     this.queryHistory.push(queryResult);
-    
-    // Keep only last 10
-    if (this.queryHistory.length > 10) {
+    if (this.queryHistory.length > 20) {
       this.queryHistory.shift();
     }
   }
@@ -416,18 +429,33 @@ class StorageExplorer {
       timeElement.textContent = '- ms';
     }
     
+    const returnTypeEl = document.getElementById('return-type');
+    if (returnTypeEl) {
+      returnTypeEl.textContent = 'Not yet queried';
+    }
+    
+    const propertiesEl = document.getElementById('type-properties');
+    if (propertiesEl) {
+      propertiesEl.textContent = 'Properties will appear after query';
+    }
+    
     this.log('🧹 Query results cleared', 'info');
   }
 
   private exportResults(): void {
     if (this.queryHistory.length === 0) {
-      this.log('No query results to export', 'error');
+      this.log('No query history to export', 'warning');
       return;
     }
     
     const exportData = {
       generated: new Date().toISOString(),
-      queries: this.queryHistory,
+      queries: this.queryHistory.map(q => ({
+        ...q,
+        result: JSON.stringify(q.result, (key, val) => 
+          typeof val === 'bigint' ? val.toString() + 'n' : val
+        )
+      })),
       totalQueries: this.queryHistory.length,
       activeSubscriptions: this.activeSubscriptions.size
     };
@@ -442,23 +470,19 @@ class StorageExplorer {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    this.log('📥 Query results exported as JSON', 'success');
+    this.log('📥 Query history exported', 'success');
   }
 
-  private copyQuery(): void {
-    const queryElement = document.getElementById('typed-query');
-    if (!queryElement || queryElement.textContent === '-') {
-      this.log('No query to copy', 'error');
+  private copyResult(): void {
+    const resultElement = document.getElementById('typed-result');
+    if (!resultElement || resultElement.textContent === 'Click "Execute Query" to see results...') {
+      this.log('No result to copy', 'warning');
       return;
     }
     
-    navigator.clipboard.writeText(queryElement.textContent)
-      .then(() => {
-        this.log('✅ Query copied to clipboard!', 'success');
-      })
-      .catch(err => {
-        this.log(`❌ Failed to copy: ${err}`, 'error');
-      });
+    navigator.clipboard.writeText(resultElement.textContent || '')
+      .then(() => this.log('✅ Result copied to clipboard', 'success'))
+      .catch(() => this.log('❌ Failed to copy result', 'error'));
   }
 
   private randomAddress(): void {
@@ -467,79 +491,60 @@ class StorageExplorer {
     
     if (addressInput) {
       addressInput.value = this.sampleAddresses[randomIndex];
-      this.log(`🎲 Random address selected: ${this.sampleAddresses[randomIndex].substring(0, 16)}...`, 'info');
+      this.log(`🎲 Random address: ${this.sampleAddresses[randomIndex].substring(0, 16)}...`, 'info');
     }
   }
 
-  private formatBalance(balance: bigint | number): string {
-    const bal = typeof balance === 'bigint' ? balance : BigInt(balance || 0);
-    
-    // Convert planck to DOT (1 DOT = 10^10 planck)
-    const dotAmount = Number(bal) / 1e10;
-    
-    if (dotAmount >= 1) {
-      return `${dotAmount.toFixed(4)} DOT`;
-    } else if (dotAmount > 0) {
-      return `${dotAmount.toFixed(8)} DOT`;
-    } else {
-      return `${bal.toString()} Planck`;
-    }
-  }
-
-  private log(message: string, type: 'info' | 'success' | 'error' = 'info'): void {
+  private log(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info'): void {
     const consoleContent = document.getElementById('console-content');
     if (!consoleContent) return;
     
-    const timestamp = new Date().toLocaleTimeString([], { 
+    const timestamp = new Date().toLocaleTimeString('en-US', { 
       hour: '2-digit', 
       minute: '2-digit', 
-      second: '2-digit' 
+      second: '2-digit',
+      hour12: false
     });
     
     const entry = document.createElement('div');
-    entry.className = 'console-entry';
+    entry.className = `console-entry ${type}`;
     
     const timeSpan = document.createElement('span');
     timeSpan.className = 'console-time';
     timeSpan.textContent = `[${timestamp}]`;
     
     const textSpan = document.createElement('span');
-    textSpan.className = `console-text ${type}`;
+    textSpan.className = 'console-text';
     textSpan.textContent = message;
     
     entry.appendChild(timeSpan);
     entry.appendChild(textSpan);
     consoleContent.appendChild(entry);
     
-    // Auto-scroll to bottom
+    // Auto-scroll
     consoleContent.scrollTop = consoleContent.scrollHeight;
     
     // Also log to browser console
-    const consoleMethod = type === 'error' ? 'error' : type === 'success' ? 'log' : 'info';
-    console[consoleMethod](`[Storage Explorer] ${message}`);
+    console.log(`[Storage Explorer] ${message}`);
   }
 
   private clearConsole(): void {
     const consoleContent = document.getElementById('console-content');
     if (consoleContent) {
-      consoleContent.innerHTML = `
-        <div class="console-entry">
-          <span class="console-time">[${new Date().toLocaleTimeString()}]</span>
-          <span class="console-text info">Console cleared</span>
-        </div>
-      `;
+      consoleContent.innerHTML = '';
+      this.log('Console cleared', 'info');
     }
   }
 }
 
-// Initialize the application
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('=============================================');
-  console.log('🚀 PAPI Day 6: Storage Explorer');
-  console.log('=============================================');
-  console.log('Exploring blockchain storage with typed queries...');
-  console.log('Demonstrating the power of PAPI storage queries!');
-  console.log('=============================================');
+  console.log('='.repeat(50));
+  console.log('🚀 PAPI Storage Explorer - Day 6');
+  console.log('='.repeat(50));
+  console.log('Connecting to Polkadot mainnet...');
+  console.log('Demonstrating typed storage queries with PAPI');
+  console.log('='.repeat(50));
   
   new StorageExplorer();
 });
