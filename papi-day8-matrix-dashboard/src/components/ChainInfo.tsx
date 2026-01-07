@@ -1,7 +1,7 @@
 // src/components/ChainInfo.tsx
-import React, { useState, useEffect } from 'react';
-import { TypedApi } from 'polkadot-api';
-import { dot } from '@polkadot-api/descriptors';
+import { useState, useEffect } from 'react';
+import type { TypedApi } from 'polkadot-api';
+import type { Dot } from '@polkadot-api/descriptors';
 import { 
   Code, 
   Shield, 
@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 interface ChainInfoProps {
-  api: TypedApi<typeof dot> | null;
+  api: TypedApi<Dot> | null;
   chainInfo: {
     chainName: string;
     version: string;
@@ -39,16 +39,17 @@ export const ChainInfo: React.FC<ChainInfoProps> = ({ api, chainInfo }) => {
         setIsLoadingBalance(true);
         
         // Fetch account balance
-        const accountInfo = await api.query.System.Account.getValue(EXAMPLE_ACCOUNT, { at: 'best' });
+        const accountInfo = await api.query.System.Account.getValue(EXAMPLE_ACCOUNT);
         setAccountBalance(accountInfo.data.free);
         
-        // Fetch latest block hash
-        const header = await api.query.System.Header.getValue({ at: 'best' });
-        setBlockHash(header.hash);
+        // Fetch latest block hash using finalized head
+        const finalizedHash = await api.query.System.BlockHash.getValue(chainInfo.currentBlock);
+        // Convert Binary to hex string
+        setBlockHash(finalizedHash.asHex());
         
         console.log("📊 Additional chain info fetched:", {
           accountBalance: accountInfo.data.free.toString(),
-          blockHash: header.hash
+          blockHash: finalizedHash.asHex()
         });
         
       } catch (error) {

@@ -1,6 +1,5 @@
 // src/components/MatrixBackground.tsx
-import React, { useEffect, useRef } from 'react';
-import '../styles/MatrixBackground.css';
+import { useEffect, useRef } from 'react';
 
 export const MatrixBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

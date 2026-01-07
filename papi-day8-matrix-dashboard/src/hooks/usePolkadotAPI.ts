@@ -1,8 +1,13 @@
 // src/hooks/usePolkadotAPI.ts
 import { useState, useEffect, useCallback } from 'react';
-import { createClient, TypedApi } from 'polkadot-api';
+import { createClient } from 'polkadot-api';
+import type { TypedApi, PolkadotClient } from 'polkadot-api';
 import { getSmProvider } from '@polkadot-api/sm-provider';
+import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
 import { dot } from '@polkadot-api/descriptors';
+import type { Dot } from '@polkadot-api/descriptors';
+import SmWorker from 'polkadot-api/smoldot/worker?worker';
+import { chainSpec } from 'polkadot-api/chains/polkadot';
 
 export interface ChainInfo {
   chainName: string;
@@ -13,7 +18,7 @@ export interface ChainInfo {
 }
 
 export interface UsePolkadotAPIResult {
-  api: TypedApi<typeof dot> | null;
+  api: TypedApi<Dot> | null;
   chainInfo: ChainInfo | null;
   isLoading: boolean;
   error: string | null;
@@ -22,19 +27,30 @@ export interface UsePolkadotAPIResult {
 }
 
 export const usePolkadotAPI = (): UsePolkadotAPIResult => {
-  const [api, setApi] = useState<TypedApi<typeof dot> | null>(null);
+  const [api, setApi] = useState<TypedApi<Dot> | null>(null);
   const [chainInfo, setChainInfo] = useState<ChainInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [client, setClient] = useState<any>(null);
+  const [client, setClient] = useState<PolkadotClient | null>(null);
 
   const connect = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
     try {
-      // Initialize Smoldot provider with Polkadot chain
-      const smoldotProvider = getSmProvider("wss://rpc.polkadot.io");
+      console.log("🚀 Initializing PAPI connection...");
+      
+      // Initialize Smoldot with worker
+      const smoldot = startFromWorker(new SmWorker());
+      
+      // Add Polkadot chain using built-in chain spec
+      console.log("📡 Loading Polkadot chain spec...");
+      const chain = await smoldot.addChain({ chainSpec });
+      
+      console.log("✅ Chain added to Smoldot");
+      
+      // Create provider from chain
+      const smoldotProvider = getSmProvider(chain);
       
       // Create PAPI client
       const papiClient = createClient(smoldotProvider);
@@ -44,29 +60,30 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
       const typedApi = papiClient.getTypedApi(dot);
       setApi(typedApi);
       
-      console.log("🚀 PAPI Client initialized successfully!");
-      console.log("📡 Connected to Polkadot via light-client");
+      console.log("✅ PAPI Client initialized successfully!");
+      console.log("📡 Connected to Polkadot via Smoldot light-client");
       
-      // Fetch chain info
-      const [version, existentialDeposit, header] = await Promise.all([
+      // Fetch chain info using proper APIs
+      console.log("📊 Fetching chain information...");
+      const [version, existentialDeposit, blockNumber] = await Promise.all([
         typedApi.constants.System.Version(),
         typedApi.constants.Balances.ExistentialDeposit(),
-        typedApi.query.System.Header.getValue({ at: 'best' })
+        typedApi.query.System.Number.getValue()
       ]);
       
       setChainInfo({
-        chainName: version.implName,
-        version: `${version.specVersion}.${version.implVersion}`,
-        specVersion: version.specVersion,
+        chainName: version.impl_name,
+        version: `${version.spec_version}.${version.impl_version}`,
+        specVersion: version.spec_version,
         existentialDeposit,
-        currentBlock: Number(header.number)
+        currentBlock: blockNumber
       });
       
       console.log("✅ Chain info fetched:", {
-        chainName: version.implName,
-        version: `${version.specVersion}.${version.implVersion}`,
+        chainName: version.impl_name,
+        version: `${version.spec_version}.${version.impl_version}`,
         existentialDeposit: existentialDeposit.toString(),
-        currentBlock: Number(header.number)
+        currentBlock: blockNumber
       });
       
     } catch (err) {

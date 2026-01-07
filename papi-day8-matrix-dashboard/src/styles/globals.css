@@ -1,10 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 @layer base {
   body {
-    @apply bg-black text-white font-matrix overflow-x-hidden;
+    @apply bg-black text-white overflow-x-hidden;
+    font-family: 'Courier New', monospace;
   }
 }
 
@@ -32,9 +33,9 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-matrix-green/30 rounded-full;
+  @apply bg-green-500/30 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-matrix-green/50;
+  @apply bg-green-500/50;
 }
