@@ -11,7 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@polkadot-api/descriptors": "file:.papi/descriptors",
+    "@polkadot-api/descriptors": "file:.papi\\descriptors",
     "@polkadot-api/sm-provider": "^0.1.15",
     "lucide-react": "^0.468.0",
     "polkadot-api": "^1.23.2",
