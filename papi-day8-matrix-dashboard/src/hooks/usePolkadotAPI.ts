@@ -1,11 +1,10 @@
 // src/hooks/usePolkadotAPI.ts
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from 'polkadot-api';
-import type { TypedApi, PolkadotClient } from 'polkadot-api';
+import type { PolkadotClient } from 'polkadot-api';
 import { getSmProvider } from '@polkadot-api/sm-provider';
 import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
 import { dot } from '@polkadot-api/descriptors';
-import type { Dot } from '@polkadot-api/descriptors';
 import SmWorker from 'polkadot-api/smoldot/worker?worker';
 import { chainSpec } from 'polkadot-api/chains/polkadot';
 
@@ -18,7 +17,7 @@ export interface ChainInfo {
 }
 
 export interface UsePolkadotAPIResult {
-  api: TypedApi<Dot> | null;
+  api: any | null;
   chainInfo: ChainInfo | null;
   isLoading: boolean;
   error: string | null;
@@ -27,7 +26,7 @@ export interface UsePolkadotAPIResult {
 }
 
 export const usePolkadotAPI = (): UsePolkadotAPIResult => {
-  const [api, setApi] = useState<TypedApi<Dot> | null>(null);
+  const [api, setApi] = useState<any | null>(null);
   const [chainInfo, setChainInfo] = useState<ChainInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,14 +55,14 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
       const papiClient = createClient(smoldotProvider);
       setClient(papiClient);
       
-      // Get typed API
+      // Get typed API using generated descriptors
       const typedApi = papiClient.getTypedApi(dot);
       setApi(typedApi);
       
       console.log("✅ PAPI Client initialized successfully!");
       console.log("📡 Connected to Polkadot via Smoldot light-client");
       
-      // Fetch chain info using proper APIs
+      // Fetch chain info using typed API
       console.log("📊 Fetching chain information...");
       const [version, existentialDeposit, blockNumber] = await Promise.all([
         typedApi.constants.System.Version(),

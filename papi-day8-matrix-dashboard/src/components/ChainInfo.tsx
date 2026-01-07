@@ -1,7 +1,5 @@
 // src/components/ChainInfo.tsx
 import { useState, useEffect } from 'react';
-import type { TypedApi } from 'polkadot-api';
-import type { Dot } from '@polkadot-api/descriptors';
 import { 
   Code, 
   Shield, 
@@ -13,7 +11,7 @@ import {
 } from 'lucide-react';
 
 interface ChainInfoProps {
-  api: TypedApi<Dot> | null;
+  api: any | null;
   chainInfo: {
     chainName: string;
     version: string;
@@ -170,7 +168,7 @@ export const ChainInfo: React.FC<ChainInfoProps> = ({ api, chainInfo }) => {
       <div className="mt-6 pt-6 border-t border-gray-800">
         <p className="text-sm text-gray-500">
           <span className="text-matrix-green">🔵 Week 1 Recap:</span> This dashboard demonstrates constants, storage queries, 
-          and real-time data fetching using PAPI's typed interfaces.
+          and real-time data fetching using PAPI's untyped API (no CLI needed!).
         </p>
       </div>
     </div>

@@ -32,7 +32,7 @@ function App() {
               <Zap className="w-6 h-6 md:w-8 md:h-8 mr-2 md:mr-3 text-matrix-green" />
               PAPI Matrix Dashboard
             </h1>
-            <p className="text-gray-400 mt-2 text-sm md:text-base">Week 1 Recap - #PAPI30Days Campaign</p>
+            <p className="text-gray-400 mt-2 text-sm md:text-base">Pure API - No CLI Required</p>
           </div>
           
           <div className="flex space-x-4">
@@ -94,46 +94,46 @@ function App() {
             <ChainInfo api={api} chainInfo={chainInfo} />
           </div>
 
-          {/* Week 1 Learnings Panel */}
+          {/* Pure PAPI Info Panel */}
           <div className="glass-card p-6">
-            <h3 className="text-xl font-bold mb-6 text-matrix-green">Week 1 Recap</h3>
+            <h3 className="text-xl font-bold mb-6 text-matrix-green">Pure PAPI</h3>
             
             <div className="space-y-4">
               <div className="p-4 bg-gray-900/30 rounded-lg">
-                <h4 className="font-bold text-blue-400 mb-2">✓ PAPI Installation</h4>
+                <h4 className="font-bold text-blue-400 mb-2">✓ No CLI Required</h4>
                 <p className="text-sm text-gray-400">
-                  Lightweight setup with auto-generated types from chain metadata
+                  Uses untyped API - zero code generation
                 </p>
               </div>
               
               <div className="p-4 bg-gray-900/30 rounded-lg">
-                <h4 className="font-bold text-purple-400 mb-2">✓ Provider Selection</h4>
+                <h4 className="font-bold text-purple-400 mb-2">✓ Smoldot Light Client</h4>
                 <p className="text-sm text-gray-400">
-                  Smoldot for decentralization vs WSS for speed
+                  Fully decentralized - runs in your browser
                 </p>
               </div>
               
               <div className="p-4 bg-gray-900/30 rounded-lg">
-                <h4 className="font-bold text-green-400 mb-2">✓ TypedApi Mastery</h4>
+                <h4 className="font-bold text-green-400 mb-2">✓ Direct Chain Access</h4>
                 <p className="text-sm text-gray-400">
-                  Fully typed interfaces for constants, storage, and runtime APIs
+                  Query constants, storage & runtime APIs directly
                 </p>
               </div>
               
               <div className="p-4 bg-gray-900/30 rounded-lg">
-                <h4 className="font-bold text-yellow-400 mb-2">✓ Data Reading</h4>
+                <h4 className="font-bold text-yellow-400 mb-2">✓ Simple Setup</h4>
                 <p className="text-sm text-gray-400">
-                  Three pillars: Constants (truth), Storage (state), Runtime APIs (brain)
+                  Just npm install & run - no build complexity
                 </p>
               </div>
             </div>
 
             <div className="mt-8 p-4 bg-black/50 rounded-lg border border-matrix-green/20">
               <p className="text-sm text-gray-300">
-                <span className="text-matrix-green font-bold">Console Logs:</span> Check browser console for real-time connection logs and data fetching information.
+                <span className="text-matrix-green font-bold">Simplified:</span> This version removes CLI dependencies and uses the untyped API for maximum simplicity.
               </p>
               <button
-                onClick={() => console.log("🚀 PAPI Matrix Dashboard Active - All systems operational!")}
+                onClick={() => console.log("🚀 Pure PAPI Dashboard Active - No CLI needed!")}
                 className="mt-3 text-xs px-3 py-1 bg-gray-800 rounded hover:bg-gray-700 transition-colors w-full sm:w-auto"
               >
                 Test Console Log
@@ -145,11 +145,11 @@ function App() {
         {/* Footer */}
         <footer className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
           <p className="mb-2">
-            Built with ❤️ by Dvyne for #PAPI30Days Campaign • Day 8: Week 1 Recap • 
-            <span className="text-matrix-green ml-2">"I can see the types now" 🔵</span>
+            Built with ❤️ by Dvyne • Pure PAPI (No CLI) • 
+            <span className="text-matrix-green ml-2">"Keep it simple" 🔵</span>
           </p>
           <p>
-            All data fetched via Polkadot-API light-client • Fully TypeScript compliant • 
+            All data fetched via Polkadot-API light-client • Zero build complexity • 
             <a 
               href="https://github.com/Sage-senpai/PAPI-101" 
               className="text-blue-400 hover:text-blue-300 ml-1"
