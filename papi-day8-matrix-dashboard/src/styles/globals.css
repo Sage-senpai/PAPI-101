@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-black text-white font-matrix overflow-x-hidden;
+  }
+}
+
+@layer components {
+  .matrix-text {
+    text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 30px #00ff41;
+  }
+  
+  .glass-card {
+    @apply bg-gray-900/70 backdrop-blur-lg border border-gray-700/50 rounded-xl;
+  }
+  
+  .polkadot-glow {
+    box-shadow: 0 0 20px rgba(230, 0, 122, 0.3);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-matrix-green/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-matrix-green/50;
+}
