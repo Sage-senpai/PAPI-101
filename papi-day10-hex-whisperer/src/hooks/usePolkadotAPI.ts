@@ -1,6 +1,6 @@
-// src/hooks/usePolkadotAPI.ts
+//src/hooks/usePolkadotAPI.ts
 import { useState, useEffect, useCallback } from 'react';
-import { createClient, type TypedApi } from 'polkadot-api';
+import { createClient, TypedApi } from 'polkadot-api';
 import { getSmProvider } from '@polkadot-api/sm-provider';
 import { dot } from '@polkadot-api/descriptors';
 
@@ -17,7 +17,7 @@ export interface ChainInfo {
     authoringVersion: number;
     specVersion: number;
     implVersion: number;
-    apis: string[];
+    apis: [string, number][];
     transactionVersion: number;
     stateVersion: number;
   };
@@ -37,63 +37,69 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
   const [chainInfo, setChainInfo] = useState<ChainInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [client, setClient] = useState<ReturnType<typeof createClient> | null>(null);
+  const [client, setClient] = useState<any>(null);
 
   const connect = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
     try {
-      console.log("🚀 Initializing PAPI client with Smoldot provider...");
+      console.log("🎩 Initializing PAPI Hex Whisperer...");
+      console.log("🔮 Loading runtime metadata for txFromCallData support...");
       
-      // Use string URL directly - this is the correct way
+      // Initialize Smoldot provider
       const smoldotProvider = getSmProvider("wss://rpc.polkadot.io");
+      
+      // Create PAPI client
       const papiClient = createClient(smoldotProvider);
       setClient(papiClient);
       
+      // Get typed API
       const typedApi = papiClient.getTypedApi(dot);
       setApi(typedApi);
       
-      console.log("✅ PAPI client initialized successfully!");
+      console.log("✅ PAPI client initialized with txFromCallData support!");
+      console.log("📡 Connected to Polkadot via light-client");
+      console.log("✨ Ready to decode hex call data!");
       
-      const [version, existentialDeposit, bestBlock, runtimeVersion] = await Promise.all([
+      // Fetch chain info
+      const [version, existentialDeposit, header, runtimeVersion] = await Promise.all([
         typedApi.constants.System.Version(),
         typedApi.constants.Balances.ExistentialDeposit(),
-        typedApi.query.System.Number.getValue(),
-        typedApi.apis.Core.version()
+        typedApi.query.System.Header.getValue({ at: 'best' }),
+        typedApi.apis.Core.Version()
       ]);
       
-      // Convert APIs array to string array for display
-      const apisArray = runtimeVersion.apis.map((api) => {
-        const [nameBytes, version] = api;
-        // Convert FixedSizeBinary to hex string
-        const hexString = Array.from(nameBytes.asBytes())
-          .map(b => b.toString(16).padStart(2, '0'))
-          .join('');
-        return `${hexString}:${version}`;
-      });
-      
       const chainInfoData: ChainInfo = {
-        chainName: version.impl_name,
-        version: `${version.spec_version}.${version.impl_version}`,
-        specVersion: version.spec_version,
-        txVersion: runtimeVersion.transaction_version,
+        chainName: version.implName,
+        version: `${version.specVersion}.${version.implVersion}`,
+        specVersion: version.specVersion,
+        txVersion: runtimeVersion.transactionVersion,
         existentialDeposit,
-        blockNumber: Number(bestBlock),
+        blockNumber: Number(header.number),
         runtimeVersion: {
-          specName: runtimeVersion.spec_name,
-          implName: runtimeVersion.impl_name,
-          authoringVersion: runtimeVersion.authoring_version,
-          specVersion: runtimeVersion.spec_version,
-          implVersion: runtimeVersion.impl_version,
-          apis: apisArray,
-          transactionVersion: runtimeVersion.transaction_version,
-          stateVersion: runtimeVersion.system_version,
+          specName: runtimeVersion.specName,
+          implName: runtimeVersion.implName,
+          authoringVersion: runtimeVersion.authoringVersion,
+          specVersion: runtimeVersion.specVersion,
+          implVersion: runtimeVersion.implVersion,
+          apis: runtimeVersion.apis,
+          transactionVersion: runtimeVersion.transactionVersion,
+          stateVersion: runtimeVersion.stateVersion,
         },
       };
       
       setChainInfo(chainInfoData);
-      console.log("📊 Chain Info Loaded:", chainInfoData);
+      
+      console.log("📊 Chain Info Loaded:", {
+        chainName: chainInfoData.chainName,
+        specVersion: chainInfoData.specVersion,
+        txVersion: chainInfoData.txVersion,
+        blockNumber: chainInfoData.blockNumber,
+      });
+      
+      console.log("🔍 Important: txFromCallData requires valid runtime metadata");
+      console.log("💡 All hex decoding will be validated against current runtime");
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';

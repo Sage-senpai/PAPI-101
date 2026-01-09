@@ -69,11 +69,11 @@ function App() {
               <Github className="w-5 h-5" />
             </a>
             <a 
-              href="https://twitter.com/hashtag/PAPI30Days" 
+              href="https://x.com/sage_senpeak/status/2009688379550552361?s=20" 
               target="_blank" 
               rel="noopener noreferrer"
               className="p-2 rounded-lg bg-card-bg hover:bg-border-color transition-colors"
-              title="#PAPI30Days"
+              title="X link to Day 9 Post"
             >
               <Twitter className="w-5 h-5" />
             </a>
