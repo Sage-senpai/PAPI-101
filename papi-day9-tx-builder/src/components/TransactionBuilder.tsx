@@ -12,7 +12,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { useTransactionBuilder } from '../hooks/useTransactionBuilder';
-import { TypedApi } from 'polkadot-api';
+import type { TypedApi } from 'polkadot-api';
 import { dot } from '@polkadot-api/descriptors';
 import { MultiAddress } from '@polkadot-api/descriptors';
 import { formatBalance, truncateAddress } from '../utils/formatters';

@@ -1,5 +1,5 @@
 // src/utils/palletsData.ts
-import { PalletInfo } from '../types/transaction';
+import type { PalletInfo } from '../types/transaction';
 
 export const POLKADOT_PALLETS: PalletInfo[] = [
   {
@@ -90,8 +90,8 @@ export const getCallDescription = (pallet: string, call: string): string => {
   return descriptions[pallet]?.[call] || `Execute ${call} from ${pallet} pallet`;
 };
 
-export const getCallParameters = (pallet: string, call: string): Record<string, any> => {
-  const templates: Record<string, Record<string, any>> = {
+export const getCallParameters = (pallet: string, call: string): Record<string, unknown> => {
+  const templates: Record<string, Record<string, unknown>> = {
     Balances: {
       transfer: {
         dest: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',

@@ -1,8 +1,8 @@
-// src/types/transactions.ts
+// src/types/transaction.ts
 export interface TransactionCall {
   pallet: string;
   method: string;
-  args: Record<string, any>;
+  args: Record<string, unknown>;
   callData: string;
   description: string;
   estimatedFee?: bigint;

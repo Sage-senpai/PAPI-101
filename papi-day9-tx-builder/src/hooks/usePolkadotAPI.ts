@@ -1,7 +1,6 @@
 // src/hooks/usePolkadotAPI.ts
-
 import { useState, useEffect, useCallback } from 'react';
-import { createClient, TypedApi } from 'polkadot-api';
+import { createClient, type TypedApi } from 'polkadot-api';
 import { getSmProvider } from '@polkadot-api/sm-provider';
 import { dot } from '@polkadot-api/descriptors';
 
@@ -38,7 +37,7 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
   const [chainInfo, setChainInfo] = useState<ChainInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [client, setClient] = useState<any>(null);
+  const [client, setClient] = useState<ReturnType<typeof createClient> | null>(null);
 
   const connect = useCallback(async () => {
     setIsLoading(true);
@@ -47,26 +46,20 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
     try {
       console.log("🚀 Initializing PAPI client with Smoldot provider...");
       
-      // Initialize Smoldot provider
       const smoldotProvider = getSmProvider("wss://rpc.polkadot.io");
-      
-      // Create PAPI client
       const papiClient = createClient(smoldotProvider);
       setClient(papiClient);
       
-      // Get typed API
       const typedApi = papiClient.getTypedApi(dot);
       setApi(typedApi);
       
       console.log("✅ PAPI client initialized successfully!");
-      console.log("📡 Connected to Polkadot via light-client");
       
-      // Fetch comprehensive chain info
-      const [version, existentialDeposit, header, runtimeVersion] = await Promise.all([
+      const [version, existentialDeposit, bestBlock, runtimeVersion] = await Promise.all([
         typedApi.constants.System.Version(),
         typedApi.constants.Balances.ExistentialDeposit(),
-        typedApi.query.System.Header.getValue({ at: 'best' }),
-        typedApi.apis.Core.Version()
+        typedApi.query.System.Number.getValue(),
+        typedApi.apis.Core.version()
       ]);
       
       const chainInfoData: ChainInfo = {
@@ -75,7 +68,7 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
         specVersion: version.specVersion,
         txVersion: runtimeVersion.transactionVersion,
         existentialDeposit,
-        blockNumber: Number(header.number),
+        blockNumber: Number(bestBlock),
         runtimeVersion: {
           specName: runtimeVersion.specName,
           implName: runtimeVersion.implName,
@@ -89,16 +82,7 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
       };
       
       setChainInfo(chainInfoData);
-      
-      console.log("📊 Chain Info Loaded:", {
-        chainName: chainInfoData.chainName,
-        specVersion: chainInfoData.specVersion,
-        txVersion: chainInfoData.txVersion,
-        blockNumber: chainInfoData.blockNumber,
-        existentialDeposit: chainInfoData.existentialDeposit.toString(),
-      });
-      
-      console.log("💡 Ready to build transactions using dotApi.tx.* methods!");
+      console.log("📊 Chain Info Loaded:", chainInfoData);
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';

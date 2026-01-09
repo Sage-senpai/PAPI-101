@@ -8,7 +8,7 @@ import {
   CheckCircle,
   AlertTriangle
 } from 'lucide-react';
-import { TransactionCall } from '../types/transaction';
+import type { TransactionCall } from '../types/transaction';
 import { formatHex, calculateCallDataSize } from '../utils/formatters';
 
 interface TransactionInspectorProps {

@@ -1,9 +1,9 @@
+// src/hooks/useTransactionBuilder.ts
 import { useState, useCallback } from 'react';
-import { TypedApi } from 'polkadot-api';
+import type { TypedApi } from 'polkadot-api';
 import { dot } from '@polkadot-api/descriptors';
-import { MultiAddress } from '@polkadot-api/descriptors';
-import { TransactionCall, TransactionState } from '../types/transaction';
-import { amountValidator, addressValidator } from '../utils/validators';
+import type { TransactionCall, TransactionState } from '../types/transaction';
+import { addressValidator } from '../utils/validators';
 
 export const useTransactionBuilder = (api: TypedApi<typeof dot> | null) => {
   const [state, setState] = useState<TransactionState>({
@@ -20,7 +20,7 @@ export const useTransactionBuilder = (api: TypedApi<typeof dot> | null) => {
   const buildTransaction = useCallback(async (
     pallet: string,
     method: string,
-    args: Record<string, any>
+    args: Record<string, unknown>
   ) => {
     if (!api) {
       setState(prev => ({
@@ -42,21 +42,16 @@ export const useTransactionBuilder = (api: TypedApi<typeof dot> | null) => {
       console.log(`🏗️ Building transaction: ${pallet}.${method}`);
       console.log('📦 Parameters:', args);
 
-      // Dynamically call the tx method based on pallet and method
-      const txMethod = (api.tx as any)[pallet]?.[method];
+      const txMethod = (api.tx as Record<string, Record<string, (args: unknown) => { encodedCallData: Uint8Array }>>)[pallet]?.[method];
       if (!txMethod) {
         throw new Error(`Transaction method ${pallet}.${method} not found`);
       }
 
-      // Build the transaction
       const tx = txMethod(args);
-      
-      // Get call data
-      const callData = tx.encodedCallData.toString();
+      const callData = `0x${Array.from(tx.encodedCallData).map(b => b.toString(16).padStart(2, '0')).join('')}`;
       
       console.log(`✅ Transaction built successfully!`);
-      console.log(`📏 Call data size: ${(callData.length - 2) / 2} bytes`);
-      console.log(`🔢 Call data: ${callData.substring(0, 64)}...`);
+      console.log(`📏 Call data size: ${callData.length / 2 - 1} bytes`);
 
       const transaction: TransactionCall = {
         pallet,
@@ -66,12 +61,10 @@ export const useTransactionBuilder = (api: TypedApi<typeof dot> | null) => {
         description: `Execute ${method} from ${pallet} pallet`,
       };
 
-      // Validate parameters
       const errors: string[] = [];
       const warnings: string[] = [];
 
-      // Check for address parameters
-      if (args.dest) {
+      if (args.dest && typeof args.dest === 'string') {
         try {
           addressValidator.parse(args.dest);
         } catch {
@@ -79,14 +72,8 @@ export const useTransactionBuilder = (api: TypedApi<typeof dot> | null) => {
         }
       }
 
-      if (args.value) {
-        try {
-          if (typeof args.value === 'bigint' && args.value < BigInt(100000000)) {
-            warnings.push('Transaction value is very small');
-          }
-        } catch {
-          // Ignore validation errors for non-bigint values
-        }
+      if (args.value && typeof args.value === 'bigint' && args.value < BigInt(100000000)) {
+        warnings.push('Transaction value is very small');
       }
 
       setState({
