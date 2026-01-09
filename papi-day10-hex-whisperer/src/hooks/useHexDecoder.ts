@@ -1,9 +1,9 @@
 //src/hooks/useHexDecoder.ts
 import { useState, useCallback } from 'react';
-import { TypedApi } from 'polkadot-api';
+import type { TypedApi } from 'polkadot-api';
 import { dot } from '@polkadot-api/descriptors';
 import { Binary } from '@polkadot-api/descriptors';
-import { DecodedTransaction, DecodingState } from '../types/decoding';
+import type { DecodedTransaction,  DecodingState } from '../types/decoding';
 import { isValidHex, calculateHexSize, extractCallIndices } from '../utils/hexUtils';
 import { analyzeBytes } from '../utils/byteParser';
 

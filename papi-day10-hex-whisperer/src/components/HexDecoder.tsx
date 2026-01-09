@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Wand2, Search, Copy, Check, AlertCircle, Sparkles, History } from 'lucide-react';
 import { useHexDecoder } from '../hooks/useHexDecoder';
-import { TypedApi } from 'polkadot-api';
+import type { TypedApi } from 'polkadot-api';
 import { dot } from '@polkadot-api/descriptors';
 import { isValidHex, formatHex, calculateHexSize } from '../utils/hexUtils';
 import { EXAMPLE_TRANSACTIONS } from '../utils/transactionExamples';

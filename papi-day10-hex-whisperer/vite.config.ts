@@ -1,7 +1,28 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    port: 3000,
+    open: true,
+    host: true
+  },
+  build: {
+    target: 'es2020',
+    sourcemap: true,
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'papi': ['polkadot-api', '@polkadot-api/descriptors', '@polkadot-api/sm-provider'],
+          'ui': ['react', 'react-dom', 'zustand'],
+          'utils': ['prismjs']
+        }
+      }
+    }
+  },
+  optimizeDeps: {
+    include: ['polkadot-api', '@polkadot-api/sm-provider']
+  }
 })

@@ -1,6 +1,6 @@
 //src/hooks/usePolkadotAPI.ts
 import { useState, useEffect, useCallback } from 'react';
-import { createClient, TypedApi } from 'polkadot-api';
+import { createClient, type TypedApi } from 'polkadot-api';
 import { getSmProvider } from '@polkadot-api/sm-provider';
 import { dot } from '@polkadot-api/descriptors';
 

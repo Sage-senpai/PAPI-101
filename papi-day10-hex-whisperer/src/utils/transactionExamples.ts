@@ -1,4 +1,5 @@
-import { ExampleTransaction } from '../types/decoding';
+//src/utils/transactionExamples
+import type{ ExampleTransaction } from '../types/decoding';
 
 export const EXAMPLE_TRANSACTIONS: ExampleTransaction[] = [
   {
