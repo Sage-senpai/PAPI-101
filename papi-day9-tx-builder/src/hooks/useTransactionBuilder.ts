@@ -42,12 +42,21 @@ export const useTransactionBuilder = (api: TypedApi<typeof dot> | null) => {
       console.log(`🏗️ Building transaction: ${pallet}.${method}`);
       console.log('📦 Parameters:', args);
 
-      const txMethod = (api.tx as Record<string, Record<string, (args: unknown) => { encodedCallData: Uint8Array }>>)[pallet]?.[method];
+      // Access the transaction method dynamically
+      const palletTx = (api.tx as unknown as Record<string, unknown>)[pallet];
+      if (!palletTx || typeof palletTx !== 'object') {
+        throw new Error(`Pallet ${pallet} not found`);
+      }
+
+      const txMethod = (palletTx as Record<string, (args: unknown) => { encodedCallData: Uint8Array }>)[method];
       if (!txMethod) {
         throw new Error(`Transaction method ${pallet}.${method} not found`);
       }
 
+      // Build the transaction
       const tx = txMethod(args);
+      
+      // Get encoded call data
       const callData = `0x${Array.from(tx.encodedCallData).map(b => b.toString(16).padStart(2, '0')).join('')}`;
       
       console.log(`✅ Transaction built successfully!`);
@@ -61,17 +70,41 @@ export const useTransactionBuilder = (api: TypedApi<typeof dot> | null) => {
         description: `Execute ${method} from ${pallet} pallet`,
       };
 
+      // Validation
       const errors: string[] = [];
       const warnings: string[] = [];
 
-      if (args.dest && typeof args.dest === 'string') {
-        try {
-          addressValidator.parse(args.dest);
-        } catch {
-          errors.push('Invalid destination address format');
+      // Check destination address if present
+      if (args.dest) {
+        const destValue = typeof args.dest === 'object' && args.dest !== null && 'Id' in args.dest
+          ? (args.dest as { Id: string }).Id
+          : args.dest;
+        
+        if (typeof destValue === 'string') {
+          try {
+            addressValidator.parse(destValue);
+          } catch {
+            errors.push('Invalid destination address format');
+          }
         }
       }
 
+      // Check controller address if present
+      if (args.controller) {
+        const controllerValue = typeof args.controller === 'object' && args.controller !== null && 'Id' in args.controller
+          ? (args.controller as { Id: string }).Id
+          : args.controller;
+        
+        if (typeof controllerValue === 'string') {
+          try {
+            addressValidator.parse(controllerValue);
+          } catch {
+            errors.push('Invalid controller address format');
+          }
+        }
+      }
+
+      // Check value if present
       if (args.value && typeof args.value === 'bigint' && args.value < BigInt(100000000)) {
         warnings.push('Transaction value is very small');
       }

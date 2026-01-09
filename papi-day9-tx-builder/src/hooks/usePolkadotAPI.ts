@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { createClient, type TypedApi } from 'polkadot-api';
 import { getSmProvider } from '@polkadot-api/sm-provider';
 import { dot } from '@polkadot-api/descriptors';
+import type { polkadot } from '@polkadot-api/descriptors';
 
 export interface ChainInfo {
   chainName: string;
@@ -17,7 +18,7 @@ export interface ChainInfo {
     authoringVersion: number;
     specVersion: number;
     implVersion: number;
-    apis: [string, number][];
+    apis: string[];
     transactionVersion: number;
     stateVersion: number;
   };
@@ -46,7 +47,7 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
     try {
       console.log("🚀 Initializing PAPI client with Smoldot provider...");
       
-      const smoldotProvider = getSmProvider("wss://rpc.polkadot.io");
+      const smoldotProvider = getSmProvider(polkadot);
       const papiClient = createClient(smoldotProvider);
       setClient(papiClient);
       
@@ -62,22 +63,32 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
         typedApi.apis.Core.version()
       ]);
       
+      // Convert APIs array to string array for display
+      const apisArray = runtimeVersion.apis.map((api) => {
+        const [nameBytes, version] = api;
+        // Convert FixedSizeBinary to hex string
+        const hexString = Array.from(nameBytes.asBytes())
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+        return `${hexString}:${version}`;
+      });
+      
       const chainInfoData: ChainInfo = {
-        chainName: version.implName,
-        version: `${version.specVersion}.${version.implVersion}`,
-        specVersion: version.specVersion,
-        txVersion: runtimeVersion.transactionVersion,
+        chainName: version.impl_name,
+        version: `${version.spec_version}.${version.impl_version}`,
+        specVersion: version.spec_version,
+        txVersion: runtimeVersion.transaction_version,
         existentialDeposit,
         blockNumber: Number(bestBlock),
         runtimeVersion: {
-          specName: runtimeVersion.specName,
-          implName: runtimeVersion.implName,
-          authoringVersion: runtimeVersion.authoringVersion,
-          specVersion: runtimeVersion.specVersion,
-          implVersion: runtimeVersion.implVersion,
-          apis: runtimeVersion.apis,
-          transactionVersion: runtimeVersion.transactionVersion,
-          stateVersion: runtimeVersion.stateVersion,
+          specName: runtimeVersion.spec_name,
+          implName: runtimeVersion.impl_name,
+          authoringVersion: runtimeVersion.authoring_version,
+          specVersion: runtimeVersion.spec_version,
+          implVersion: runtimeVersion.impl_version,
+          apis: apisArray,
+          transactionVersion: runtimeVersion.transaction_version,
+          stateVersion: runtimeVersion.system_version,
         },
       };
       

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// src/components/TransactionBuilder.tsx
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,14 +9,12 @@ import {
   Copy, 
   Check, 
   AlertCircle,
-  Zap,
-  ChevronDown
+  Zap
 } from 'lucide-react';
 import { useTransactionBuilder } from '../hooks/useTransactionBuilder';
 import type { TypedApi } from 'polkadot-api';
 import { dot } from '@polkadot-api/descriptors';
-import { MultiAddress } from '@polkadot-api/descriptors';
-import { formatBalance, truncateAddress } from '../utils/formatters';
+import { formatBalance } from '../utils/formatters';
 import { getCallParameters } from '../utils/palletsData';
 
 interface TransactionBuilderProps {
@@ -24,6 +23,24 @@ interface TransactionBuilderProps {
   selectedCall: string | null;
   onTransactionBuilt: () => void;
 }
+
+// Form data type based on selected call
+type BalancesFormData = {
+  pallet: string;
+  method: string;
+  dest: string;
+  value: string;
+};
+
+type StakingFormData = {
+  pallet: string;
+  method: string;
+  controller: string;
+  value: string;
+  payee: 'Staked' | 'Stash' | 'Controller' | 'Account';
+};
+
+type FormData = BalancesFormData | StakingFormData | { pallet: string; method: string };
 
 // Dynamic schema based on selected call
 const createSchema = (pallet: string, call: string) => {
@@ -34,7 +51,6 @@ const createSchema = (pallet: string, call: string) => {
 
   const fields: Record<string, z.ZodTypeAny> = {};
 
-  // Add fields based on pallet and call
   if (pallet === 'Balances' && (call === 'transfer' || call === 'transfer_keep_alive')) {
     fields.dest = z.string()
       .min(47, 'Address too short')
@@ -42,8 +58,7 @@ const createSchema = (pallet: string, call: string) => {
       .regex(/^[0-9a-zA-Z]+$/, 'Invalid SS58 address');
     
     fields.value = z.string()
-      .regex(/^\d+(\.\d+)?$/, 'Invalid amount')
-      .transform(val => BigInt(Math.floor(parseFloat(val) * Math.pow(10, 10))));
+      .regex(/^\d+(\.\d+)?$/, 'Invalid amount');
   } else if (pallet === 'Staking' && call === 'bond') {
     fields.controller = z.string()
       .min(47, 'Address too short')
@@ -51,8 +66,7 @@ const createSchema = (pallet: string, call: string) => {
       .regex(/^[0-9a-zA-Z]+$/, 'Invalid SS58 address');
     
     fields.value = z.string()
-      .regex(/^\d+(\.\d+)?$/, 'Invalid amount')
-      .transform(val => BigInt(Math.floor(parseFloat(val) * Math.pow(10, 10))));
+      .regex(/^\d+(\.\d+)?$/, 'Invalid amount');
     
     fields.payee = z.enum(['Staked', 'Stash', 'Controller', 'Account']);
   }
@@ -60,19 +74,19 @@ const createSchema = (pallet: string, call: string) => {
   return baseSchema.extend(fields);
 };
 
-export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
+export const TransactionBuilder = ({
   api,
   selectedPallet,
   selectedCall,
   onTransactionBuilt,
-}) => {
+}: TransactionBuilderProps) => {
   const { state, buildTransaction, clearTransaction } = useTransactionBuilder(api);
   const [copied, setCopied] = useState(false);
   const [autoFillUsed, setAutoFillUsed] = useState(false);
 
   const schema = selectedPallet && selectedCall 
     ? createSchema(selectedPallet, selectedCall)
-    : z.object({});
+    : z.object({ pallet: z.string(), method: z.string() });
 
   const {
     register,
@@ -81,12 +95,12 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
     formState: { errors },
     setValue,
     watch,
-  } = useForm({
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       pallet: selectedPallet || '',
       method: selectedCall || '',
-    },
+    } as FormData,
   });
 
   // Auto-fill when pallet/call changes
@@ -98,9 +112,9 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
       const params = getCallParameters(selectedPallet, selectedCall);
       Object.entries(params).forEach(([key, value]) => {
         if (key === 'value' && typeof value === 'bigint') {
-          setValue(key, (Number(value) / Math.pow(10, 10)).toString());
+          setValue(key as keyof FormData, (Number(value) / Math.pow(10, 10)).toString() as never);
         } else {
-          setValue(key, value.toString());
+          setValue(key as keyof FormData, value.toString() as never);
         }
       });
       
@@ -109,28 +123,28 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
     }
   }, [selectedPallet, selectedCall, setValue, autoFillUsed]);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: FormData) => {
     if (!selectedPallet || !selectedCall) return;
 
     console.log(`🚀 Building transaction: ${selectedPallet}.${selectedCall}`);
     console.log('📋 Form data:', data);
 
     // Prepare arguments
-    const args: Record<string, any> = { ...data };
+    const args: Record<string, unknown> = { ...data };
     delete args.pallet;
     delete args.method;
 
     // Convert string values back to appropriate types
-    if (args.value && typeof args.value === 'string') {
+    if ('value' in args && typeof args.value === 'string') {
       args.value = BigInt(Math.floor(parseFloat(args.value) * Math.pow(10, 10)));
     }
 
-    // Convert MultiAddress if needed
-    if (args.dest) {
-      args.dest = MultiAddress.Id(args.dest);
+    // Convert addresses to proper format
+    if ('dest' in args && typeof args.dest === 'string') {
+      args.dest = { Id: args.dest };
     }
-    if (args.controller) {
-      args.controller = MultiAddress.Id(args.controller);
+    if ('controller' in args && typeof args.controller === 'string') {
+      args.controller = { Id: args.controller };
     }
 
     await buildTransaction(selectedPallet, selectedCall, args);
@@ -155,11 +169,11 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
   const formData = watch();
 
   return (
-    <div className="glass-card p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="glass-card p-4 md:p-6">
+      <div className="flex items-center justify-between mb-4 md:mb-6">
         <div>
-          <h3 className="text-2xl font-bold text-white">Transaction Builder</h3>
-          <p className="text-gray-400">Construct transactions using PAPI's tx method</p>
+          <h3 className="text-xl md:text-2xl font-bold text-white">Transaction Builder</h3>
+          <p className="text-sm md:text-base text-gray-400">Construct transactions using PAPI's tx method</p>
         </div>
         <div className="flex items-center space-x-2 px-3 py-1 bg-turbo-blue/20 rounded-lg">
           <Zap className="w-4 h-4 text-turbo-blue" />
@@ -174,7 +188,7 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-400">Building Transaction</p>
-                <p className="text-xl font-bold text-white">
+                <p className="text-lg md:text-xl font-bold text-white">
                   {selectedPallet}.{selectedCall}
                 </p>
               </div>
@@ -201,10 +215,10 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
                 <input
                   type="text"
                   placeholder="5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"
-                  {...register('dest')}
-                  className="w-full px-4 py-2 bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white font-jetbrains"
+                  {...register('dest' as keyof FormData)}
+                  className="w-full px-4 py-2 text-sm bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white font-jetbrains"
                 />
-                {errors.dest && (
+                {'dest' in errors && errors.dest && (
                   <p className="mt-1 text-sm text-red-400">{errors.dest.message}</p>
                 )}
               </div>
@@ -217,19 +231,19 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
                   <input
                     type="text"
                     placeholder="1.0"
-                    {...register('value')}
-                    className="w-full px-4 py-2 bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white"
+                    {...register('value' as keyof FormData)}
+                    className="w-full px-4 py-2 text-sm bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white"
                   />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
                     DOT
                   </div>
                 </div>
-                {errors.value && (
+                {'value' in errors && errors.value && (
                   <p className="mt-1 text-sm text-red-400">{errors.value.message}</p>
                 )}
-                {formData.value && !errors.value && (
+                {'value' in formData && formData.value && !('value' in errors) && (
                   <p className="mt-1 text-sm text-gray-400">
-                    = {formatBalance(parseFloat(formData.value) * Math.pow(10, 10))}
+                    = {formatBalance(parseFloat(formData.value as string) * Math.pow(10, 10))}
                   </p>
                 )}
               </div>
@@ -245,10 +259,10 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
                 <input
                   type="text"
                   placeholder="5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"
-                  {...register('controller')}
-                  className="w-full px-4 py-2 bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white font-jetbrains"
+                  {...register('controller' as keyof FormData)}
+                  className="w-full px-4 py-2 text-sm bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white font-jetbrains"
                 />
-                {errors.controller && (
+                {'controller' in errors && errors.controller && (
                   <p className="mt-1 text-sm text-red-400">{errors.controller.message}</p>
                 )}
               </div>
@@ -261,14 +275,14 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
                   <input
                     type="text"
                     placeholder="100.0"
-                    {...register('value')}
-                    className="w-full px-4 py-2 bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white"
+                    {...register('value' as keyof FormData)}
+                    className="w-full px-4 py-2 text-sm bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white"
                   />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
                     DOT
                   </div>
                 </div>
-                {errors.value && (
+                {'value' in errors && errors.value && (
                   <p className="mt-1 text-sm text-red-400">{errors.value.message}</p>
                 )}
               </div>
@@ -278,8 +292,8 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
                   Reward Destination
                 </label>
                 <select
-                  {...register('payee')}
-                  className="w-full px-4 py-2 bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white"
+                  {...register('payee' as keyof FormData)}
+                  className="w-full px-4 py-2 text-sm bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white"
                 >
                   <option value="Staked">Staked (Add to stake)</option>
                   <option value="Stash">Stash (Pay to stash account)</option>
@@ -317,7 +331,7 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
       {state.error && (
         <div className="mt-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
           <div className="flex items-start space-x-3">
-            <AlertCircle className="w-5 h-5 text-red-400 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-semibold text-red-300">Build Failed</p>
               <p className="text-sm text-gray-300 mt-1">{state.error}</p>
@@ -328,14 +342,14 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
 
       {state.transaction && (
         <div className="mt-6 p-4 bg-black/30 rounded-lg border border-turbo-blue/30">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-3">
             <div>
               <h4 className="font-bold text-white text-lg">✅ Transaction Built Successfully</h4>
               <p className="text-sm text-gray-400">Call data ready for signing</p>
             </div>
             <button
               onClick={handleCopyCallData}
-              className="px-3 py-1 bg-turbo-blue/20 hover:bg-turbo-blue/30 text-turbo-blue rounded transition-colors flex items-center"
+              className="px-3 py-1 bg-turbo-blue/20 hover:bg-turbo-blue/30 text-turbo-blue rounded transition-colors flex items-center whitespace-nowrap"
             >
               {copied ? (
                 <>
@@ -354,7 +368,7 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
           <div className="space-y-4">
             <div>
               <p className="text-sm text-gray-400 mb-1">Call Data (Hex)</p>
-              <div className="p-3 bg-black/50 rounded font-jetbrains text-sm overflow-x-auto">
+              <div className="p-3 bg-black/50 rounded font-jetbrains text-xs md:text-sm overflow-x-auto">
                 {state.transaction.callData}
               </div>
               <p className="text-xs text-gray-500 mt-1">
@@ -376,8 +390,8 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
             {Object.keys(state.transaction.args).length > 0 && (
               <div>
                 <p className="text-sm text-gray-400 mb-2">Parameters</p>
-                <div className="p-3 bg-black/30 rounded">
-                  <pre className="text-sm text-gray-300 whitespace-pre-wrap">
+                <div className="p-3 bg-black/30 rounded overflow-x-auto">
+                  <pre className="text-xs md:text-sm text-gray-300 whitespace-pre-wrap">
                     {JSON.stringify(state.transaction.args, (key, value) => {
                       if (typeof value === 'bigint') {
                         return value.toString();
@@ -405,7 +419,7 @@ export const TransactionBuilder: React.FC<TransactionBuilderProps> = ({
       )}
 
       <div className="mt-6 pt-4 border-t border-border-color/50">
-        <p className="text-sm text-gray-400">
+        <p className="text-xs md:text-sm text-gray-400">
           <span className="text-turbo-blue font-semibold">💡 Day 9 Achievement:</span> You've successfully built a transaction using PAPI's tx method! 
           The call data above is ready to be signed and submitted to the chain.
         </p>
