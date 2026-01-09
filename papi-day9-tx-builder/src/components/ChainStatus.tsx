@@ -1,4 +1,5 @@
 // src/components/ChainStatus.tsx
+import { useEffect } from 'react';
 import { Wifi, Cpu, Hash, Shield, Zap } from 'lucide-react';
 import type { ChainInfo } from '../hooks/usePolkadotAPI';
 import { formatBalance } from '../utils/formatters';
@@ -16,7 +17,19 @@ export const ChainStatus = ({
   isLoading,
   error,
 }: ChainStatusProps) => {
+  // Debug logging
+  useEffect(() => {
+    console.log('🔍 ChainStatus render:', {
+      isLoading,
+      isConnected,
+      hasChainInfo: !!chainInfo,
+      hasError: !!error,
+      chainName: chainInfo?.chainName
+    });
+  }, [isLoading, isConnected, chainInfo, error]);
+
   if (isLoading) {
+    console.log('🔄 Showing loading state');
     return (
       <div className="glass-card p-4 md:p-6 turbo-glow border-turbo-blue/30">
         <div className="flex items-center space-x-3">
@@ -31,6 +44,7 @@ export const ChainStatus = ({
   }
 
   if (error) {
+    console.log('❌ Showing error state:', error);
     return (
       <div className="glass-card p-4 md:p-6 border-red-500/30 bg-red-900/10">
         <div className="flex items-center space-x-3">
@@ -45,6 +59,7 @@ export const ChainStatus = ({
   }
 
   if (!isConnected || !chainInfo) {
+    console.log('⚪ Showing disconnected state');
     return (
       <div className="glass-card p-4 md:p-6">
         <div className="flex items-center space-x-3">
@@ -58,6 +73,7 @@ export const ChainStatus = ({
     );
   }
 
+  console.log('✅ Showing connected state with chain info');
   return (
     <div className="glass-card p-4 md:p-6 turbo-glow border-turbo-blue/30">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">

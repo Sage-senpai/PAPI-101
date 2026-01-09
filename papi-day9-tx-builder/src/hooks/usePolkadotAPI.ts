@@ -40,13 +40,19 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
   const [client, setClient] = useState<ReturnType<typeof createClient> | null>(null);
 
   const connect = useCallback(async () => {
+    // Prevent multiple simultaneous connections
+    if (isLoading) {
+      console.log("⚠️ Connection already in progress");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     
     try {
       console.log("🚀 Initializing PAPI client with Smoldot provider...");
       
-      // Use string URL directly - this is the correct way
+      // Use string URL directly
       const smoldotProvider = getSmProvider("wss://rpc.polkadot.io");
       const papiClient = createClient(smoldotProvider);
       setClient(papiClient);
@@ -55,18 +61,33 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
       setApi(typedApi);
       
       console.log("✅ PAPI client initialized successfully!");
+      console.log("📡 Fetching chain information...");
       
-      const [version, existentialDeposit, bestBlock, runtimeVersion] = await Promise.all([
+      // Fetch chain info with a timeout
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Connection timeout after 30 seconds')), 30000)
+      );
+
+      const chainDataPromise = Promise.all([
         typedApi.constants.System.Version(),
         typedApi.constants.Balances.ExistentialDeposit(),
         typedApi.query.System.Number.getValue(),
         typedApi.apis.Core.version()
       ]);
+
+      const [version, existentialDeposit, bestBlock, runtimeVersion] = await Promise.race([
+        chainDataPromise,
+        timeoutPromise
+      ]) as Awaited<typeof chainDataPromise>;
+      
+      console.log("📊 Chain data received:", {
+        version: version.impl_name,
+        block: Number(bestBlock)
+      });
       
       // Convert APIs array to string array for display
       const apisArray = runtimeVersion.apis.map((api) => {
         const [nameBytes, version] = api;
-        // Convert FixedSizeBinary to hex string
         const hexString = Array.from(nameBytes.asBytes())
           .map(b => b.toString(16).padStart(2, '0'))
           .join('');
@@ -92,32 +113,50 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
         },
       };
       
+      // CRITICAL: Set chain info BEFORE setting isLoading to false
       setChainInfo(chainInfoData);
-      console.log("📊 Chain Info Loaded:", chainInfoData);
+      console.log("✅ Chain Info Loaded Successfully!");
+      console.log("📊 Chain:", chainInfoData.chainName);
+      console.log("🔢 Block:", chainInfoData.blockNumber);
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(`Connection failed: ${errorMessage}`);
       console.error("❌ Connection error:", err);
+      
+      // Clean up on error
+      setApi(null);
+      setChainInfo(null);
     } finally {
+      // ALWAYS set isLoading to false at the end
       setIsLoading(false);
+      console.log("🏁 Connection attempt completed");
     }
-  }, []);
+  }, [isLoading]);
 
   const disconnect = useCallback(() => {
     if (client) {
-      client.destroy();
-      console.log("🔌 Disconnected from Polkadot");
+      try {
+        client.destroy();
+        console.log("🔌 Disconnected from Polkadot");
+      } catch (err) {
+        console.error("Error disconnecting:", err);
+      }
     }
     setApi(null);
     setChainInfo(null);
     setClient(null);
+    setError(null);
   }, [client]);
 
   useEffect(() => {
     return () => {
       if (client) {
-        client.destroy();
+        try {
+          client.destroy();
+        } catch (err) {
+          console.error("Error cleaning up client:", err);
+        }
       }
     };
   }, [client]);

@@ -24,23 +24,8 @@ interface TransactionBuilderProps {
   onTransactionBuilt: () => void;
 }
 
-// Form data type based on selected call
-type BalancesFormData = {
-  pallet: string;
-  method: string;
-  dest: string;
-  value: string;
-};
-
-type StakingFormData = {
-  pallet: string;
-  method: string;
-  controller: string;
-  value: string;
-  payee: 'Staked' | 'Stash' | 'Controller' | 'Account';
-};
-
-type FormData = BalancesFormData | StakingFormData | { pallet: string; method: string };
+// Form data type
+type FormData = Record<string, string>;
 
 // Dynamic schema based on selected call
 const createSchema = (pallet: string, call: string) => {
@@ -100,7 +85,7 @@ export const TransactionBuilder = ({
     defaultValues: {
       pallet: selectedPallet || '',
       method: selectedCall || '',
-    } as FormData,
+    },
   });
 
   // Auto-fill when pallet/call changes
@@ -112,9 +97,10 @@ export const TransactionBuilder = ({
       const params = getCallParameters(selectedPallet, selectedCall);
       Object.entries(params).forEach(([key, value]) => {
         if (key === 'value' && typeof value === 'bigint') {
-          setValue(key as keyof FormData, (Number(value) / Math.pow(10, 10)).toString() as never);
+          // Convert bigint to decimal string for display
+          setValue(key, (Number(value) / Math.pow(10, 10)).toString());
         } else {
-          setValue(key as keyof FormData, value.toString() as never);
+          setValue(key, value.toString());
         }
       });
       
@@ -129,26 +115,40 @@ export const TransactionBuilder = ({
     console.log(`🚀 Building transaction: ${selectedPallet}.${selectedCall}`);
     console.log('📋 Form data:', data);
 
-    // Prepare arguments
-    const args: Record<string, unknown> = { ...data };
-    delete args.pallet;
-    delete args.method;
+    try {
+      // Prepare arguments - this is the key fix!
+      const args: Record<string, unknown> = {};
+      
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === 'pallet' || key === 'method') return;
+        
+        // Convert value string to bigint (in plancks)
+        if (key === 'value' && typeof value === 'string') {
+          // Parse the DOT value and convert to plancks (10 decimals)
+          const dotAmount = parseFloat(value);
+          if (isNaN(dotAmount)) {
+            throw new Error('Invalid amount');
+          }
+          // Convert to plancks and store as number (not BigInt to avoid serialization issues)
+          args[key] = Math.floor(dotAmount * Math.pow(10, 10));
+        }
+        // Convert addresses to proper format
+        else if ((key === 'dest' || key === 'controller') && typeof value === 'string') {
+          args[key] = { Id: value };
+        }
+        // Keep other values as-is
+        else {
+          args[key] = value;
+        }
+      });
 
-    // Convert string values back to appropriate types
-    if ('value' in args && typeof args.value === 'string') {
-      args.value = BigInt(Math.floor(parseFloat(args.value) * Math.pow(10, 10)));
-    }
+      console.log('📦 Converted args:', args);
 
-    // Convert addresses to proper format
-    if ('dest' in args && typeof args.dest === 'string') {
-      args.dest = { Id: args.dest };
+      await buildTransaction(selectedPallet, selectedCall, args);
+      onTransactionBuilt();
+    } catch (error) {
+      console.error('❌ Error preparing transaction:', error);
     }
-    if ('controller' in args && typeof args.controller === 'string') {
-      args.controller = { Id: args.controller };
-    }
-
-    await buildTransaction(selectedPallet, selectedCall, args);
-    onTransactionBuilt();
   };
 
   const handleCopyCallData = () => {
@@ -215,10 +215,10 @@ export const TransactionBuilder = ({
                 <input
                   type="text"
                   placeholder="5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"
-                  {...register('dest' as keyof FormData)}
+                  {...register('dest')}
                   className="w-full px-4 py-2 text-sm bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white font-jetbrains"
                 />
-                {'dest' in errors && errors.dest && (
+                {errors.dest && (
                   <p className="mt-1 text-sm text-red-400">{errors.dest.message}</p>
                 )}
               </div>
@@ -231,19 +231,19 @@ export const TransactionBuilder = ({
                   <input
                     type="text"
                     placeholder="1.0"
-                    {...register('value' as keyof FormData)}
+                    {...register('value')}
                     className="w-full px-4 py-2 text-sm bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white"
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
                     DOT
                   </div>
                 </div>
-                {'value' in errors && errors.value && (
+                {errors.value && (
                   <p className="mt-1 text-sm text-red-400">{errors.value.message}</p>
                 )}
-                {'value' in formData && formData.value && !('value' in errors) && (
+                {formData.value && !errors.value && (
                   <p className="mt-1 text-sm text-gray-400">
-                    = {formatBalance(parseFloat(formData.value as string) * Math.pow(10, 10))}
+                    = {formatBalance(parseFloat(formData.value) * Math.pow(10, 10))}
                   </p>
                 )}
               </div>
@@ -259,10 +259,10 @@ export const TransactionBuilder = ({
                 <input
                   type="text"
                   placeholder="5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"
-                  {...register('controller' as keyof FormData)}
+                  {...register('controller')}
                   className="w-full px-4 py-2 text-sm bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white font-jetbrains"
                 />
-                {'controller' in errors && errors.controller && (
+                {errors.controller && (
                   <p className="mt-1 text-sm text-red-400">{errors.controller.message}</p>
                 )}
               </div>
@@ -275,14 +275,14 @@ export const TransactionBuilder = ({
                   <input
                     type="text"
                     placeholder="100.0"
-                    {...register('value' as keyof FormData)}
+                    {...register('value')}
                     className="w-full px-4 py-2 text-sm bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white"
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
                     DOT
                   </div>
                 </div>
-                {'value' in errors && errors.value && (
+                {errors.value && (
                   <p className="mt-1 text-sm text-red-400">{errors.value.message}</p>
                 )}
               </div>
@@ -292,7 +292,7 @@ export const TransactionBuilder = ({
                   Reward Destination
                 </label>
                 <select
-                  {...register('payee' as keyof FormData)}
+                  {...register('payee')}
                   className="w-full px-4 py-2 text-sm bg-black/50 border border-border-color rounded-lg focus:outline-none focus:border-turbo-blue text-white"
                 >
                   <option value="Staked">Staked (Add to stake)</option>
@@ -392,12 +392,7 @@ export const TransactionBuilder = ({
                 <p className="text-sm text-gray-400 mb-2">Parameters</p>
                 <div className="p-3 bg-black/30 rounded overflow-x-auto">
                   <pre className="text-xs md:text-sm text-gray-300 whitespace-pre-wrap">
-                    {JSON.stringify(state.transaction.args, (key, value) => {
-                      if (typeof value === 'bigint') {
-                        return value.toString();
-                      }
-                      return value;
-                    }, 2)}
+                    {JSON.stringify(state.transaction.args, null, 2)}
                   </pre>
                 </div>
               </div>
