@@ -1,4 +1,5 @@
-//src/utils/byteParser.ts
+// src/utils/byteParser.ts
+// ==========================================
 import type { ByteAnalysis } from '../types/decoding';
 
 export const analyzeBytes = (hex: string): ByteAnalysis[] => {
@@ -28,7 +29,6 @@ const getByteMeaning = (position: number, byte: string): string => {
   if (position < 4) return 'Length Prefix';
   if (position < 8) return 'Parameter Data';
   
-  // Try to interpret as ASCII if it's printable
   const charCode = parseInt(byte, 16);
   if (charCode >= 32 && charCode <= 126) {
     return `Data: '${String.fromCharCode(charCode)}' (ASCII ${charCode})`;
@@ -53,15 +53,14 @@ export const decodeByte = (byte: string, context: 'pallet' | 'call' | 'data'): s
       const pallets: Record<number, string> = {
         4: 'Balances',
         7: 'Staking',
-        24: 'Utility', // 0x18
-        30: 'Multisig', // 0x1E
-        50: 'Assets', // 0x32
-        12: 'Governance', // 0x0C
+        24: 'Utility',
+        30: 'Multisig',
+        50: 'Assets',
+        12: 'Governance',
       };
       return pallets[value] || `Unknown Pallet (${value})`;
       
     case 'call':
-      // These would come from runtime metadata in a real implementation
       const balanceCalls: Record<number, string> = {
         0: 'transfer',
         1: 'set_balance',

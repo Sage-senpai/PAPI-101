@@ -1,14 +1,12 @@
 //src/components/HexDecoder.tsx
-import React, { useState, useEffect } from 'react';
-import { Wand2, Search, Copy, Check, AlertCircle, Sparkles, History } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Wand2, Copy, Check, AlertCircle, Sparkles, History } from 'lucide-react';
 import { useHexDecoder } from '../hooks/useHexDecoder';
-import type { TypedApi } from 'polkadot-api';
-import { dot } from '@polkadot-api/descriptors';
 import { isValidHex, formatHex, calculateHexSize } from '../utils/hexUtils';
 import { EXAMPLE_TRANSACTIONS } from '../utils/transactionExamples';
 
 interface HexDecoderProps {
-  api: TypedApi<typeof dot> | null;
+  api: any | null;
   onDecode: (hex: string) => void;
 }
 
@@ -57,7 +55,7 @@ export const HexDecoder: React.FC<HexDecoderProps> = ({ api, onDecode }) => {
 
   return (
     <div className="crystal-card p-6 magic-glow">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
         <div>
           <h3 className="text-2xl font-bold text-white flex items-center">
             <Wand2 className="w-7 h-7 mr-3 text-magic-purple animate-wave" />
@@ -95,7 +93,7 @@ export const HexDecoder: React.FC<HexDecoderProps> = ({ api, onDecode }) => {
                 type="button"
                 onClick={handleCopyHex}
                 disabled={!hexInput}
-                className="p-1.5 bg-gray-800 hover:bg-gray-700 rounded transition-colors"
+                className="p-1.5 bg-gray-800 hover:bg-gray-700 rounded transition-colors disabled:opacity-50"
                 title="Copy hex"
               >
                 {copied ? (
@@ -155,11 +153,11 @@ export const HexDecoder: React.FC<HexDecoderProps> = ({ api, onDecode }) => {
                   className="p-3 text-left bg-gray-900/50 hover:bg-gray-800/50 rounded border border-gray-800 transition-colors"
                 >
                   <div className="flex justify-between items-start">
-                    <div>
+                    <div className="flex-1">
                       <p className="font-medium text-white">{example.name}</p>
                       <p className="text-xs text-gray-400 mt-1">{example.description}</p>
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded ${
+                    <span className={`text-xs px-2 py-1 rounded ml-2 whitespace-nowrap ${
                       example.difficulty === 'easy' 
                         ? 'bg-success-emerald/20 text-success-emerald' 
                         : example.difficulty === 'medium'
@@ -178,7 +176,7 @@ export const HexDecoder: React.FC<HexDecoderProps> = ({ api, onDecode }) => {
           </div>
         )}
 
-        <div className="flex space-x-4">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
           <button
             type="submit"
             disabled={state.isDecoding || !hexInput.trim()}
@@ -211,7 +209,7 @@ export const HexDecoder: React.FC<HexDecoderProps> = ({ api, onDecode }) => {
       {state.error && (
         <div className="mt-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
           <div className="flex items-start space-x-3">
-            <AlertCircle className="w-5 h-5 text-red-400 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-semibold text-red-300">Decoding Failed</p>
               <p className="text-sm text-gray-300 mt-1">{state.error}</p>

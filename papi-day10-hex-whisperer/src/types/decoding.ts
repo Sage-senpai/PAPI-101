@@ -1,4 +1,5 @@
-//src/types/decoding.ts
+// src/types/decoding.ts
+// ==========================================
 export interface DecodedTransaction {
   pallet: string;
   method: string;

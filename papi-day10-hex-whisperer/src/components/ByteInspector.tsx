@@ -1,15 +1,13 @@
 //src/components/ByteInspector.tsx
-import React from 'react';
 import { Binary, Hash, Eye, Info } from 'lucide-react';
 import type { ByteAnalysis } from '../types/decoding';
 import { decodeByte } from '../utils/byteParser';
 
 interface ByteInspectorProps {
   bytes: ByteAnalysis[];
-  decoded: any;
 }
 
-export const ByteInspector: React.FC<ByteInspectorProps> = ({ bytes, decoded }) => {
+export const ByteInspector: React.FC<ByteInspectorProps> = ({ bytes }) => {
   if (bytes.length === 0) {
     return (
       <div className="crystal-card p-6 h-full flex flex-col items-center justify-center">

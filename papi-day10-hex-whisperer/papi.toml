@@ -1,0 +1,4 @@
+# papi.toml
+[polkadot]
+chain = "polkadot"
+metadata = "https://raw.githubusercontent.com/polkadot-api/polkadot-api/main/packages/codegen/metadata/polkadot.scale"

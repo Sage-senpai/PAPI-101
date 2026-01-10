@@ -1,4 +1,5 @@
-//src/utils/hexUtils.ts
+// src/utils/hexUtils.ts
+// ==========================================
 export const isValidHex = (hex: string): boolean => {
   if (!hex) return false;
   const cleanHex = hex.startsWith('0x') ? hex.slice(2) : hex;
@@ -26,9 +27,7 @@ export const hexToBytes = (hex: string): Uint8Array => {
 };
 
 export const bytesToHex = (bytes: Uint8Array): string => {
-  return '0x' + Array.from(bytes)
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
+  return '0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
 };
 
 export const calculateHexSize = (hex: string): string => {
@@ -40,14 +39,9 @@ export const calculateHexSize = (hex: string): string => {
 
 export const extractCallIndices = (hex: string): { palletIndex: number; callIndex: number } | null => {
   if (!isValidHex(hex)) return null;
-  
   const bytes = hexToBytes(hex);
   if (bytes.length < 2) return null;
-  
-  return {
-    palletIndex: bytes[0],
-    callIndex: bytes[1],
-  };
+  return { palletIndex: bytes[0], callIndex: bytes[1] };
 };
 
 export const truncateHex = (hex: string, maxLength: number = 32): string => {

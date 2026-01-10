@@ -50,10 +50,6 @@ export default {
           '100%': { backgroundPosition: '200% center' },
         },
       },
-      backgroundImage: {
-        'magic-gradient': 'linear-gradient(135deg, #8A2BE2 0%, #00D4FF 50%, #10B981 100%)',
-        'crystal-texture': 'radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 50%)',
-      },
     },
   },
   plugins: [],

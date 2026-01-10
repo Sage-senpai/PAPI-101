@@ -1,16 +1,17 @@
-//src/app.tsx
-import React, { useState } from 'react';
+//src/App.tsx
+import { useState } from 'react';
 import { MagicBackground } from './components/MagicBackground';
 import { HexDecoder } from './components/HexDecoder';
 import { TransactionViewer } from './components/TransactionViewer';
 import { ByteInspector } from './components/ByteInspector';
 import { usePolkadotAPI } from './hooks/usePolkadotAPI';
+import { useHexDecoder } from './hooks/useHexDecoder';
 import { Wand2, Github, Twitter, Sparkles, Zap } from 'lucide-react';
 
 function App() {
   const { api, chainInfo, isLoading, error, connect, disconnect } = usePolkadotAPI();
+  const { state: decoderState } = useHexDecoder(api);
   const [isConnected, setIsConnected] = useState(false);
-  const [lastDecodedHex, setLastDecodedHex] = useState<string>('');
   const [decodingHistory, setDecodingHistory] = useState<string[]>([]);
 
   const handleConnect = async () => {
@@ -21,17 +22,12 @@ function App() {
   const handleDisconnect = () => {
     disconnect();
     setIsConnected(false);
-    setLastDecodedHex('');
     setDecodingHistory([]);
   };
 
   const handleDecode = (hex: string) => {
-    setLastDecodedHex(hex);
     setDecodingHistory(prev => [hex, ...prev.slice(0, 4)]);
   };
-
-  // Get the decoded transaction from a hook (we'll simulate this for now)
-  const decodedTransaction = null; // This would come from useHexDecoder
 
   return (
     <div className="min-h-screen bg-dark-crystal text-white relative overflow-hidden">
@@ -39,7 +35,7 @@ function App() {
       
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center space-x-3">
             <div className="relative">
               <Wand2 className="w-10 h-10 text-magic-purple animate-float-magic" />
@@ -80,12 +76,12 @@ function App() {
         {/* Connection Status */}
         <div className="mb-8">
           <div className="crystal-card p-6 mb-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
                 <h3 className="text-lg font-bold text-white">Connection Status</h3>
                 <p className="text-gray-400">
                   {isConnected && chainInfo 
-                    ? `Connected to ${chainInfo.chainName} (v${chainInfo.version})` 
+                    ? `Connected to ${chainInfo.chainName}` 
                     : 'Not connected'}
                 </p>
               </div>
@@ -154,9 +150,9 @@ function App() {
               
               <div className="p-3 bg-black/30 rounded border border-border-magic">
                 <p className="font-semibold text-white mb-1">⚡ Code Example</p>
-                <pre className="text-xs text-gray-300 mt-2 font-mono-magic">
-{`const callData = Binary.fromHex('0x0400...');
-const tx = dotApi.txFromCallData(callData);
+                <pre className="text-xs text-gray-300 mt-2 font-mono-magic whitespace-pre-wrap">
+{`const hex = '0x0400...';
+const tx = api.txFromCallData(hex);
 console.log(tx.pallet); // "Balances"
 console.log(tx.method); // "transfer"`}
                 </pre>
@@ -169,7 +165,7 @@ console.log(tx.method); // "transfer"`}
                 <p className="font-semibold text-white mb-2">Recent Decodes</p>
                 <div className="space-y-2">
                   {decodingHistory.map((hex, idx) => (
-                    <div key={idx} className="p-2 bg-gray-900/30 rounded text-xs font-mono-magic">
+                    <div key={idx} className="p-2 bg-gray-900/30 rounded text-xs font-mono-magic overflow-hidden">
                       {hex.substring(0, 32)}...
                     </div>
                   ))}
@@ -182,13 +178,10 @@ console.log(tx.method); // "transfer"`}
         {/* Bottom Row: Transaction Viewer & Byte Inspector */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
-            <TransactionViewer decoded={decodedTransaction} />
+            <TransactionViewer decoded={decoderState.decoded} />
           </div>
           <div>
-            <ByteInspector 
-              bytes={[]} // This would come from useHexDecoder
-              decoded={decodedTransaction}
-            />
+            <ByteInspector bytes={decoderState.bytesAnalysis} />
           </div>
         </div>
 
@@ -198,7 +191,7 @@ console.log(tx.method); // "transfer"`}
             <div className="p-4 bg-black/30 rounded-lg">
               <h4 className="font-bold text-magic-purple mb-2">🎩 Today's Achievement</h4>
               <p className="text-sm text-gray-300">
-                You've mastered PAPI's `txFromCallData` method for decoding hex call data into human-readable transactions.
+                You've mastered PAPI's txFromCallData method for decoding hex call data into human-readable transactions.
               </p>
             </div>
             
@@ -221,7 +214,7 @@ console.log(tx.method); // "transfer"`}
         {/* Footer */}
         <footer className="mt-12 pt-8 border-t border-border-magic text-center text-gray-500 text-sm">
           <p>
-            Built with ❤️ Dvyne for #PAPI30Days Campaign • Day 10: Hex Decoding • 
+            Built with ❤️ for #PAPI30Days Campaign • Day 10: Hex Decoding • 
             <span className="text-magic-purple ml-2">"Turning hex into magic 🎩"</span>
           </p>
           <p className="mt-2">

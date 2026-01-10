@@ -17,7 +17,6 @@
       radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.15) 0%, transparent 50%);
   }
   
-  /* Custom scrollbar */
   ::-webkit-scrollbar {
     @apply w-2;
   }
@@ -58,7 +57,6 @@
   }
 }
 
-/* Custom animations */
 @keyframes magic-reveal {
   0% {
     opacity: 0;
@@ -72,20 +70,4 @@
 
 .magic-reveal {
   animation: magic-reveal 0.5s ease-out forwards;
-}
-
-/* Code block styling */
-pre[class*="language-"] {
-  @apply bg-gray-900/50 border border-gray-800 rounded-lg p-4;
-}
-
-.token.comment,
-.token.prolog,
-.token.doctype,
-.token.cdata {
-  @apply text-gray-500;
-}
-
-.token.punctuation {
-  @apply text-gray-400;
 }

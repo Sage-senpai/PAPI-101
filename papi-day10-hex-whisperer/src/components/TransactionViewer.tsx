@@ -1,5 +1,4 @@
-//src/components/TransactionViewer
-import React from 'react';
+//src/components/TransactionViewer.tsx
 import { 
   FileText, 
   Code, 
@@ -142,7 +141,7 @@ export const TransactionViewer: React.FC<TransactionViewerProps> = ({ decoded })
             <h4 className="font-semibold text-white mb-3">Arguments</h4>
             <div className="p-4 bg-black/30 rounded-lg">
               <pre className="text-sm text-gray-300 font-mono-magic whitespace-pre-wrap overflow-x-auto">
-                {JSON.stringify(decoded.args, (key, value) => {
+                {JSON.stringify(decoded.args, (_key, value) => {
                   if (typeof value === 'bigint') {
                     return value.toString();
                   }
