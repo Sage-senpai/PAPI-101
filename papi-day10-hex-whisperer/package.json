@@ -11,13 +11,10 @@
     "papi": "papi"
   },
   "dependencies": {
-    "@polkadot-api/client": "^0.8.0",
-    "@polkadot-api/observable-client": "^0.6.0",
-    "@polkadot-api/substrate-bindings": "^0.9.0",
-    "@polkadot-api/metadata-builders": "^0.8.0",
+    "@polkadot-api/descriptors": "file:.papi\\descriptors",
     "clsx": "^2.1.1",
     "lucide-react": "^0.562.0",
-    "polkadot-api": "^1.7.7",
+    "polkadot-api": "^1.19.1",
     "prismjs": "^1.30.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -25,7 +22,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@polkadot-api/cli": "^0.10.0",
+    "@polkadot-api/cli": "^0.13.4",
     "@types/node": "^22.10.2",
     "@types/prismjs": "^1.26.5",
     "@types/react": "^18.3.12",

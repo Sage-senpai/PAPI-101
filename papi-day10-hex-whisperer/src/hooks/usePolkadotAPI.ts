@@ -1,8 +1,9 @@
 //src/hooks/usePolkadotAPI.ts
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from 'polkadot-api';
-import { getWsProvider } from 'polkadot-api/ws-provider/web';
-import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
+import { getSmProvider } from 'polkadot-api/sm-provider';
+import { start } from 'polkadot-api/smoldot';
+import { chainSpec } from 'polkadot-api/chains/polkadot';
 
 export interface ChainInfo {
   chainName: string;
@@ -33,29 +34,43 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
     
     try {
       console.log("🎩 Initializing PAPI Hex Whisperer...");
-      console.log("🔮 Loading runtime metadata for txFromCallData support...");
+      console.log("🔮 Starting Smoldot light client...");
       
-      // Use WebSocket provider for simplicity
-      const wsProvider = getWsProvider('wss://rpc.polkadot.io');
+      const smoldot = start();
+      const chain = await smoldot.addChain({ chainSpec });
       
-      // Create PAPI client
-      const papiClient = createClient(wsProvider);
+      console.log("✅ Smoldot light client started!");
+      
+      const jsonRpcProvider = getSmProvider(chain);
+      const papiClient = createClient(jsonRpcProvider);
+      
       setClient(papiClient);
       setApi(papiClient);
       
-      console.log("✅ PAPI client initialized!");
-      console.log("📡 Connected to Polkadot");
-      console.log("✨ Ready to decode hex call data!");
+      console.log("📡 PAPI client created and connected!");
+      console.log("🔍 Client methods:", Object.keys(papiClient));
       
-      // Create a simple chain info object
-      setChainInfo({
-        chainName: "Polkadot",
-        version: "1.0.0",
-        specVersion: 1000000,
-        blockNumber: 0,
-      });
-      
-      console.log("📊 Connected to Polkadot network");
+      try {
+        const finalizedBlock = await papiClient.getFinalizedBlock();
+        
+        setChainInfo({
+          chainName: "Polkadot",
+          version: "Latest",
+          specVersion: 0,
+          blockNumber: finalizedBlock.number,
+        });
+        
+        console.log("📊 Connected to Polkadot - Block:", finalizedBlock.number);
+        console.log("✨ Ready to decode hex!");
+      } catch (infoErr) {
+        console.warn("⚠️ Using default chain info");
+        setChainInfo({
+          chainName: "Polkadot",
+          version: "Latest",
+          specVersion: 0,
+          blockNumber: 0,
+        });
+      }
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
@@ -68,8 +83,12 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
 
   const disconnect = useCallback(() => {
     if (client) {
-      client.destroy();
-      console.log("🔌 Disconnected from Polkadot");
+      try {
+        client.destroy();
+        console.log("🔌 Disconnected from Polkadot");
+      } catch (err) {
+        console.error("Error disconnecting:", err);
+      }
     }
     setApi(null);
     setChainInfo(null);
@@ -79,7 +98,11 @@ export const usePolkadotAPI = (): UsePolkadotAPIResult => {
   useEffect(() => {
     return () => {
       if (client) {
-        client.destroy();
+        try {
+          client.destroy();
+        } catch (err) {
+          console.error("Cleanup error:", err);
+        }
       }
     };
   }, [client]);
