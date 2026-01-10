@@ -1,9 +1,9 @@
 // src/App.tsx
-import React from 'react';
+import { useEffect } from 'react';
 import { WalletConnector } from './components/WalletConnector';
 import { AccountManager } from './components/AccountManager';
 import { NetworkIndicator } from './components/NetworkIndicator';
-import { usePolkadotExtension } from './hooks/usePolkadotExtension';
+import { useWallet } from './contexts/WalletContext';
 import { 
   Handshake, 
   Github, 
@@ -14,26 +14,32 @@ import {
 } from 'lucide-react';
 
 function App() {
-  const { state } = usePolkadotExtension();
+  const { state } = useWallet();
+
+  useEffect(() => {
+    console.log('🎨 App rendered:', {
+      isConnected: state.isConnected,
+      accounts: state.accounts.length,
+      network: state.network?.name,
+    });
+  }, [state]);
 
   return (
     <div className="min-h-screen bg-dark-foundation text-white relative overflow-hidden">
-      {/* Background Pattern */}
       <div className="absolute inset-0 bg-security-pattern opacity-10"></div>
       
-      {/* Header */}
       <header className="container mx-auto px-4 py-6 relative z-10">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center flex-wrap gap-4">
           <div className="flex items-center space-x-3">
             <div className="relative">
               <Handshake className="w-10 h-10 text-trust-blue animate-float-trust" />
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-security-green rounded-full animate-pulse-safe"></div>
             </div>
             <div>
-              <h1 className="text-3xl font-bold trust-gradient-text">
+              <h1 className="text-2xl md:text-3xl font-bold trust-gradient-text">
                 PAPI Trust Bridge
               </h1>
-              <p className="text-gray-400 mt-1">Day 11: Secure Wallet Integration • #PAPI30Days</p>
+              <p className="text-gray-400 text-sm md:text-base mt-1">Day 11: Secure Wallet Integration • #PAPI30Days</p>
             </div>
           </div>
           
@@ -61,9 +67,18 @@ function App() {
       </header>
 
       <main className="container mx-auto px-4 pb-12 relative z-10">
+        {/* Debug Info */}
+        <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-700/50 rounded-lg text-sm">
+          <p className="text-yellow-300 font-mono">
+            🐛 Debug: Connected={state.isConnected ? 'YES' : 'NO'} | 
+            Accounts={state.accounts.length} | 
+            Network={state.network ? state.network.name : 'NONE'}
+          </p>
+        </div>
+
         {/* Stats Bar */}
         <div className="mb-8 trust-card p-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-3">
               <div className="flex items-center justify-center space-x-2">
                 <Key className="w-5 h-5 text-trust-blue" />
@@ -108,34 +123,26 @@ function App() {
           </div>
         </div>
 
-        {/* Main Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Left: Wallet Connector */}
           <div className="lg:col-span-2">
             <WalletConnector />
           </div>
-
-          {/* Right: Network Indicator */}
           <div>
             <NetworkIndicator />
           </div>
         </div>
 
-        {/* Bottom Row: Account Manager */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="lg:col-span-2">
-            <AccountManager />
-          </div>
+        <div className="grid grid-cols-1 gap-8">
+          <AccountManager />
         </div>
 
-        {/* Partnership Showcase */}
         <div className="mt-8 trust-card p-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex-1">
               <h3 className="text-2xl font-bold text-white mb-3">The Perfect Partnership</h3>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-trust-blue to-accent-purple flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-trust-blue to-accent-purple flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">P</span>
                   </div>
                   <div>
@@ -145,7 +152,7 @@ function App() {
                 </div>
                 
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-security-green to-warning-amber flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-security-green to-warning-amber flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">E</span>
                   </div>
                   <div>
@@ -156,7 +163,7 @@ function App() {
               </div>
             </div>
             
-            <div className="flex-1">
+            <div className="flex-1 w-full">
               <div className="p-6 bg-gradient-to-br from-trust-blue/10 to-security-green/10 rounded-2xl border border-trust-blue/30">
                 <div className="text-center">
                   <Handshake className="w-16 h-16 mx-auto text-trust-blue mb-4 handshake-animation" />
@@ -164,7 +171,7 @@ function App() {
                   <p className="text-gray-400 mt-2">
                     PAPI builds, Extension signs. Each component excels at what it does best.
                   </p>
-                  <div className="mt-4 text-sm text-gray-300">
+                  <div className="mt-4 text-sm text-gray-300 space-y-1">
                     <p>• Zero private key exposure</p>
                     <p>• Full type safety</p>
                     <p>• Runtime compatibility</p>
@@ -176,7 +183,6 @@ function App() {
           </div>
         </div>
 
-        {/* Footer */}
         <footer className="mt-12 pt-8 border-t border-border-safe text-center text-gray-500 text-sm">
           <p>
             Built with ❤️ for #PAPI30Days Campaign • Day 11: Secure Wallet Integration • 

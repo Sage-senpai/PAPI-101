@@ -1,11 +1,22 @@
-// src/hooks/usePolkadotExtension.ts
-import { useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import type { InjectedExtension } from '@polkadot/extension-inject/types';
-import type { WalletAccount, ExtensionState, NetworkInfo } from '../types/wallet';
+import type { WalletAccount, ExtensionState, NetworkInfo, SecurityCheck } from '../types/wallet';
 import { performSecurityCheck } from '../utils/securityCheck';
 
-export const usePolkadotExtension = () => {
+interface WalletContextType {
+  state: ExtensionState;
+  extensions: InjectedExtension[];
+  securityCheck: SecurityCheck;
+  connect: (appName?: string) => Promise<void>;
+  disconnect: () => void;
+  selectAccount: (account: WalletAccount) => void;
+  refreshAccounts: () => Promise<void>;
+}
+
+const WalletContext = createContext<WalletContextType | undefined>(undefined);
+
+export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<ExtensionState>({
     isAvailable: false,
     isConnected: false,
@@ -27,7 +38,7 @@ export const usePolkadotExtension = () => {
   useEffect(() => {
     const checkExtension = () => {
       const hasExtension = typeof window.injectedWeb3 !== 'undefined';
-      console.log('🔍 Checking for Polkadot.js Extension:', hasExtension ? 'Available' : 'Not Available');
+      console.log('🔍 Extension check:', hasExtension);
       
       setState(prev => ({
         ...prev,
@@ -36,49 +47,32 @@ export const usePolkadotExtension = () => {
     };
 
     checkExtension();
-    
-    // Listen for extension installation
     const interval = setInterval(checkExtension, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // Connect to extension
   const connect = useCallback(async (appName: string = 'PAPI Trust Bridge') => {
-    console.log('🤝 Connecting to Polkadot.js Extension...');
-    console.log('📝 App name:', appName);
+    console.log('🤝 Connecting to extension...');
 
     try {
-      // Check availability first
       if (typeof window.injectedWeb3 === 'undefined') {
-        const error = 'Polkadot.js Extension not detected. Please install it first.';
-        console.error('❌ Connection failed:', error);
-        setState(prev => ({
-          ...prev,
-          error,
-          isConnected: false,
-        }));
-        return;
+        throw new Error('Extension not detected');
       }
 
-      // Request extension authorization
       const injectedExtensions = await web3Enable(appName);
       setExtensions(injectedExtensions);
       
       if (injectedExtensions.length === 0) {
-        throw new Error('No extension authorized access. Please approve the connection request.');
+        throw new Error('No extension authorized access');
       }
 
-      console.log('✅ Extensions authorized:', injectedExtensions.map(e => e.name));
-      
-      // Get accounts
       const allAccounts = await web3Accounts();
-      console.log('📋 Accounts found:', allAccounts.length);
+      console.log('📋 Accounts:', allAccounts.length);
 
       if (allAccounts.length === 0) {
-        throw new Error('No accounts found in extension. Please create or import an account first.');
+        throw new Error('No accounts found');
       }
 
-      // Map to our interface
       const mappedAccounts: WalletAccount[] = allAccounts.map(account => ({
         address: account.address,
         meta: {
@@ -90,72 +84,48 @@ export const usePolkadotExtension = () => {
         publicKey: account.publicKey,
       }));
 
-      // Check permissions from first extension
-      const firstExtension = injectedExtensions[0];
-      const permissions = {
-        canSign: true,
-        canSignRaw: firstExtension.signer.signRaw !== undefined,
-        canGetAccounts: true,
-      };
-
-      // Determine network - Polkadot as default
       const network: NetworkInfo = {
         name: 'Polkadot',
         ss58Format: 0,
         token: 'DOT',
         tokenDecimals: 10,
         isConnected: true,
-        genesisHash: mappedAccounts[0]?.meta.genesisHash || '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
+        genesisHash: '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
         specVersion: 1000000,
       };
 
-      // Update security check
       const newSecurityCheck = performSecurityCheck();
       setSecurityCheck(newSecurityCheck);
 
-      // Update state with all data at once
       const newState: ExtensionState = {
         isAvailable: true,
         isConnected: true,
         accounts: mappedAccounts,
         selectedAccount: mappedAccounts[0] || null,
         network,
-        permissions,
+        permissions: {
+          canSign: true,
+          canSignRaw: injectedExtensions[0].signer.signRaw !== undefined,
+          canGetAccounts: true,
+        },
         error: null,
       };
 
-      console.log('✅ Successfully connected to extension!');
-      console.log('📊 Security check:', newSecurityCheck.level);
-      console.log('👤 Selected account:', mappedAccounts[0]?.address);
-      console.log('🌐 Network:', network.name);
-      console.log('📦 New State:', newState);
-
-      // Force state update
+      console.log('✅ Connected! Setting state:', newState);
       setState(newState);
 
-      // Trigger a re-render after a short delay to ensure UI updates
-      setTimeout(() => {
-        setState(prev => ({ ...prev }));
-      }, 100);
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error connecting to extension';
       console.error('❌ Connection error:', error);
-      
       setState(prev => ({
         ...prev,
         isConnected: false,
-        accounts: [],
-        selectedAccount: null,
-        network: null,
-        error: errorMessage,
+        error: error instanceof Error ? error.message : 'Connection failed',
       }));
     }
   }, []);
 
   const disconnect = useCallback(() => {
-    console.log('🔌 Disconnecting from extension...');
-    
+    console.log('🔌 Disconnecting...');
     setState({
       isAvailable: true,
       isConnected: false,
@@ -169,14 +139,11 @@ export const usePolkadotExtension = () => {
       },
       error: null,
     });
-    
     setExtensions([]);
-    console.log('✅ Disconnected successfully');
   }, []);
 
   const selectAccount = useCallback((account: WalletAccount) => {
     console.log('👤 Selecting account:', account.address);
-    
     setState(prev => ({
       ...prev,
       selectedAccount: account,
@@ -187,9 +154,7 @@ export const usePolkadotExtension = () => {
     if (!state.isConnected) return;
     
     try {
-      console.log('🔄 Refreshing accounts...');
       const allAccounts = await web3Accounts();
-      
       const mappedAccounts: WalletAccount[] = allAccounts.map(account => ({
         address: account.address,
         meta: {
@@ -207,29 +172,39 @@ export const usePolkadotExtension = () => {
         selectedAccount: mappedAccounts.find(a => a.address === prev.selectedAccount?.address) || mappedAccounts[0] || null,
       }));
 
-      console.log('✅ Accounts refreshed:', mappedAccounts.length);
+      console.log('✅ Accounts refreshed');
     } catch (error) {
-      console.error('❌ Failed to refresh accounts:', error);
+      console.error('❌ Refresh failed:', error);
     }
   }, [state.isConnected]);
 
-  // Debug logging
   useEffect(() => {
-    console.log('🔄 State updated:', {
+    console.log('🔄 Context state updated:', {
       isConnected: state.isConnected,
       accountsCount: state.accounts.length,
       hasNetwork: !!state.network,
-      selectedAccount: state.selectedAccount?.address,
     });
   }, [state]);
 
-  return {
-    state,
-    extensions,
-    securityCheck,
-    connect,
-    disconnect,
-    selectAccount,
-    refreshAccounts,
-  };
+  return (
+    <WalletContext.Provider value={{
+      state,
+      extensions,
+      securityCheck,
+      connect,
+      disconnect,
+      selectAccount,
+      refreshAccounts,
+    }}>
+      {children}
+    </WalletContext.Provider>
+  );
+};
+
+export const useWallet = () => {
+  const context = useContext(WalletContext);
+  if (context === undefined) {
+    throw new Error('useWallet must be used within a WalletProvider');
+  }
+  return context;
 };

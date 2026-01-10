@@ -1,5 +1,5 @@
 // src/components/WalletConnector.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   Plug, 
   Shield, 
@@ -9,19 +9,21 @@ import {
   Download,
   ExternalLink
 } from 'lucide-react';
-import { usePolkadotExtension } from '../hooks/usePolkadotExtension';
+import { useWallet } from '../contexts/WalletContext';
 import { getSecurityColor, getSecurityIcon } from '../utils/securityCheck';
 
-export const WalletConnector: React.FC = () => {
-  const { state, securityCheck, connect, disconnect, refreshAccounts } = usePolkadotExtension();
+export const WalletConnector = () => {
+  const { state, securityCheck, connect, disconnect, refreshAccounts } = useWallet();
   const [appName, setAppName] = useState('PAPI Trust Bridge');
   const [isCustomizing, setIsCustomizing] = useState(false);
 
   const handleConnect = () => {
+    console.log('🔘 Connect button clicked');
     connect(appName);
   };
 
   const handleDisconnect = () => {
+    console.log('🔘 Disconnect button clicked');
     disconnect();
   };
 
@@ -31,13 +33,13 @@ export const WalletConnector: React.FC = () => {
 
   return (
     <div className="trust-card p-6 secure-glow">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h3 className="text-2xl font-bold text-white flex items-center">
-            <Plug className="w-7 h-7 mr-3 text-trust-blue animate-pulse-safe" />
+          <h3 className="text-xl md:text-2xl font-bold text-white flex items-center">
+            <Plug className="w-6 md:w-7 h-6 md:h-7 mr-3 text-trust-blue animate-pulse-safe" />
             Wallet Connection Hub
           </h3>
-          <p className="text-gray-400">Secure integration with Polkadot.js Extension</p>
+          <p className="text-gray-400 text-sm md:text-base">Secure integration with Polkadot.js Extension</p>
         </div>
         <div className="flex items-center space-x-2 px-3 py-1 bg-trust-blue/20 rounded-lg">
           <Shield className="w-4 h-4 text-trust-blue" />
@@ -45,19 +47,18 @@ export const WalletConnector: React.FC = () => {
         </div>
       </div>
 
-      {/* Extension Status */}
       <div className="mb-6">
         <div className={`p-4 rounded-lg border ${
           state.isAvailable 
             ? 'bg-security-green/10 border-security-green/30' 
             : 'bg-warning-amber/10 border-warning-amber/30'
         }`}>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center space-x-3">
               {state.isAvailable ? (
-                <CheckCircle className="w-6 h-6 text-security-green" />
+                <CheckCircle className="w-6 h-6 text-security-green flex-shrink-0" />
               ) : (
-                <AlertCircle className="w-6 h-6 text-warning-amber" />
+                <AlertCircle className="w-6 h-6 text-warning-amber flex-shrink-0" />
               )}
               <div>
                 <p className="font-semibold text-white">
@@ -84,10 +85,8 @@ export const WalletConnector: React.FC = () => {
         </div>
       </div>
 
-      {/* Connection Controls */}
       {state.isAvailable && (
         <div className="space-y-4">
-          {/* App Name Customization */}
           {isCustomizing && (
             <div className="p-4 bg-black/30 rounded-lg border border-border-safe">
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -106,11 +105,11 @@ export const WalletConnector: React.FC = () => {
             </div>
           )}
 
-          <div className="flex space-x-4">
+          <div className="flex flex-wrap gap-4">
             {!state.isConnected ? (
               <button
                 onClick={handleConnect}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-trust-blue to-accent-purple text-white font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center connection-ring animate-connection-pulse"
+                className="flex-1 min-w-[200px] px-6 py-3 bg-gradient-to-r from-trust-blue to-accent-purple text-white font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center connection-ring animate-connection-pulse"
               >
                 <Plug className="w-5 h-5 mr-2" />
                 Connect Wallet
@@ -118,7 +117,7 @@ export const WalletConnector: React.FC = () => {
             ) : (
               <button
                 onClick={handleDisconnect}
-                className="flex-1 px-6 py-3 bg-gray-800 border border-gray-700 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors"
+                className="flex-1 min-w-[200px] px-6 py-3 bg-gray-800 border border-gray-700 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors"
               >
                 Disconnect Wallet
               </button>
@@ -144,9 +143,8 @@ export const WalletConnector: React.FC = () => {
         </div>
       )}
 
-      {/* Security Status */}
       <div className="mt-6 p-4 bg-black/30 rounded-lg border border-border-safe">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h4 className="font-semibold text-white flex items-center">
             <Shield className="w-5 h-5 mr-2 text-security-green" />
             Security Status
@@ -183,11 +181,10 @@ export const WalletConnector: React.FC = () => {
         )}
       </div>
 
-      {/* Error Display */}
       {state.error && (
         <div className="mt-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
           <div className="flex items-start space-x-3">
-            <AlertCircle className="w-5 h-5 text-red-400 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-semibold text-red-300">Connection Error</p>
               <p className="text-sm text-gray-300 mt-1">{state.error}</p>
@@ -196,7 +193,6 @@ export const WalletConnector: React.FC = () => {
         </div>
       )}
 
-      {/* Connection Info */}
       {state.isConnected && (
         <div className="mt-6 p-4 bg-gradient-to-r from-trust-blue/10 to-accent-purple/10 rounded-lg border border-trust-blue/30">
           <div className="flex items-center space-x-2 mb-2">
@@ -210,7 +206,6 @@ export const WalletConnector: React.FC = () => {
         </div>
       )}
 
-      {/* Help Link */}
       <div className="mt-6 pt-4 border-t border-border-safe/50">
         <a
           href="https://wiki.polkadot.network/docs/learn-account-generation"

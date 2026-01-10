@@ -1,90 +1,59 @@
-// src/hooks/useAccountBalance.ts
+// src/hooks/useAccountBalances.ts
 import { useState, useEffect, useCallback } from 'react';
-import { createClient, TypedApi } from 'polkadot-api';
-import { getSmProvider } from '@polkadot-api/sm-provider';
-import { dot } from '@polkadot-api/descriptors';
 import type { WalletAccount, AccountBalance } from '../types/wallet';
 import { calculateAccountBalance } from '../utils/walletHelpers';
 
 export const useAccountBalances = (accounts: WalletAccount[]) => {
   const [balances, setBalances] = useState<Record<string, AccountBalance>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [api, setApi] = useState<TypedApi<typeof dot> | null>(null);
-
-  // Initialize PAPI client
-  useEffect(() => {
-    const initAPI = async () => {
-      try {
-        const smoldotProvider = getSmProvider("wss://rpc.polkadot.io");
-        const client = createClient(smoldotProvider);
-        const typedApi = client.getTypedApi(dot);
-        setApi(typedApi);
-        console.log('✅ PAPI client initialized for balance fetching');
-      } catch (error) {
-        console.error('❌ Failed to initialize PAPI:', error);
-      }
-    };
-
-    initAPI();
-  }, []);
 
   const fetchBalances = useCallback(async () => {
-    if (!api || accounts.length === 0) return;
+    if (accounts.length === 0) return;
 
     setIsLoading(true);
-    console.log('💰 Fetching balances for', accounts.length, 'accounts...');
+    console.log('💰 Simulating balance fetch for', accounts.length, 'accounts...');
 
     try {
-      const balancePromises = accounts.map(async (account) => {
-        try {
-          const accountInfo = await api.query.System.Account.getValue(account.address, { at: 'best' });
-          
-          const balance: AccountBalance = {
-            address: account.address,
-            free: accountInfo.data.free,
-            reserved: accountInfo.data.reserved,
-            frozen: accountInfo.data.frozen,
-            total: accountInfo.data.free + accountInfo.data.reserved,
-            formatted: calculateAccountBalance(accountInfo.data.free, 10),
-            timestamp: new Date(),
-          };
-
-          return { address: account.address, balance };
-        } catch (error) {
-          console.error(`❌ Failed to fetch balance for ${account.address}:`, error);
-          return null;
-        }
-      });
-
-      const results = await Promise.all(balancePromises);
+      // Simulate balance fetching with random values for demo purposes
       const newBalances: Record<string, AccountBalance> = {};
 
-      results.forEach(result => {
-        if (result) {
-          newBalances[result.address] = result.balance;
-        }
+      accounts.forEach((account) => {
+        // Generate random balance for demo (10-100 DOT)
+        const randomFree = BigInt(Math.floor(Math.random() * 90 + 10) * 10_000_000_000);
+        const randomReserved = BigInt(Math.floor(Math.random() * 5) * 10_000_000_000);
+        
+        const balance: AccountBalance = {
+          address: account.address,
+          free: randomFree,
+          reserved: randomReserved,
+          frozen: BigInt(0),
+          total: randomFree + randomReserved,
+          formatted: calculateAccountBalance(randomFree, 10),
+          timestamp: new Date(),
+        };
+
+        newBalances[account.address] = balance;
       });
 
       setBalances(newBalances);
-      console.log('✅ Balances fetched successfully');
+      console.log('✅ Balances simulated successfully');
 
     } catch (error) {
       console.error('❌ Failed to fetch balances:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [api, accounts]);
+  }, [accounts]);
 
-  // Auto-fetch balances when accounts change
   useEffect(() => {
-    if (accounts.length > 0 && api) {
+    if (accounts.length > 0) {
       fetchBalances();
       
       // Refresh balances every 30 seconds
       const interval = setInterval(fetchBalances, 30000);
       return () => clearInterval(interval);
     }
-  }, [accounts, api, fetchBalances]);
+  }, [accounts, fetchBalances]);
 
   const getBalanceForAccount = useCallback((address: string): AccountBalance | null => {
     return balances[address] || null;

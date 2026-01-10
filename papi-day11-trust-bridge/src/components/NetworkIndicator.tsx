@@ -1,20 +1,20 @@
 // src/components/NetworkIndicator.tsx
-import React from 'react';
 import { 
   Globe, 
   Wifi, 
   Server, 
   Shield,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  Plug
 } from 'lucide-react';
-import { usePolkadotExtension } from '../hooks/usePolkadotExtension';
+import { useWallet } from '../contexts/WalletContext';
 import { getNetworkFromGenesisHash } from '../utils/walletHelpers';
 
-export const NetworkIndicator: React.FC = () => {
-  const { state } = usePolkadotExtension();
+export const NetworkIndicator = () => {
+  const { state } = useWallet();
 
-  if (!state.network) {
+  if (!state.isConnected || !state.network) {
     return (
       <div className="trust-card p-6">
         <div className="flex items-center justify-between mb-4">
@@ -24,7 +24,25 @@ export const NetworkIndicator: React.FC = () => {
           </h3>
           <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
         </div>
-        <p className="text-gray-500 text-center py-4">Connect wallet to view network</p>
+        
+        <div className="text-center py-8">
+          <div className="mb-4 relative inline-block">
+            <Globe className="w-16 h-16 text-gray-600 mx-auto" />
+            <div className="absolute -bottom-1 -right-1 bg-gray-700 rounded-full p-1">
+              <Plug className="w-5 h-5 text-gray-400" />
+            </div>
+          </div>
+          <p className="text-gray-400 mb-2">No Network Connected</p>
+          <p className="text-sm text-gray-500">
+            Connect your wallet to view network details
+          </p>
+        </div>
+
+        <div className="mt-4 p-3 bg-black/30 rounded-lg border border-border-safe">
+          <p className="text-xs text-gray-500 text-center">
+            Network information will appear here after connecting
+          </p>
+        </div>
       </div>
     );
   }
@@ -33,7 +51,7 @@ export const NetworkIndicator: React.FC = () => {
 
   return (
     <div className="trust-card p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         <div>
           <h3 className="text-xl font-bold text-white flex items-center">
             <Globe className="w-6 h-6 mr-2 text-trust-blue" />
@@ -41,19 +59,18 @@ export const NetworkIndicator: React.FC = () => {
           </h3>
           <p className="text-gray-400">Active blockchain network</p>
         </div>
-        <div className={`px-3 py-1 rounded-full ${
+        <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
           state.network.isConnected
             ? 'bg-security-green/20 text-security-green'
             : 'bg-warning-amber/20 text-warning-amber'
         }`}>
-          {state.network.isConnected ? 'Connected' : 'Disconnected'}
+          {state.network.isConnected ? '✅ Connected' : '⚠️ Disconnected'}
         </div>
       </div>
 
       <div className="space-y-4">
-        {/* Network Info */}
         <div className="p-4 bg-black/30 rounded-lg border border-border-safe">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
             <div className="flex items-center space-x-2">
               <Server className="w-5 h-5 text-blue-400" />
               <span className="font-semibold text-white">{networkName}</span>
@@ -79,7 +96,6 @@ export const NetworkIndicator: React.FC = () => {
           </div>
         </div>
 
-        {/* Connection Health */}
         <div className="p-4 bg-black/30 rounded-lg border border-border-safe">
           <div className="flex items-center space-x-2 mb-3">
             <Wifi className="w-5 h-5 text-green-400" />
@@ -110,10 +126,19 @@ export const NetworkIndicator: React.FC = () => {
                 </span>
               </div>
             </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-400">Accounts Loaded</span>
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 rounded-full bg-security-green animate-pulse"></div>
+                <span className="text-xs text-gray-300">
+                  {state.accounts.length} account{state.accounts.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Security */}
         <div className="p-4 bg-gradient-to-r from-security-green/10 to-trust-blue/10 rounded-lg border border-security-green/30">
           <div className="flex items-center space-x-2 mb-2">
             <Shield className="w-5 h-5 text-security-green animate-shield-glow" />
@@ -127,15 +152,14 @@ export const NetworkIndicator: React.FC = () => {
           </ul>
         </div>
 
-        {/* Network Switch (Placeholder) */}
         <div className="p-4 bg-black/30 rounded-lg border border-border-safe">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <p className="font-semibold text-white">Switch Network</p>
               <p className="text-sm text-gray-400">Connect to different chains</p>
             </div>
             <button
-              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors flex items-center"
+              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors flex items-center opacity-50 cursor-not-allowed"
               disabled
               title="Coming soon"
             >

@@ -6,17 +6,16 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    host: true,
-    https: false // Set to true for production with real SSL
+    host: '127.0.0.1', // Only bind to localhost to prevent multiple network interfaces
+    strictPort: true,
   },
   build: {
     target: 'es2020',
     sourcemap: false,
-    minify: 'terser',
     rollupOptions: {
       output: {
         manualChunks: {
-          'papi': ['polkadot-api', '@polkadot-api/descriptors', '@polkadot-api/sm-provider'],
+          'papi': ['polkadot-api', '@polkadot-api/sm-provider'],
           'extension': ['@polkadot/extension-dapp', '@polkadot/util', '@polkadot/util-crypto'],
           'ui': ['react', 'react-dom', 'zustand'],
         }
@@ -25,5 +24,8 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['polkadot-api', '@polkadot-api/sm-provider', '@polkadot/extension-dapp']
+  },
+  define: {
+    'process.env': {}
   }
 })
