@@ -7,11 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "papi": "papi"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@polkadot-api/descriptors": "file:.papi\\descriptors",
     "clsx": "^2.1.1",
     "lucide-react": "^0.562.0",
     "polkadot-api": "^1.19.1",

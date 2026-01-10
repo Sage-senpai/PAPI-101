@@ -1,5 +1,5 @@
 //src/App.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MagicBackground } from './components/MagicBackground';
 import { HexDecoder } from './components/HexDecoder';
 import { TransactionViewer } from './components/TransactionViewer';
@@ -11,23 +11,30 @@ import { Wand2, Github, Twitter, Sparkles, Zap } from 'lucide-react';
 function App() {
   const { api, chainInfo, isLoading, error, connect, disconnect } = usePolkadotAPI();
   const { state: decoderState } = useHexDecoder(api);
-  const [isConnected, setIsConnected] = useState(false);
   const [decodingHistory, setDecodingHistory] = useState<string[]>([]);
+
+  // Sync connection state with API availability
+  const isConnected = !!api && !!chainInfo;
 
   const handleConnect = async () => {
     await connect();
-    setIsConnected(true);
   };
 
   const handleDisconnect = () => {
     disconnect();
-    setIsConnected(false);
     setDecodingHistory([]);
   };
 
   const handleDecode = (hex: string) => {
     setDecodingHistory(prev => [hex, ...prev.slice(0, 4)]);
   };
+
+  // Show loading indicator while connecting
+  useEffect(() => {
+    if (isLoading) {
+      console.log('⏳ Connection in progress...');
+    }
+  }, [isLoading]);
 
   return (
     <div className="min-h-screen bg-dark-crystal text-white relative overflow-hidden">
@@ -80,8 +87,8 @@ function App() {
               <div>
                 <h3 className="text-lg font-bold text-white">Connection Status</h3>
                 <p className="text-gray-400">
-                  {isConnected && chainInfo 
-                    ? `Connected to ${chainInfo.chainName}` 
+                  {isConnected 
+                    ? `Connected to ${chainInfo.chainName} • Block #${chainInfo.blockNumber}` 
                     : 'Not connected'}
                 </p>
               </div>
@@ -89,10 +96,19 @@ function App() {
               <div className="flex space-x-4">
                 <button
                   onClick={handleConnect}
-                  disabled={isLoading || (isConnected && !!chainInfo)}
+                  disabled={isLoading || isConnected}
                   className="px-6 py-2 bg-gradient-to-r from-magic-purple to-sparkle-blue text-white font-bold rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  {isLoading ? 'Connecting...' : isConnected && chainInfo ? 'Connected 🟢' : 'Connect'}
+                  {isLoading ? (
+                    <span className="flex items-center">
+                      <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                      Connecting...
+                    </span>
+                  ) : isConnected ? (
+                    'Connected 🟢'
+                  ) : (
+                    'Connect'
+                  )}
                 </button>
                 
                 <button
