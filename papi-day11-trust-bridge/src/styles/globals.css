@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  
+  body {
+    @apply bg-dark-foundation text-white font-sans-trust antialiased overflow-x-hidden;
+    background-image: 
+      radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-foundation;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-trust-blue/30 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-trust-blue/50;
+  }
+}
+
+@layer components {
+  .trust-card {
+    @apply bg-card-layer/90 backdrop-blur-lg border border-border-safe/50 rounded-2xl;
+  }
+  
+  .secure-glow {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
+  }
+  
+  .trust-gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-trust-blue via-accent-purple to-security-green;
+  }
+  
+  .connection-ring {
+    @apply ring-2 ring-trust-blue/30 ring-offset-2 ring-offset-dark-foundation;
+  }
+  
+  .shield-border {
+    @apply border-2 border-security-green/30 rounded-lg;
+  }
+}
+
+/* Custom animations */
+@keyframes handshake {
+  0% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-5px) rotate(-5deg); }
+  75% { transform: translateX(5px) rotate(5deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+.handshake-animation {
+  animation: handshake 0.5s ease-in-out;
+}
+
+/* Loading skeletons */
+.skeleton {
+  @apply bg-gray-800 animate-pulse rounded;
+}
+
+/* Security badge pulse */
+.security-badge {
+  animation: pulseSafe 2s infinite;
+}
