@@ -5,13 +5,9 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && vite build",
-    "preview": "vite preview",
-    "server": "tsx src/server/index.ts",
-    "test": "jest",
-    "lint": "eslint src --ext ts,tsx",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\""
+    "preview": "vite preview"
   },
   "keywords": [
     "polkadot",
@@ -24,15 +20,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@polkadot-api/descriptors": "file:.papi\\descriptors",
-    "@polkadot-api/observable-client": "^0.1.0",
-    "@polkadot-api/substrate-bindings": "^0.5.0",
-    "@polkadot/api": "^12.0.2",
-    "@polkadot/keyring": "^13.0.2",
-    "@polkadot/util": "^13.0.2",
-    "@polkadot/util-crypto": "^13.0.2",
-    "dotenv": "^16.4.5",
-    "polkadot-api": "^1.0.0",
+    "@polkadot/keyring": "^13.2.2",
+    "@polkadot/util": "^13.2.2",
+    "@polkadot/util-crypto": "^13.2.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -44,7 +34,6 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
-    "tsx": "^4.7.1",
     "typescript": "^5.6.3",
     "vite": "^5.4.11"
   }
