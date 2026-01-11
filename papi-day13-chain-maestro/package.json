@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@polkadot-api/descriptors": "^0.0.1",
+    "@polkadot-api/descriptors": "file:.papi\\descriptors",
     "@polkadot-api/sm-provider": "^0.1.15",
     "@polkadot/util": "^14.0.1",
     "@polkadot/util-crypto": "^14.0.1",
@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/d3": "^7.4.3",
     "@types/node": "^24.10.7",
     "@types/react": "^19.2.8",
