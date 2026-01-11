@@ -97,7 +97,13 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       const newSecurityCheck = performSecurityCheck();
       setSecurityCheck(newSecurityCheck);
 
-      const newState: ExtensionState = {
+      console.log('✅ Connected! Setting state with:', {
+        accountsCount: mappedAccounts.length,
+        networkName: network.name,
+      });
+
+      // Set state in one call
+      setState({
         isAvailable: true,
         isConnected: true,
         accounts: mappedAccounts,
@@ -109,10 +115,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           canGetAccounts: true,
         },
         error: null,
-      };
-
-      console.log('✅ Connected! Setting state:', newState);
-      setState(newState);
+      });
 
     } catch (error) {
       console.error('❌ Connection error:', error);

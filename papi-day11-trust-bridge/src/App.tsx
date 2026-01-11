@@ -68,13 +68,7 @@ function App() {
 
       <main className="container mx-auto px-4 pb-12 relative z-10">
         {/* Debug Info */}
-        <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-700/50 rounded-lg text-sm">
-          <p className="text-yellow-300 font-mono">
-            🐛 Debug: Connected={state.isConnected ? 'YES' : 'NO'} | 
-            Accounts={state.accounts.length} | 
-            Network={state.network ? state.network.name : 'NONE'}
-          </p>
-        </div>
+        
 
         {/* Stats Bar */}
         <div className="mb-8 trust-card p-4">
