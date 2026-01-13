@@ -1,4 +1,6 @@
-//src/types/multiChain.ts
+// src/types/multiChain.ts
+import type { PolkadotClient, TypedApi } from 'polkadot-api';
+
 export interface ChainConfig {
   id: string;
   name: string;
@@ -25,7 +27,7 @@ export interface ChainMetrics {
   totalIssuance: bigint;
   activeAccounts: number;
   epochProgress: number;
-  latency: number; // ms
+  latency: number;
   status: 'connected' | 'connecting' | 'disconnected' | 'error';
   lastError?: string;
 }
@@ -57,7 +59,7 @@ export interface CrossChainOperation {
   results: {
     [chainId: string]: {
       success: boolean;
-      data?: any;
+      data?: unknown;
       error?: string;
       duration: number;
     };
@@ -67,9 +69,9 @@ export interface CrossChainOperation {
 }
 
 export interface ChainConnection {
-  api: any; // TypedApi instance
-  client: any; // PAPI client
-  provider: any; // Provider instance
+  api: TypedApi<any> | null;
+  client: PolkadotClient | null;
+  provider: any;
   metrics: ChainMetrics;
   lastUpdate: Date;
 }

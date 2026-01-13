@@ -1,5 +1,5 @@
-//src/utils/chainConfig.ts
-import type { ChainConfig } from '../types/multiChain';
+// src/utils/chainConfig.ts
+import type { ChainConfig, ChainMetrics } from '../types/multiChain';
 
 export const CHAIN_CONFIGS: ChainConfig[] = [
   {
@@ -65,7 +65,7 @@ export const formatTokenAmount = (amount: bigint, chainId: string): string => {
   return `${whole.toLocaleString()}.${fractional.toString().padStart(config.tokenDecimals, '0').slice(0, 4)} ${config.token}`;
 };
 
-export const calculateChainPerformance = (metrics: any[]): {
+export const calculateChainPerformance = (metrics: ChainMetrics[]): {
   fastest: string;
   slowest: string;
   averageLatency: number;
@@ -94,8 +94,14 @@ export const calculateChainPerformance = (metrics: any[]): {
   };
 };
 
-export const compareChains = (chainA: any, chainB: any, metric: keyof any): number => {
-  if (chainA[metric] > chainB[metric]) return -1;
-  if (chainA[metric] < chainB[metric]) return 1;
+export const compareChains = (chainA: ChainMetrics, chainB: ChainMetrics, metric: keyof ChainMetrics): number => {
+  const valueA = chainA[metric];
+  const valueB = chainB[metric];
+  
+  if (typeof valueA === 'number' && typeof valueB === 'number') {
+    if (valueA > valueB) return -1;
+    if (valueA < valueB) return 1;
+  }
+  
   return 0;
 };

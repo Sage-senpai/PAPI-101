@@ -1,4 +1,4 @@
-//src/components/ChainOrchestrator.tsx
+// src/components/ChainOrchestrator.tsx
 import React, { useState } from 'react';
 import { 
   Music, 
@@ -11,7 +11,7 @@ import {
   Network
 } from 'lucide-react';
 import { useMultiChain } from '../hooks/useMultiChain';
-import { CHAIN_CONFIGS,type formatTokenAmount, getChainColor, getChainIcon } from '../utils/chainConfig';
+import { CHAIN_CONFIGS, getChainColor, getChainIcon } from '../utils/chainConfig';
 import { calculateHealthScore, formatLatency, getHealthIcon } from '../utils/metricsCalculator';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -55,7 +55,6 @@ export const ChainOrchestrator: React.FC = () => {
         </div>
       </div>
 
-      {/* Controls */}
       <div className="mb-6 p-4 bg-black/30 rounded-lg border border-border-stage">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
@@ -103,7 +102,6 @@ export const ChainOrchestrator: React.FC = () => {
         </div>
       </div>
 
-      {/* Chain Selection */}
       <div className="mb-6">
         <h4 className="font-semibold text-white mb-3 flex items-center">
           <Cpu className="w-5 h-5 mr-2 text-gray-400" />
@@ -180,7 +178,6 @@ export const ChainOrchestrator: React.FC = () => {
         </div>
       </div>
 
-      {/* Connection Status */}
       <div className="mb-6">
         <h4 className="font-semibold text-white mb-3 flex items-center">
           <BarChart3 className="w-5 h-5 mr-2 text-gray-400" />
@@ -221,7 +218,6 @@ export const ChainOrchestrator: React.FC = () => {
         </div>
       </div>
 
-      {/* Chain Details */}
       {Object.keys(connections).length > 0 && (
         <div className="mt-6 p-4 bg-gradient-to-r from-accent-orchestra/10 to-success-maestro/10 rounded-lg border border-accent-orchestra/30">
           <div className="flex items-center space-x-2 mb-3">
@@ -237,7 +233,7 @@ export const ChainOrchestrator: React.FC = () => {
             {Object.entries(connections).map(([chainId, connection]) => (
               <div
                 key={chainId}
-                className="px-3 py-1 rounded-full text-xs"
+                className="px-3 py-1 rounded-full text-xs border"
                 style={{
                   backgroundColor: `${getChainColor(chainId)}20`,
                   borderColor: `${getChainColor(chainId)}40`,
@@ -251,7 +247,6 @@ export const ChainOrchestrator: React.FC = () => {
         </div>
       )}
 
-      {/* Initialization Status */}
       {isInitializing && (
         <div className="mt-6 p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
           <div className="flex items-center space-x-3">

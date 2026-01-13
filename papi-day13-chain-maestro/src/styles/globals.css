@@ -17,7 +17,6 @@
       radial-gradient(circle at 50% 50%, rgba(109, 40, 217, 0.1) 0%, transparent 50%);
   }
   
-  /* Custom scrollbar */
   ::-webkit-scrollbar {
     @apply w-2;
   }
@@ -53,9 +52,8 @@
   }
   
   .polkadot-badge {
-  @apply bg-polkadot-purple/10 text-white border-polkadot-purple/30;
-}
-
+    @apply bg-polkadot-purple/10 text-white border-polkadot-purple/30;
+  }
   
   .kusama-badge {
     @apply bg-kusama-yellow/10 text-white border-kusama-yellow/30;
@@ -82,21 +80,71 @@
   }
 }
 
-/* Music note animation */
-@keyframes floatNote {
-  0% {
-    opacity: 0;
-    transform: translateY(0) rotate(0deg);
+@layer utilities {
+  .animate-float-orchestra {
+    animation: floatOrchestra 3s ease-in-out infinite;
   }
-  10% {
-    opacity: 1;
+  
+  .animate-wave-music {
+    animation: waveMusic 2s ease-in-out infinite;
   }
-  90% {
-    opacity: 1;
+  
+  @keyframes floatOrchestra {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    25% {
+      transform: translateY(-10px) rotate(-5deg);
+    }
+    50% {
+      transform: translateY(-5px) rotate(0deg);
+    }
+    75% {
+      transform: translateY(-10px) rotate(5deg);
+    }
   }
-  100% {
-    opacity: 0;
-    transform: translateY(-100px) rotate(20deg);
+  
+  @keyframes waveMusic {
+    0%, 100% {
+      transform: scale(1) rotate(0deg);
+    }
+    50% {
+      transform: scale(1.1) rotate(10deg);
+    }
+  }
+  
+  @keyframes floatNote {
+    0% {
+      opacity: 0;
+      transform: translateY(0) rotate(0deg);
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-100px) rotate(20deg);
+    }
+  }
+  
+  @keyframes pulseChain {
+    0%, 100% {
+      opacity: 0.3;
+      stroke-width: 2;
+    }
+    50% {
+      opacity: 0.7;
+      stroke-width: 3;
+    }
+  }
+  
+  @keyframes waveDash {
+    to {
+      stroke-dashoffset: 1000;
+    }
   }
 }
 
@@ -107,19 +155,11 @@
   pointer-events: none;
 }
 
-/* Wave animation for connections */
 .wave-line {
   stroke-dasharray: 10;
   animation: waveDash 20s linear infinite;
 }
 
-@keyframes waveDash {
-  to {
-    stroke-dashoffset: 1000;
-  }
-}
-
-/* Chain connection lines */
 .chain-connection {
   stroke: rgba(109, 40, 217, 0.3);
   stroke-width: 2;

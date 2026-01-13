@@ -1,4 +1,4 @@
-//src/App.tsx
+// src/App.tsx
 import React from 'react';
 import { SymphonyBackground } from './components/SymphonyBackground';
 import { ChainOrchestrator } from './components/ChainOrchestrator';
@@ -11,6 +11,8 @@ import {
   Layers,
   Globe
 } from 'lucide-react';
+import { getChainColor, getChainIcon } from './utils/chainConfig';
+import { calculateHealthScore, formatLatency, getHealthIcon } from './utils/metricsCalculator';
 
 function App() {
   const { connections, isInitializing } = useMultiChain();
@@ -19,7 +21,6 @@ function App() {
     <div className="min-h-screen bg-dark-stage text-white relative overflow-hidden">
       <SymphonyBackground />
       
-      {/* Header */}
       <header className="container mx-auto px-4 py-6 relative z-10">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-3">
@@ -59,12 +60,11 @@ function App() {
       </header>
 
       <main className="container mx-auto px-4 pb-12 relative z-10">
-        {/* Stats Banner */}
         <div className="mb-8 console-card p-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-3">
               <div className="flex items-center justify-center space-x-2">
-                <Globe className="w-5 h-5 text-polka" />
+                <Globe className="w-5 h-5 text-polkadot-purple" />
                 <p className="text-2xl font-bold text-white">
                   {Object.keys(connections).length}
                 </p>
@@ -108,14 +108,11 @@ function App() {
           </div>
         </div>
 
-        {/* Main Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Left: Chain Orchestrator */}
           <div className="lg:col-span-2">
             <ChainOrchestrator />
           </div>
 
-          {/* Right: Quick Stats */}
           <div className="console-card p-6">
             <div className="flex items-center space-x-2 mb-4">
               <Zap className="w-5 h-5 text-accent-orchestra" />
@@ -176,7 +173,6 @@ function App() {
           </div>
         </div>
 
-        {/* Chain Details Table */}
         <div className="console-card p-6">
           <h3 className="text-xl font-bold text-white mb-6">Chain Performance Dashboard</h3>
           
@@ -200,7 +196,7 @@ function App() {
                       <div className="flex items-center space-x-2">
                         <span className="text-xl">{getChainIcon(chainId)}</span>
                         <div>
-                          <p className="font-medium text-white">{chainId}</p>
+                          <p className="font-medium text-white capitalize">{chainId}</p>
                           <p className="text-xs text-gray-400">{connection.metrics.blockHash.substring(0, 16)}...</p>
                         </div>
                       </div>
@@ -214,7 +210,7 @@ function App() {
                             ? 'connecting-status'
                             : 'disconnected-status'
                         }`} />
-                        <span className="capitalize">{connection.metrics.status}</span>
+                        <span className="capitalize text-white">{connection.metrics.status}</span>
                       </div>
                     </td>
                     <td className="py-3 px-4">
@@ -255,7 +251,6 @@ function App() {
           )}
         </div>
 
-        {/* Footer */}
         <footer className="mt-12 pt-8 border-t border-border-stage text-center text-gray-500 text-sm">
           <p>
             Built with ❤️ by Dvyne for #PAPI30Days Campaign • Day 13: Multi-Chain Mastery • 

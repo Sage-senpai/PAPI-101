@@ -1,11 +1,27 @@
-//src/hooks/useMultiChain.ts
+// src/hooks/useMultiChain.ts
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { createClient, TypedApi } from 'polkadot-api';
-import { getSmProvider } from '@polkadot-api/sm-provider';
-import { dot, ksm, wnd } from '@polkadot-api/descriptors';
 import { CHAIN_CONFIGS } from '../utils/chainConfig';
 import type { ChainConfig, ChainMetrics, ChainConnection, CrossChainOperation } from '../types/multiChain';
-import { calculateHealthScore } from '../utils/metricsCalculator';
+
+// Mock data generator for demo purposes
+const generateMockMetrics = (chainId: string): ChainMetrics => {
+  const baseBlock = chainId === 'polkadot' ? 22000000 : chainId === 'kusama' ? 25000000 : 8000000;
+  
+  return {
+    chainId,
+    timestamp: new Date(),
+    blockNumber: baseBlock + Math.floor(Math.random() * 1000),
+    blockHash: `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+    specVersion: chainId === 'polkadot' ? 1002004 : chainId === 'kusama' ? 1002005 : 1002000,
+    transactionVersion: 24,
+    validatorCount: chainId === 'polkadot' ? 297 : chainId === 'kusama' ? 1000 : 150,
+    totalIssuance: BigInt(chainId === 'polkadot' ? 1370000000 : chainId === 'kusama' ? 15000000 : 5000000) * BigInt(1e10),
+    activeAccounts: Math.floor(Math.random() * 10000) + 50000,
+    epochProgress: Math.random() * 100,
+    latency: Math.floor(Math.random() * 300) + 50,
+    status: 'connected' as const
+  };
+};
 
 export const useMultiChain = () => {
   const [connections, setConnections] = useState<Record<string, ChainConnection>>({});
@@ -18,73 +34,30 @@ export const useMultiChain = () => {
     console.log(`🌐 Initializing connection to ${chainConfig.name}...`);
     
     try {
-      const startTime = Date.now();
+      // Simulate connection delay
+      await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
       
-      // Create provider and client
-      const provider = getSmProvider(chainConfig.rpcUrl);
-      const client = createClient(provider);
-      
-      // Get appropriate descriptor
-      let api: TypedApi<any>;
-      switch (chainConfig.network) {
-        case 'polkadot':
-          api = client.getTypedApi(dot);
-          break;
-        case 'kusama':
-          api = client.getTypedApi(ksm);
-          break;
-        case 'westend':
-          api = client.getTypedApi(wnd);
-          break;
-        default:
-          throw new Error(`Unsupported network: ${chainConfig.network}`);
-      }
-      
-      // Fetch initial metrics
-      const [version, header, validatorCount, totalIssuance] = await Promise.all([
-        api.constants.System.Version(),
-        api.query.System.Header.getValue({ at: 'best' }),
-        api.query.Session.Validators.getValue({ at: 'best' }).then(vals => vals.length).catch(() => 0),
-        api.query.Balances.TotalIssuance.getValue({ at: 'best' }).catch(() => BigInt(0))
-      ]);
-      
-      const latency = Date.now() - startTime;
-      
-      const metrics: ChainMetrics = {
-        chainId: chainConfig.id,
-        timestamp: new Date(),
-        blockNumber: Number(header.number),
-        blockHash: header.hash,
-        specVersion: version.specVersion,
-        transactionVersion: version.transactionVersion,
-        validatorCount,
-        totalIssuance,
-        activeAccounts: 0, // Would need to query accounts
-        epochProgress: 0, // Would need to calculate from epoch
-        latency,
-        status: 'connected'
-      };
+      const metrics = generateMockMetrics(chainConfig.id);
       
       const connection: ChainConnection = {
-        api,
-        client,
-        provider,
+        api: null, // Would be actual TypedApi in production
+        client: null, // Would be actual PolkadotClient in production
+        provider: null,
         metrics,
         lastUpdate: new Date()
       };
       
       console.log(`✅ Connected to ${chainConfig.name}:`);
       console.log(`   Block: #${metrics.blockNumber}`);
-      console.log(`   Version: ${version.specName} v${version.specVersion}`);
-      console.log(`   Latency: ${latency}ms`);
-      console.log(`   Validators: ${validatorCount}`);
+      console.log(`   Version: v${metrics.specVersion}`);
+      console.log(`   Latency: ${metrics.latency}ms`);
+      console.log(`   Validators: ${metrics.validatorCount}`);
       
       return connection;
       
     } catch (error) {
       console.error(`❌ Failed to connect to ${chainConfig.name}:`, error);
       
-      // Create connection with error state
       const metrics: ChainMetrics = {
         chainId: chainConfig.id,
         timestamp: new Date(),
@@ -144,27 +117,13 @@ export const useMultiChain = () => {
 
   const updateChainMetrics = useCallback(async (chainId: string) => {
     const connection = connections[chainId];
-    if (!connection?.api) return;
+    if (!connection) return;
     
     try {
-      const startTime = Date.now();
+      // Simulate fetching new metrics
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      const [header, validators] = await Promise.all([
-        connection.api.query.System.Header.getValue({ at: 'best' }),
-        connection.api.query.Session.Validators.getValue({ at: 'best' }).then(vals => vals.length).catch(() => 0)
-      ]);
-      
-      const latency = Date.now() - startTime;
-      
-      const updatedMetrics: ChainMetrics = {
-        ...connection.metrics,
-        timestamp: new Date(),
-        blockNumber: Number(header.number),
-        blockHash: header.hash,
-        validatorCount: validators,
-        latency,
-        status: 'connected'
-      };
+      const updatedMetrics = generateMockMetrics(chainId);
       
       setConnections(prev => ({
         ...prev,
@@ -175,23 +134,10 @@ export const useMultiChain = () => {
         }
       }));
       
-      console.log(`📈 Updated ${chainId}: Block #${updatedMetrics.blockNumber}, Latency: ${latency}ms`);
+      console.log(`📈 Updated ${chainId}: Block #${updatedMetrics.blockNumber}, Latency: ${updatedMetrics.latency}ms`);
       
     } catch (error) {
       console.error(`❌ Failed to update metrics for ${chainId}:`, error);
-      
-      setConnections(prev => ({
-        ...prev,
-        [chainId]: {
-          ...connection,
-          metrics: {
-            ...connection.metrics,
-            status: 'error',
-            lastError: error instanceof Error ? error.message : 'Connection lost'
-          },
-          lastUpdate: new Date()
-        }
-      }));
     }
   }, [connections]);
 
@@ -206,10 +152,10 @@ export const useMultiChain = () => {
     console.log('✅ All chain metrics updated');
   }, [connections, updateChainMetrics]);
 
-  const executeCrossChainOperation = useCallback(async <T>(
+  const executeCrossChainOperation = useCallback(async <T,>(
     operationId: string,
     chains: string[],
-    operation: (api: TypedApi<any>, chainId: string) => Promise<T>
+    operation: (api: any, chainId: string) => Promise<T>
   ): Promise<Record<string, T>> => {
     const operationStart = new Date();
     const op: CrossChainOperation = {
@@ -296,24 +242,19 @@ export const useMultiChain = () => {
   const toggleChain = useCallback((chainId: string) => {
     setActiveChains(prev => {
       if (prev.includes(chainId)) {
-        // Disconnect chain
         setConnections(prevConnections => {
           const newConnections = { ...prevConnections };
-          if (newConnections[chainId]?.client) {
-            newConnections[chainId].client.destroy();
-          }
           delete newConnections[chainId];
           return newConnections;
         });
         return prev.filter(id => id !== chainId);
       } else {
-        // Will be connected on next initialization
         return [...prev, chainId];
       }
     });
   }, []);
 
-  const getChainApi = useCallback((chainId: string): TypedApi<any> | null => {
+  const getChainApi = useCallback((chainId: string): any | null => {
     return connections[chainId]?.api || null;
   }, [connections]);
 
@@ -329,30 +270,22 @@ export const useMultiChain = () => {
     return metrics;
   }, [connections]);
 
-  // Initialize chains on mount
   useEffect(() => {
     initializeAllChains();
     
-    // Set up periodic updates
-    updateIntervalRef.current = setInterval(updateAllMetrics, 30000); // Update every 30 seconds
+    updateIntervalRef.current = setInterval(() => {
+      updateAllMetrics();
+    }, 10000); // Update every 10 seconds
     
     return () => {
       if (updateIntervalRef.current) {
         clearInterval(updateIntervalRef.current);
       }
-      
-      // Clean up all connections
-      Object.values(connections).forEach(connection => {
-        if (connection.client) {
-          connection.client.destroy();
-        }
-      });
     };
-  }, [initializeAllChains]);
+  }, []);
 
-  // Re-initialize when active chains change
   useEffect(() => {
-    if (!isInitializing) {
+    if (!isInitializing && Object.keys(connections).length !== activeChains.length) {
       initializeAllChains();
     }
   }, [activeChains]);
