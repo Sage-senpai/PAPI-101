@@ -1,33 +1,27 @@
 {
   "name": "papi-day15-recap-commander",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Week 2 Recap: Multi-Chain Balance Commander - A comprehensive PAPI learning showcase",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "papi": "npx papi add dot -n polkadot && npx papi add ksm -n kusama && npx papi"
   },
-  "keywords": [],
+  "keywords": ["polkadot", "papi", "blockchain", "web3"],
   "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "license": "MIT",
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.2",
     "@mui/material": "^5.15.2",
-    "@mui/x-data-grid": "^6.19.5",
-    "@polkadot-api/descriptors": "file:.papi\\descriptors",
-    "@polkadot-api/sm-provider": "^0.1.15",
-    "@polkadot/extension-dapp": "^0.62.6",
-    "axios": "^1.6.5",
-    "polkadot-api": "^1.23.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@types/node": "^20.10.0",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.0",

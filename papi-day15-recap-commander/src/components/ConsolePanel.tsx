@@ -1,4 +1,3 @@
-//src/components/ConsolePanel.tsx
 import React, { useState, useEffect, useRef } from 'react'
 import {
   Paper,
@@ -9,8 +8,9 @@ import {
   Chip,
   TextField,
   Button,
-  Divider,
   Fade,
+  Switch,
+  FormControlLabel,
 } from '@mui/material'
 import {
   Terminal,
@@ -24,6 +24,7 @@ import {
   CheckCircle,
   Error,
   Info,
+  VerticalAlignBottom,
 } from '@mui/icons-material'
 
 interface LogEntry {
@@ -81,8 +82,9 @@ const ConsolePanel: React.FC = () => {
   ])
   
   const [isPaused, setIsPaused] = useState(false)
-  const [autoScroll, setAutoScroll] = useState(true)
+  const [autoScroll, setAutoScroll] = useState(false) // Changed default to false
   const consoleEndRef = useRef<HTMLDivElement>(null)
+  const consoleContainerRef = useRef<HTMLDivElement>(null)
   const logCounter = useRef(logs.length)
 
   const addLog = (message: string, type: LogEntry['type'] = 'info') => {
@@ -103,7 +105,7 @@ const ConsolePanel: React.FC = () => {
       icon: icons[type],
     }
 
-    setLogs(prev => [...prev.slice(-19), newLog]) // Keep last 20 logs
+    setLogs(prev => [...prev.slice(-49), newLog]) // Keep last 50 logs
   }
 
   useEffect(() => {
@@ -167,9 +169,14 @@ const ConsolePanel: React.FC = () => {
     a.href = url
     a.download = `papi-week2-logs-${new Date().toISOString().split('T')[0]}.txt`
     a.click()
+    URL.revokeObjectURL(url)
     
     console.log('💾 Logs exported to file')
     addLog('Logs exported successfully', 'success')
+  }
+
+  const scrollToBottom = () => {
+    consoleEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
   const getTypeColor = (type: LogEntry['type']) => {
@@ -185,6 +192,7 @@ const ConsolePanel: React.FC = () => {
   return (
     <Paper
       id="console"
+      elevation={0}
       sx={{
         p: 3,
         background: 'linear-gradient(135deg, rgba(10, 10, 20, 0.95) 0%, rgba(0, 0, 0, 0.9) 100%)',
@@ -193,11 +201,11 @@ const ConsolePanel: React.FC = () => {
         fontFamily: '"Roboto Mono", monospace',
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3, flexWrap: 'wrap', gap: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Terminal sx={{ fontSize: 32, color: '#00B2FF' }} />
           <Box>
-            <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
+            <Typography variant="h5" component="h2" sx={{ fontWeight: 600, fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
               Developer Console
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -206,7 +214,7 @@ const ConsolePanel: React.FC = () => {
           </Box>
         </Box>
         
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
           <Chip
             icon={<FiberManualRecord />}
             label={`${logs.length} logs`}
@@ -234,11 +242,43 @@ const ConsolePanel: React.FC = () => {
               <Download />
             </IconButton>
           </Tooltip>
+          <Tooltip title="Scroll to bottom">
+            <IconButton size="small" onClick={scrollToBottom}>
+              <VerticalAlignBottom />
+            </IconButton>
+          </Tooltip>
         </Box>
+      </Box>
+
+      {/* Auto-scroll toggle */}
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={autoScroll}
+              onChange={(e) => setAutoScroll(e.target.checked)}
+              size="small"
+              sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': {
+                  color: '#00B2FF',
+                },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                  backgroundColor: '#00B2FF',
+                },
+              }}
+            />
+          }
+          label={
+            <Typography variant="caption" color="text.secondary">
+              Auto-scroll
+            </Typography>
+          }
+        />
       </Box>
 
       {/* Console Output */}
       <Paper
+        ref={consoleContainerRef}
         sx={{
           p: 2,
           mb: 3,
@@ -249,6 +289,17 @@ const ConsolePanel: React.FC = () => {
           overflow: 'auto',
           fontFamily: '"Roboto Mono", monospace',
           fontSize: '0.875rem',
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'rgba(255, 255, 255, 0.05)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: 'linear-gradient(45deg, #E6007A, #00B2FF)',
+            borderRadius: '4px',
+          },
         }}
       >
         <Box sx={{ color: '#00D68F', mb: 1 }}>
@@ -265,7 +316,7 @@ const ConsolePanel: React.FC = () => {
                 color: getTypeColor(log.type),
               }}
             >
-              <Box sx={{ mr: 1.5, mt: 0.5, color: getTypeColor(log.type) }}>
+              <Box sx={{ mr: 1.5, mt: 0.5, color: getTypeColor(log.type), fontSize: '1rem' }}>
                 {log.icon}
               </Box>
               <Box sx={{ flex: 1 }}>
@@ -283,7 +334,7 @@ const ConsolePanel: React.FC = () => {
       </Paper>
 
       {/* Console Controls */}
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
         <TextField
           placeholder="Type a command or message..."
           size="small"
@@ -291,10 +342,11 @@ const ConsolePanel: React.FC = () => {
           disabled={isPaused}
           onKeyPress={(e) => {
             if (e.key === 'Enter') {
-              const input = e.currentTarget.value
+              const target = e.target as HTMLInputElement
+              const input = target.value
               if (input.trim()) {
                 addLog(`$ ${input}`, 'info')
-                e.currentTarget.value = ''
+                target.value = ''
               }
             }
           }}
@@ -320,13 +372,14 @@ const ConsolePanel: React.FC = () => {
             addLog(`$ ${cmd}`, 'info')
           }}
           disabled={isPaused}
+          sx={{ minWidth: '120px' }}
         >
           Test Command
         </Button>
       </Box>
 
       {/* Status Bar */}
-      <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
         <Typography variant="caption" color="text.secondary">
           {isPaused ? '⏸️ Logs paused' : '▶️ Live logging active'} • Showing {logs.length} entries
         </Typography>

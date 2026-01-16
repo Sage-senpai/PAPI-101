@@ -1,4 +1,3 @@
-//src/App.tsx
 import React, { useState, useEffect } from 'react'
 import {
   Container,
@@ -36,10 +35,8 @@ import './styles/global.css'
 const App: React.FC = () => {
   const [connected, setConnected] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('dashboard')
 
   useEffect(() => {
-    // Simulate connection setup
     const timer = setTimeout(() => {
       setLoading(false)
       console.log('🚀 Week 2 Recap App initialized')
@@ -78,7 +75,7 @@ const App: React.FC = () => {
         <Box className="float-animation" sx={{ mb: 4 }}>
           <RocketLaunch sx={{ fontSize: 80, color: '#E6007A' }} />
         </Box>
-        <Typography variant="h4" className="gradient-text" sx={{ mb: 2 }}>
+        <Typography variant="h4" className="gradient-text" sx={{ mb: 2, fontWeight: 700 }}>
           Week 2 Recap: Initializing...
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
@@ -93,6 +90,7 @@ const App: React.FC = () => {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Header */}
       <Paper
+        elevation={0}
         sx={{
           p: 4,
           mb: 4,
@@ -116,29 +114,29 @@ const App: React.FC = () => {
         
         <Grid container alignItems="center" spacing={3}>
           <Grid item xs={12} md={8}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <RocketLaunch sx={{ mr: 2, fontSize: 40, color: '#E6007A' }} />
-              <Typography variant="h3" component="h1" sx={{ fontWeight: 700 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
+              <RocketLaunch sx={{ fontSize: 40, color: '#E6007A' }} />
+              <Typography variant="h3" component="h1" sx={{ fontWeight: 700, fontSize: { xs: '1.75rem', md: '3rem' } }}>
                 <span className="gradient-text">Week 2 Recap</span>
               </Typography>
               <Chip
                 label="Day 15"
-                sx={{ ml: 2, bgcolor: 'rgba(0, 178, 255, 0.2)', color: '#00B2FF' }}
+                sx={{ bgcolor: 'rgba(0, 178, 255, 0.2)', color: '#00B2FF' }}
               />
             </Box>
             
-            <Typography variant="h5" sx={{ mb: 3, color: 'text.secondary' }}>
+            <Typography variant="h5" sx={{ mb: 3, color: 'text.secondary', fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
               Multi-Chain Balance Commander
             </Typography>
             
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 3 }}>
-              <Chip icon={<AutoAwesome />} label="Real-time Balances" color="primary" variant="outlined" />
-              <Chip icon={<CompareArrows />} label="Cross-chain Transactions" color="secondary" variant="outlined" />
-              <Chip icon={<Timeline />} label="Observable Streams" color="success" variant="outlined" />
-              <Chip icon={<Bolt />} label="Week 2 Skills" color="warning" variant="outlined" />
+              <Chip icon={<AutoAwesome />} label="Real-time Balances" color="primary" variant="outlined" size="small" />
+              <Chip icon={<CompareArrows />} label="Cross-chain Transactions" color="secondary" variant="outlined" size="small" />
+              <Chip icon={<Timeline />} label="Observable Streams" sx={{ borderColor: '#00D68F', color: '#00D68F' }} variant="outlined" size="small" />
+              <Chip icon={<Bolt />} label="Week 2 Skills" sx={{ borderColor: '#FFAA00', color: '#FFAA00' }} variant="outlined" size="small" />
             </Box>
             
-            <Typography variant="body1" sx={{ mb: 3 }}>
+            <Typography variant="body1" sx={{ mb: 3, fontSize: { xs: '0.875rem', md: '1rem' } }}>
               A showcase of everything learned in Week 2: Reading data, sending transactions, 
               multi-chain setup, and reactive programming with Observables.
             </Typography>
@@ -149,6 +147,7 @@ const App: React.FC = () => {
               <Button
                 variant="contained"
                 size="large"
+                fullWidth
                 startIcon={connected ? <CloudSync /> : <Bolt />}
                 onClick={handleConnect}
                 sx={{
@@ -159,7 +158,10 @@ const App: React.FC = () => {
                     background: connected 
                       ? 'linear-gradient(45deg, #00D68F 60%, #00B2FF 90%)'
                       : 'linear-gradient(45deg, #E6007A 60%, #FF1493 90%)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 20px rgba(230, 0, 122, 0.3)',
                   },
+                  transition: 'all 0.3s ease',
                 }}
               >
                 {connected ? 'Connected' : 'Connect Chains'}
@@ -168,8 +170,19 @@ const App: React.FC = () => {
               <Button
                 variant="outlined"
                 size="large"
+                fullWidth
                 startIcon={<Terminal />}
-                onClick={() => window.open('#console', '_self')}
+                onClick={() => {
+                  document.getElementById('console')?.scrollIntoView({ behavior: 'smooth' })
+                }}
+                sx={{
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                  '&:hover': {
+                    borderColor: '#00B2FF',
+                    transform: 'translateY(-2px)',
+                  },
+                  transition: 'all 0.3s ease',
+                }}
               >
                 View Console Logs
               </Button>
@@ -191,7 +204,7 @@ const App: React.FC = () => {
               </Button>
             }
           >
-            <Typography variant="body1">
+            <Typography variant="body2">
               ✅ Connected to Polkadot & Kusama | 🔄 Real-time updates active | 
               💸 Transaction system online | 🌉 Cross-chain mode enabled
             </Typography>
@@ -218,6 +231,7 @@ const App: React.FC = () => {
 
       {/* Footer */}
       <Paper
+        elevation={0}
         sx={{
           mt: 6,
           p: 3,
@@ -227,26 +241,26 @@ const App: React.FC = () => {
           borderRadius: 2,
         }}
       >
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
+        <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
+          <Grid item xs={12} md={6}>
             <Typography variant="body2" color="text.secondary">
               🎯 Week 2 Recap Complete | #PAPI30Days Challenge | Day 15
             </Typography>
           </Grid>
-          <Grid item>
-            <Box sx={{ display: 'flex', gap: 1 }}>
+          <Grid item xs={12} md={6}>
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
               <Tooltip title="View source code">
-                <IconButton color="primary">
+                <IconButton color="primary" size="small">
                   <GitHub />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Share on Twitter">
-                <IconButton color="primary">
+                <IconButton color="primary" size="small">
                   <Twitter />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Export logs">
-                <IconButton color="primary">
+                <IconButton color="primary" size="small">
                   <Download />
                 </IconButton>
               </Tooltip>

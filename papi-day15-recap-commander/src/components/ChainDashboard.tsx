@@ -1,4 +1,3 @@
-//src/components/ChainDashboard
 import React, { useState, useEffect } from 'react'
 import {
   Paper,
@@ -20,13 +19,10 @@ import {
   Timeline,
   CompareArrows,
   Refresh,
-  TrendingUp,
-  TrendingDown,
   Circle,
   FiberManualRecord,
   Autorenew,
 } from '@mui/icons-material'
-import { createPolkadotClient, createKusamaClient } from '../utils/chainClients'
 
 interface ChainData {
   name: string
@@ -66,11 +62,6 @@ const ChainDashboard: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [totalBalance, setTotalBalance] = useState('0.0000')
 
-  const TEST_ADDRESSES = {
-    polkadot: '13UVJyLnbVp9RBZYFwFGyDvVd1y27Tt8tkntv6Q7JVPhFsTB',
-    kusama: 'F7fq1jSJ7QF7qjK2qTkY7s7Zq7q7q7q7q7q7q7q7q7q7q7q',
-  }
-
   const formatBalance = (raw: string): string => {
     if (!raw || raw === '0') return '0.0000'
     try {
@@ -91,7 +82,6 @@ const ChainDashboard: React.FC = () => {
     console.log('📡 Setting up Polkadot connection...')
     console.log('📡 Setting up Kusama connection...')
 
-    // Simulate chain connections
     await new Promise(resolve => setTimeout(resolve, 1500))
 
     const mockData = [
@@ -124,7 +114,6 @@ const ChainDashboard: React.FC = () => {
 
     setChains(updatedChains)
     
-    // Calculate total
     const total = updatedChains.reduce((sum, chain) => {
       return sum + parseFloat(chain.formattedBalance.replace(/,/g, ''))
     }, 0)
@@ -139,12 +128,10 @@ const ChainDashboard: React.FC = () => {
     
     setLoading(false)
 
-    // Start simulated updates
     startLiveUpdates()
   }
 
   const startLiveUpdates = () => {
-    // Simulate real-time updates
     const interval = setInterval(() => {
       setChains(prev => prev.map(chain => {
         if (chain.isLive && Math.random() > 0.7) {
@@ -186,6 +173,7 @@ const ChainDashboard: React.FC = () => {
 
   return (
     <Paper
+      elevation={0}
       sx={{
         p: 3,
         height: '100%',
@@ -194,11 +182,11 @@ const ChainDashboard: React.FC = () => {
         borderRadius: 3,
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3, flexWrap: 'wrap', gap: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <AccountBalance sx={{ fontSize: 32, color: '#00B2FF' }} />
           <Box>
-            <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
+            <Typography variant="h5" component="h2" sx={{ fontWeight: 600, fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
               Multi-Chain Dashboard
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -225,6 +213,7 @@ const ChainDashboard: React.FC = () => {
 
       {/* Total Balance */}
       <Card
+        elevation={0}
         sx={{
           mb: 4,
           background: 'linear-gradient(135deg, rgba(230, 0, 122, 0.15) 0%, rgba(0, 178, 255, 0.15) 100%)',
@@ -237,7 +226,7 @@ const ChainDashboard: React.FC = () => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 Total Multi-Chain Balance
               </Typography>
-              <Typography variant="h3" component="div" sx={{ fontWeight: 700 }}>
+              <Typography variant="h3" component="div" sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>
                 {totalBalance}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -247,7 +236,7 @@ const ChainDashboard: React.FC = () => {
             <Grid item xs={12} md={4}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <CompareArrows sx={{ color: '#00D68F' }} />
-                <Typography variant="body1" color="success.main">
+                <Typography variant="body2" sx={{ color: '#00D68F' }}>
                   Cross-chain monitoring active
                 </Typography>
               </Box>
@@ -280,6 +269,7 @@ const ChainDashboard: React.FC = () => {
           <Grid item xs={12} md={6} key={chain.name}>
             <Fade in={true} timeout={500 + index * 200}>
               <Card
+                elevation={0}
                 sx={{
                   height: '100%',
                   background: `linear-gradient(135deg, ${chain.color}15 0%, rgba(0, 178, 255, 0.15) 100%)`,
@@ -323,7 +313,7 @@ const ChainDashboard: React.FC = () => {
                   </Box>
 
                   <Box sx={{ textAlign: 'center', py: 2 }}>
-                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1 }}>
+                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1.75rem', md: '2.125rem' } }}>
                       {chain.formattedBalance}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -362,6 +352,7 @@ const ChainDashboard: React.FC = () => {
 
       {/* Live Status */}
       <Paper
+        elevation={0}
         sx={{
           mt: 3,
           p: 2,
@@ -370,7 +361,7 @@ const ChainDashboard: React.FC = () => {
           borderRadius: 2,
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <FiberManualRecord sx={{ color: '#00D68F', fontSize: 12 }} />
             <Typography variant="body2">
