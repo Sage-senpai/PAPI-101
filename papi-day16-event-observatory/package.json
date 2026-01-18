@@ -1,0 +1,37 @@
+{
+  "name": "papi-day16-event-observatory",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "papi": "npx papi add dot -n polkadot && npx papi"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.2",
+    "@mui/material": "^5.15.2",
+    "@mui/x-charts": "^6.19.5",
+    "@mui/x-data-grid": "^6.19.5",
+    "@polkadot-api/chain-specs": "^0.1.1",
+    "@polkadot-api/descriptors": "file:.papi\\descriptors",
+    "@polkadot-api/sm-provider": "^0.4.0",
+    "dayjs": "^1.11.10",
+    "decimal.js": "^10.4.3",
+    "lodash.debounce": "^4.0.8",
+    "polkadot-api": "^0.12.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "web3": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12"
+  }
+}
