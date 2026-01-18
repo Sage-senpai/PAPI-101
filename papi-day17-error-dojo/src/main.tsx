@@ -3,40 +3,48 @@ import ReactDOM from 'react-dom/client'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import App from './App'
-import './styles/globals.css'
+import './styles/global.css'
 
 const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#E6007A',
-      light: '#FF1493',
-      dark: '#B3005E',
+      main: '#FF6B6B',
+      light: '#FF8E8E',
+      dark: '#D64545',
     },
     secondary: {
-      main: '#00B2FF',
-      light: '#33C1FF',
-      dark: '#008ECC',
+      main: '#4ECDC4',
+      light: '#7AD9D2',
+      dark: '#2FA6A0',
     },
     background: {
       default: '#0A0A14',
       paper: '#1A1A2E',
     },
-    success: {
-      main: '#00D68F',
+    error: {
+      main: '#FF6B6B',
+      light: '#FF8E8E',
+      dark: '#D64545',
     },
     warning: {
-      main: '#FFAA00',
+      main: '#FFD166',
+      light: '#FFDA85',
+      dark: '#E6BC5C',
     },
-    error: {
-      main: '#FF3D71',
+    success: {
+      main: '#06D6A0',
+      light: '#38DEB3',
+      dark: '#05BC8B',
     },
     info: {
-      main: '#00B2FF',
+      main: '#118AB2',
+      light: '#43A1C3',
+      dark: '#0F7799',
     },
   },
   typography: {
-    fontFamily: '"Space Grotesk", "Inter", "Roboto", sans-serif',
+    fontFamily: '"IBM Plex Sans", "Inter", "Roboto", sans-serif',
     h1: {
       fontWeight: 700,
       letterSpacing: '-0.02em',
@@ -45,12 +53,7 @@ const theme = createTheme({
       fontWeight: 600,
       letterSpacing: '-0.01em',
     },
-    h3: {
-      fontWeight: 600,
-    },
-    h5: {
-      fontWeight: 500,
-    },
+    fontFamilyMonospace: '"IBM Plex Mono", "Roboto Mono", monospace',
   },
   shape: {
     borderRadius: 12,
@@ -61,7 +64,6 @@ const theme = createTheme({
         root: {
           textTransform: 'none',
           fontWeight: 600,
-          padding: '10px 24px',
         },
       },
     },
@@ -72,10 +74,10 @@ const theme = createTheme({
         },
       },
     },
-    MuiPaper: {
+    MuiAlert: {
       styleOverrides: {
         root: {
-          backgroundImage: 'none',
+          borderRadius: 8,
         },
       },
     },

@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: linear-gradient(135deg, #0A0A14 0%, #1A1A2E 100%);
+  min-height: 100vh;
+  color: #E2E2E2;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #FF8E8E, #7AD9D2);
+}
+
+/* Code styling */
+code, pre {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.9em;
+}
+
+/* Animations */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes pulseError {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes highlight {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(255, 107, 107, 0.2); }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.pulse-error {
+  animation: pulseError 2s infinite;
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.3s ease-out forwards;
+}
+
+.highlight {
+  animation: highlight 1s ease-in-out;
+}
+
+/* Error severity colors */
+.error-critical {
+  border-left: 4px solid #FF6B6B;
+}
+
+.error-warning {
+  border-left: 4px solid #FFD166;
+}
+
+.error-info {
+  border-left: 4px solid #118AB2;
+}
+
+/* Glass morphism */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #06D6A0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Terminal styling */
+.terminal {
+  font-family: 'IBM Plex Mono', monospace;
+  background: #000;
+  color: #00FF00;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.terminal-prompt {
+  color: #4ECDC4;
+}
+
+.terminal-error {
+  color: #FF6B6B;
+}
+
+.terminal-success {
+  color: #06D6A0;
+}
+
+.terminal-warning {
+  color: #FFD166;
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.1) 25%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    rgba(255, 255, 255, 0.1) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Tooltip styling */
+.custom-tooltip {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.875rem;
+  max-width: 300px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
