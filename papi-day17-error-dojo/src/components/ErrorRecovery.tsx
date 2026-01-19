@@ -1,26 +1,30 @@
-import React from 'react'
+// papi-day17-error-dojo/src/components/ErrorRecovery.tsx
+import React, { useState } from 'react'
 import {
   Paper,
   Typography,
   Box,
   Alert,
   Chip,
-  Divider,
   IconButton,
   Tooltip,
   Fade,
+  Grid,
+  Card,
+  CardContent,
+  Button,
+  Collapse,
 } from '@mui/material'
 import {
-  Replay,
   AutoFixHigh,
-  BugReport,
   CheckCircle,
   Warning,
-  Bolt,
   Code,
+  ContentCopy,
   PlayArrow,
+  ExpandMore,
+  ExpandLess,
 } from '@mui/icons-material'
-import { motion } from 'framer-motion'
 
 interface RecoveryPattern {
   id: string
@@ -151,7 +155,6 @@ const ErrorRecovery: React.FC<ErrorRecoveryProps> = ({ onErrorCaught, onValidati
 
   const testPattern = (pattern: RecoveryPattern) => {
     console.log(`🧪 Testing recovery pattern: ${pattern.title}`)
-    // Simulate test
     setTimeout(() => {
       console.log(`✅ Recovery pattern test passed: ${pattern.title}`)
       onValidationPassed()
@@ -216,21 +219,16 @@ const ErrorRecovery: React.FC<ErrorRecoveryProps> = ({ onErrorCaught, onValidati
                       label={pattern.category}
                       size="small"
                       sx={{
-                        bgcolor: '#06D6A0',
-                        color: 'white',
+                        bgcolor: 'rgba(6, 214, 160, 0.2)',
+                        color: '#06D6A0',
                         fontWeight: 600,
                       }}
                     />
                   </Box>
 
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                    <Chip
-                      label={pattern.whenToUse}
-                      size="small"
-                      variant="outlined"
-                      icon={<Bolt />}
-                    />
-                  </Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                    <strong>When to use:</strong> {pattern.whenToUse}
+                  </Typography>
 
                   <Collapse in={expandedPattern === pattern.id}>
                     <Paper
@@ -255,7 +253,7 @@ const ErrorRecovery: React.FC<ErrorRecoveryProps> = ({ onErrorCaught, onValidati
                       Benefits:
                     </Typography>
                     {pattern.benefits.map((benefit, index) => (
-                      <Typography key={index} variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography key={index} variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                         <CheckCircle fontSize="small" color="success" />
                         {benefit}
                       </Typography>
@@ -296,35 +294,33 @@ const ErrorRecovery: React.FC<ErrorRecoveryProps> = ({ onErrorCaught, onValidati
       <Paper
         sx={{
           mt: 4,
-          p: 2,
-          background: 'rgba(6, 214, 160, 0.1)',
-          border: '1px solid rgba(6, 214, 160, 0.3)',
-          borderRadius: 2,
-        }}
-      >
-        <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <AutoFixHigh color="success" /> Why Recovery Matters
+          p:3,
+background: 'rgba(6, 214, 160, 0.1)',
+border: '1px solid rgba(6, 214, 160, 0.3)',
+borderRadius: 2,
+}}
+>
+<Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+<AutoFixHigh color="success" /> Why Recovery Matters
+</Typography>
+    <Typography variant="body2" sx={{ mb: 2 }}>
+      In production dApps, errors are inevitable. Good recovery patterns turn 70% success rates into 95%+.
+    </Typography>
+    
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Warning color="warning" /> Before: Crash on error
         </Typography>
-        
-        <Typography variant="body2" sx={{ mb: 2 }}>
-          In production dApps, errors are inevitable. Good recovery patterns turn 70% success rates into 95%+.
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <CheckCircle color="success" /> After: Graceful recovery
         </Typography>
-        
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Warning color="warning" /> Before: Crash on error
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <CheckCircle color="success" /> After: Graceful recovery
-            </Typography>
-          </Grid>
-        </Grid>
-      </Paper>
-    </Paper>
-  )
+      </Grid>
+    </Grid>
+  </Paper>
+</Paper>
+)
 }
-
 export default ErrorRecovery

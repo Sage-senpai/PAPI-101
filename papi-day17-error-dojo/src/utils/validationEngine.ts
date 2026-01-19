@@ -1,3 +1,4 @@
+// papi-day17-error-dojo/src/utils/validationEngine.ts
 import validator from 'validator'
 import { z } from 'zod'
 
@@ -80,11 +81,10 @@ export const validateTransaction = async (
         }
         
         parsedData = { method: 'unknown', rawHex: input }
-        result.details.hexLength = input.length - 2 // Exclude 0x
+        result.details.hexLength = input.length - 2
         break
         
       case 'raw':
-        // Simple raw text parsing
         parsedData = parseRawInput(input)
         result.details.parsedRaw = parsedData
         break
@@ -109,13 +109,9 @@ export const validateTransaction = async (
       }
     }
     
-    // Check for common errors
     checkCommonErrors(parsedData, result)
-    
-    // Check for warnings
     checkWarnings(parsedData, result)
     
-    // Add validation metadata
     result.details.validationTimestamp = new Date().toISOString()
     result.details.inputType = inputType
     result.details.inputLength = input.length
@@ -126,7 +122,6 @@ export const validateTransaction = async (
     result.errors.push(`Validation engine error: ${(error as Error).message}`)
   }
   
-  // Log result
   if (result.isValid) {
     console.log('✅ Validation passed with', result.warnings.length, 'warning(s)')
   } else {
@@ -146,18 +141,14 @@ const parseRawInput = (input: string): any => {
     
     const match = line.match(/^(\w+):\s*(.+)$/)
     if (match) {
-      const [_, key, value] = match
+      const [, key, value] = match
       
       if (key === 'method') {
         result.method = value.trim()
       } else {
-        // Try to parse value
         let parsedValue = value.trim()
-        
-        // Remove trailing comments
         parsedValue = parsedValue.split('//')[0].trim()
         
-        // Try to parse as number
         if (/^\d+n$/.test(parsedValue)) {
           result.params[key] = BigInt(parsedValue.slice(0, -1))
         } else if (/^\d+$/.test(parsedValue)) {
@@ -175,7 +166,6 @@ const parseRawInput = (input: string): any => {
 }
 
 const checkCommonErrors = (data: any, result: ValidationResult) => {
-  // Check method name
   if (data.method) {
     const validMethods = [
       'balances.transfer_keep_alive',
@@ -193,9 +183,7 @@ const checkCommonErrors = (data: any, result: ValidationResult) => {
     }
   }
   
-  // Check parameters
   if (data.params) {
-    // Check amount
     if (data.params.value !== undefined) {
       try {
         amountSchema.parse(data.params.value)
@@ -207,7 +195,6 @@ const checkCommonErrors = (data: any, result: ValidationResult) => {
       }
     }
     
-    // Check address
     if (data.params.dest !== undefined) {
       try {
         addressSchema.parse(data.params.dest)
@@ -219,7 +206,6 @@ const checkCommonErrors = (data: any, result: ValidationResult) => {
       }
     }
     
-    // Check for missing required params
     if (data.method === 'balances.transfer_keep_alive') {
       if (!data.params.dest) {
         result.errors.push('Missing required parameter: dest')
@@ -234,12 +220,10 @@ const checkCommonErrors = (data: any, result: ValidationResult) => {
 }
 
 const checkWarnings = (data: any, result: ValidationResult) => {
-  // Check for suspiciously large amounts
   if (data.params?.value) {
-    let amount: bigint
     try {
-      amount = BigInt(data.params.value)
-      if (amount > 1000000000000000n) { // 100,000 DOT
+      const amount = BigInt(data.params.value)
+      if (amount > 1000000000000000n) {
         result.warnings.push('Amount is very large. Double-check the value.')
       }
     } catch {
@@ -247,11 +231,10 @@ const checkWarnings = (data: any, result: ValidationResult) => {
     }
   }
   
-  // Check for common test addresses
   if (data.params?.dest) {
     const testAddresses = [
-      '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY', // Alice
-      '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty', // Bob
+      '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
+      '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
     ]
     
     if (testAddresses.includes(data.params.dest)) {
@@ -259,13 +242,11 @@ const checkWarnings = (data: any, result: ValidationResult) => {
     }
   }
   
-  // Check for duplicate parameters
   if (data.params && Object.keys(data.params).length > 5) {
     result.warnings.push('Many parameters specified. Ensure all are required.')
   }
 }
 
-// Simulate PAPI's txFromCallData validation
 export const simulateTxFromCallData = (callData: string): ValidationResult => {
   console.log(`🧪 Simulating txFromCallData with: ${callData.substring(0, 30)}...`)
   
@@ -276,43 +257,38 @@ export const simulateTxFromCallData = (callData: string): ValidationResult => {
     details: {}
   }
   
-  // Common invalid patterns
   const invalidPatterns = [
     {
-      pattern: /^0x[0-9a-f]{0,15}$/i, // Too short
+      pattern: /^0x[0-9a-f]{0,15}$/i,
       error: 'Call data too short. Expected at least 32 bytes, got {length} bytes.',
       fix: 'Ensure call data includes method and all parameters.'
     },
     {
-      pattern: /^0x[0-9a-f]{129,}$/i, // Too long
+      pattern: /^0x[0-9a-f]{129,}$/i,
       error: 'Call data too long. Expected maximum 64 bytes, got {length} bytes.',
       fix: 'Check for duplicate or extra data in call data.'
     },
     {
-      pattern: /^[^0x]/i, // Doesn't start with 0x
+      pattern: /^[^0x]/i,
       error: 'Call data must start with 0x.',
       fix: 'Add 0x prefix to call data.'
     },
     {
-      pattern: /[^0-9a-f]/i, // Invalid characters
+      pattern: /[^0-9a-f]/i,
       error: 'Invalid characters in hex data. Only 0-9, a-f, A-F allowed.',
       fix: 'Remove non-hex characters from call data.'
     }
   ]
   
-  // Check patterns
   for (const pattern of invalidPatterns) {
     if (pattern.pattern.test(callData)) {
       result.isValid = false
-      const length = Math.floor((callData.length - 2) / 2) // Bytes
-      result.errors.push(
-        pattern.error.replace('{length}', length.toString())
-      )
+      const length = Math.floor((callData.length - 2) / 2)
+      result.errors.push(pattern.error.replace('{length}', length.toString()))
       result.warnings.push(`💡 Fix: ${pattern.fix}`)
     }
   }
   
-  // If no pattern matched but still might be invalid
   if (result.isValid && callData.length % 2 !== 0) {
     result.isValid = false
     result.errors.push('Hex data has odd length. Hex data must have even number of characters (excluding 0x).')
