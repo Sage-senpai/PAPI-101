@@ -1,3 +1,9 @@
+// ============================================================================
+// FILE: papi-event-orchestrator/tailwind.config.js
+// PURPOSE: Tailwind CSS configuration with animations and colors
+// STATUS: READY - All Week 3 animations configured
+// ============================================================================
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -42,15 +48,15 @@ export default {
       },
       keyframes: {
         eventPulse: {
-          '0%': { 
+          '0%': {
             transform: 'translateX(-100%) scale(0.8)',
             opacity: '0'
           },
-          '70%': { 
+          '70%': {
             transform: 'translateX(0) scale(1.05)',
             opacity: '1'
           },
-          '100%': { 
+          '100%': {
             transform: 'translateX(0) scale(1)',
             opacity: '1'
           },
