@@ -1,96 +1,10 @@
 /* ============================================================================
-   FILE: papi-event-orchestrator/src/index.css
-   PURPOSE: Global CSS and Tailwind directives
-   STATUS: READY - Tailwind setup complete
+   Application Entry CSS - PAPI Event Orchestrator
+   Import order is important for proper cascading
    ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Global font and base styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  font-family: system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
-  color: #f9fafb;
-  background: #0f172a;
-}
-
-/* Custom scrollbar for event stream */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1f2937;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
-}
-
-/* Animation utilities for Week 3 */
-.animate-event-pulse {
-  animation: eventPulse 2s ease-out;
-}
-
-.animate-slide-in-up {
-  animation: slideInUp 0.3s ease-out;
-}
-
-.animate-fade-in-scale {
-  animation: fadeInScale 0.5s ease-out;
-}
-
-/* Focus styles for accessibility */
-:focus {
-  outline: 2px solid #0ea5e9;
-  outline-offset: 2px;
-}
-
-button:focus-visible {
-  outline: 2px solid #0ea5e9;
-  outline-offset: 2px;
-}
-
-/* Smooth transitions */
-button,
-input,
-select,
-textarea {
-  transition: all 0.3s ease;
-}
-
-/* Remove default button styles */
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-  font-family: inherit;
-}
-
-/* Remove default input styles */
-input,
-select,
-textarea {
-  font-family: inherit;
-}

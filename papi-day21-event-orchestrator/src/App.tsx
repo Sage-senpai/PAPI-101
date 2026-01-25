@@ -15,6 +15,7 @@ import {
   Settings,
   TrendingUp,
 } from 'lucide-react';
+import './App.css'
 import './styles/global.css'
 
 // ============================================================================
