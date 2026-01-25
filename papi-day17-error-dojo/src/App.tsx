@@ -4,17 +4,15 @@ import {
   Typography,
   Box,
   Paper,
-  Grid,
   Chip,
-  Alert,
   Button,
   Fade,
-  CircularProgress,
   Tooltip,
   IconButton,
   Divider,
   Tabs,
   Tab,
+  Grid,
 } from '@mui/material'
 import {
   BugReport,
@@ -22,14 +20,8 @@ import {
   Code,
   AutoFixHigh,
   PlayArrow,
-  Stop,
-  Download,
   GitHub,
   Twitter,
-  Bolt,
-  Warning,
-  CheckCircle,
-  Error as ErrorIcon,
   ContentCopy,
 } from '@mui/icons-material'
 import ValidationStudio from './components/ValidationStudio'
@@ -51,7 +43,7 @@ const App: React.FC = () => {
     console.log('🔍 PAPI validation system activated')
   }, [])
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue)
     console.log(`📂 Switching to tab: ${['Validation Studio', 'Error Examples', 'Recovery Patterns'][newValue]}`)
   }

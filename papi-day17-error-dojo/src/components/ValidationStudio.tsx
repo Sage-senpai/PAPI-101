@@ -8,18 +8,16 @@ import {
   Alert,
   Chip,
   IconButton,
-    CircularProgress, 
+  CircularProgress,
   Tooltip,
   Fade,
-  LinearProgress,
-  Divider,
-  Grid,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Switch,
   FormControlLabel,
+  Grid,
 } from '@mui/material'
 import {
   PlayArrow,
@@ -29,13 +27,12 @@ import {
   Warning,
   CheckCircle,
   Error as ErrorIcon,
-  Refresh,
   Code,
   Bolt,
   Science,
 } from '@mui/icons-material'
 import clsx from 'clsx'
-import { validateTransaction, ValidationResult } from '../utils/validationEngine'
+import { validateTransaction, type ValidationResult } from '../utils/validationEngine'
 
 interface ValidationStudioProps {
   onErrorCaught: () => void

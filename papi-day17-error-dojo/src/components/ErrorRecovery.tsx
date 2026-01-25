@@ -9,17 +9,16 @@ import {
   IconButton,
   Tooltip,
   Fade,
-  Grid,
   Card,
   CardContent,
   Button,
   Collapse,
+  Grid,
 } from '@mui/material'
 import {
   AutoFixHigh,
   CheckCircle,
   Warning,
-  Code,
   ContentCopy,
   PlayArrow,
   ExpandMore,
@@ -41,7 +40,7 @@ interface ErrorRecoveryProps {
   onValidationPassed: () => void
 }
 
-const ErrorRecovery: React.FC<ErrorRecoveryProps> = ({ onErrorCaught, onValidationPassed }) => {
+const ErrorRecovery: React.FC<ErrorRecoveryProps> = ({ onValidationPassed }) => {
   const [expandedPattern, setExpandedPattern] = useState<string | null>(null)
 
   const recoveryPatterns: RecoveryPattern[] = [

@@ -53,7 +53,6 @@ const theme = createTheme({
       fontWeight: 600,
       letterSpacing: '-0.01em',
     },
-    fontFamilyMonospace: '"IBM Plex Mono", "Roboto Mono", monospace',
   },
   shape: {
     borderRadius: 12,

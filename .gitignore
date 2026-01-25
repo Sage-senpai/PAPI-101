@@ -1,0 +1,3 @@
+# Claude temporary files
+tmpclaude-*/
+.claude/
