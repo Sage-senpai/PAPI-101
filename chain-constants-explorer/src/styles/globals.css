@@ -1,16 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border, 214.3 31.8% 91.4%));
   }
   
   body {
-    @apply bg-gray-950 text-gray-100 antialiased;
+    background-color: #030712;
+    color: #f3f4f6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
@@ -104,37 +105,47 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-900;
+  background-color: #111827;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-700 rounded-lg;
+  background-color: #374151;
+  border-radius: 0.5rem;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-600;
+  background-color: #4b5563;
 }
 
 /* Radix UI Select Overrides */
 [data-radix-select-viewport] {
-  @apply bg-gray-900 border border-gray-700 rounded-lg shadow-xl;
+  background-color: #111827;
+  border: 1px solid #374151;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 [data-radix-select-item] {
-  @apply text-gray-100 cursor-pointer outline-none;
+  color: #f3f4f6;
+  cursor: pointer;
+  outline: none;
 }
 
 [data-radix-select-item]:hover,
 [data-radix-select-item][data-highlighted] {
-  @apply bg-gray-800;
+  background-color: #1f2937;
 }
 
 /* Smooth transitions */
 * {
-  @apply transition-colors duration-200;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
 
 button,
 a {
-  @apply transition-all duration-200;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }

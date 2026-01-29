@@ -20,8 +20,10 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
 
   const handleChange =
     (field: keyof FilterState) =>
-    (value: string | null) => {
-      onFilterChange({ ...filterState, [field]: value });
+    (value: string) => {
+      // Convert "all" back to null for filtering
+      const filterValue = value === "all" ? null : value;
+      onFilterChange({ ...filterState, [field]: filterValue });
     };
 
   return (
@@ -34,13 +36,16 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
             type="text"
             placeholder="Search constants..."
             value={filterState.search ?? ""}
-            onChange={(e) => handleChange("search")(e.target.value)}
+            onChange={(e) => handleChange("search")(e.target.value || "all")}
             className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-700 bg-gray-900 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
           />
         </div>
 
         {/* Category Select */}
-        <Select.Root value={filterState.category || undefined} onValueChange={handleChange("category")}>
+        <Select.Root 
+          value={filterState.category || "all"} 
+          onValueChange={handleChange("category")}
+        >
           <Select.Trigger className="min-w-[140px] rounded-lg border border-gray-700 bg-gray-900 px-4 py-2.5 text-sm text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all flex items-center justify-between gap-2">
             <Select.Value placeholder="Category" />
             <ChevronDown className="w-4 h-4 text-gray-400" />
@@ -49,7 +54,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
             <Select.Content className="overflow-hidden rounded-lg bg-gray-900 border border-gray-700 shadow-2xl z-50">
               <Select.Viewport className="p-1">
                 <Select.Item
-                  value=""
+                  value="all"
                   className="px-4 py-2.5 text-sm text-white cursor-pointer hover:bg-gray-800 rounded-md outline-none transition-colors"
                 >
                   <Select.ItemText>All Categories</Select.ItemText>
@@ -69,7 +74,10 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
         </Select.Root>
 
         {/* Importance Select */}
-        <Select.Root value={filterState.importance || undefined} onValueChange={handleChange("importance")}>
+        <Select.Root 
+          value={filterState.importance || "all"} 
+          onValueChange={handleChange("importance")}
+        >
           <Select.Trigger className="min-w-[140px] rounded-lg border border-gray-700 bg-gray-900 px-4 py-2.5 text-sm text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all flex items-center justify-between gap-2">
             <Select.Value placeholder="Importance" />
             <ChevronDown className="w-4 h-4 text-gray-400" />
@@ -78,7 +86,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
             <Select.Content className="overflow-hidden rounded-lg bg-gray-900 border border-gray-700 shadow-2xl z-50">
               <Select.Viewport className="p-1">
                 <Select.Item
-                  value=""
+                  value="all"
                   className="px-4 py-2.5 text-sm text-white cursor-pointer hover:bg-gray-800 rounded-md outline-none transition-colors"
                 >
                   <Select.ItemText>All Levels</Select.ItemText>
@@ -98,7 +106,10 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
         </Select.Root>
 
         {/* Chain Select */}
-        <Select.Root value={filterState.chain || undefined} onValueChange={handleChange("chain")}>
+        <Select.Root 
+          value={filterState.chain || "all"} 
+          onValueChange={handleChange("chain")}
+        >
           <Select.Trigger className="min-w-[140px] rounded-lg border border-gray-700 bg-gray-900 px-4 py-2.5 text-sm text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all flex items-center justify-between gap-2">
             <Select.Value placeholder="Chain" />
             <ChevronDown className="w-4 h-4 text-gray-400" />
@@ -107,7 +118,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
             <Select.Content className="overflow-hidden rounded-lg bg-gray-900 border border-gray-700 shadow-2xl z-50">
               <Select.Viewport className="p-1">
                 <Select.Item
-                  value=""
+                  value="all"
                   className="px-4 py-2.5 text-sm text-white cursor-pointer hover:bg-gray-800 rounded-md outline-none transition-colors"
                 >
                   <Select.ItemText>All Chains</Select.ItemText>
