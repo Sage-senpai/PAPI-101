@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { papiService } from '../../services/papi.service';
 
-export const getHealth = (req: Request, res: Response): void => {
+export const getHealth = (_req: Request, res: Response): void => {
   const startTime = Date.now();
   try {
     const papiHealthy = papiService.isReady();
-    const cacheHealthy = true; // Assume cache is healthy
+    const cacheHealthy = true;
     const healthChecks = {
       papi: { status: papiHealthy ? 'healthy' : 'unhealthy', message: papiHealthy ? 'Connected to blockchain' : 'Disconnected from blockchain' },
       cache: { status: cacheHealthy ? 'healthy' : 'unhealthy', message: cacheHealthy ? 'Cache service running' : 'Cache service unavailable' },

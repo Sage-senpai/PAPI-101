@@ -27,7 +27,6 @@ class ChainInfoApiService {
     this.wsServer = new WebSocketServer({ server: this.server });
     this.initializeMiddleware();
     this.initializeRoutes();
-    this.initializeServices();
     this.initializeErrorHandling();
   }
 
@@ -71,6 +70,7 @@ class ChainInfoApiService {
           { method: 'GET', path: '/api/chain/version', description: 'Get chain runtime version', example: 'curl http://localhost:3005/api/chain/version' },
           { method: 'GET', path: '/api/chain/constants', description: 'Get all chain constants', example: 'curl http://localhost:3005/api/chain/constants' },
           { method: 'GET', path: '/api/chain/block/:number', description: 'Get block information', example: 'curl http://localhost:3005/api/chain/block/123456' },
+          { method: 'GET', path: '/api/chain/latest', description: 'Get latest block number', example: 'curl http://localhost:3005/api/chain/latest' },
           { method: 'GET', path: '/api/health', description: 'Service health check', example: 'curl http://localhost:3005/api/health' },
           { method: 'GET', path: '/api/metrics', description: 'Service metrics (Prometheus format)', example: 'curl http://localhost:3005/api/metrics' },
           { method: 'WS', path: '/ws', description: 'WebSocket for real-time chain updates', example: 'new WebSocket("ws://localhost:3005/ws")' },
@@ -107,7 +107,9 @@ class ChainInfoApiService {
     console.log('🛡️ Error handling middleware initialized');
   }
 
-  public start(): void {
+  public async start(): Promise<void> {
+    await this.initializeServices();
+    
     this.server.listen(config.port, () => {
       console.log('\n' + '='.repeat(60));
       console.log('🚀 Chain Info API Service Started!');
