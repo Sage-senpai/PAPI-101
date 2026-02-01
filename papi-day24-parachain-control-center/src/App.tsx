@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { ChainDashboard } from './components/ChainDashboard';
-import { CrossChainCompare } from './components/CrossChainCompare';
-import { NetworkGraph } from './components/NetworkGraph';
-import { AlertPanel } from './components/AlertPanel';
-import { ChainSelector } from './components/ChainSelector';
-import { CHAINS } from './services/chainRegistry';
-import { Globe, Zap, Cpu, Network, Rocket, Shield, BarChart3 } from 'lucide-react';
-import './styles/globals.css';
-import './styles/chainAnimations.css';
+import { ChainDashboard }      from './components/ChainDashboard';
+import { CrossChainCompare }   from './components/CrossChainCompare';
+import { NetworkGraph }        from './components/NetworkGraph';
+import { AlertPanel }          from './components/AlertPanel';
+import { ChainSelector }       from './components/ChainSelector';
+import { CHAINS }              from './services/chainRegistry';
+import { Globe, Zap, Network, Cpu, Rocket, Shield, BarChart3 } from 'lucide-react';
 
 function App() {
-  const [selectedChains, setSelectedChains] = useState<string[]>(['polkadot', 'kusama', 'astar']);
-  const [isMonitoring, setIsMonitoring] = useState<boolean>(true);
-  const [connectedChains, setConnectedChains] = useState<number>(selectedChains.length);
-  const [crossChainEvents, setCrossChainEvents] = useState<number>(0);
+  const [selectedChains, setSelectedChains] = useState<string[]>([
+    'polkadot', 'kusama', 'astar',
+  ]);
+  const [isMonitoring]         = useState(true);
+  const [crossChainEvents, setCrossChainEvents] = useState(0);
 
+  /* ── console banner + live event counter ── */
   useEffect(() => {
     console.log('===========================================');
     console.log('🌉 PARACHAIN CONTROL CENTER INITIALIZED');
@@ -28,190 +28,216 @@ function App() {
     console.log('');
     console.log('💡 Active chains:');
     selectedChains.forEach(id => {
-      const chain = CHAINS.find(c => c.id === id);
-      console.log(`   • ${chain?.icon} ${chain?.name}`);
+      const c = CHAINS.find(ch => ch.id === id);
+      console.log(`   • ${c?.icon} ${c?.name}`);
     });
     console.log('');
 
-    const eventInterval = setInterval(() => {
-      setCrossChainEvents(prev => prev + 1);
-      if (crossChainEvents % 5 === 0) {
-        console.log(`📈 Cross-chain sync event #${crossChainEvents + 1}`);
-      }
+    const interval = setInterval(() => {
+      setCrossChainEvents(prev => {
+        const next = prev + 1;
+        if (next % 5 === 0) console.log(`📈 Cross-chain sync event #${next}`);
+        return next;
+      });
     }, 4000);
 
-    return () => clearInterval(eventInterval);
+    return () => clearInterval(interval);
   }, [selectedChains]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100">
-      <Toaster position="top-right" />
-      
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#1f2937',
+            color:      '#f9fafb',
+            border:     '1px solid #374151',
+          },
+        }}
+      />
+
+      {/* ──────────── HEADER ──────────── */}
       <header className="border-b border-gray-700/50 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* logo + title */}
             <div className="flex items-center space-x-4">
-              <Globe className="w-10 h-10 text-white animate-pulse-chain" />
+              <div className="relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#E6007A] via-[#0085FF] to-[#5A4FCF] rounded-full blur opacity-30" />
+                <Globe className="w-9 h-9 text-white relative" style={{ animation: 'pulseChain 2s infinite' }} />
+              </div>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-chain-polkadot via-chain-kusama to-chain-astar bg-clip-text text-transparent">
+                <h1
+                  className="text-2xl font-bold"
+                  style={{
+                    background: 'linear-gradient(90deg, #E6007A, #0085FF, #5A4FCF)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
                   Parachain Control Center
                 </h1>
-                <p className="text-gray-400">Day 24: Mastering Cross-Chain with PAPI</p>
+                <p className="text-gray-400 text-sm">Day 24 · Mastering Cross-Chain with PAPI</p>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-6">
+
+            {/* status pills */}
+            <div className="flex items-center space-x-5">
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-status-online rounded-full animate-ping"></div>
-                <span className="text-sm">{connectedChains} chains live</span>
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+                </span>
+                <span className="text-sm">{selectedChains.length} chains live</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Zap className="w-5 h-5 text-yellow-500" />
+              <div className="flex items-center space-x-1.5">
+                <Zap className="w-4 h-4 text-yellow-400" />
                 <span className="text-sm">{crossChainEvents} sync events</span>
               </div>
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                isMonitoring ? 'bg-status-online/20 text-status-online' : 'bg-status-offline/20 text-status-offline'
-              }`}>
-                {isMonitoring ? 'MONITORING' : 'PAUSED'}
-              </div>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/30">
+                MONITORING
+              </span>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-10 animate-slide-in-chain">
-          <div className="bg-gradient-to-r from-gray-800/30 to-gray-900/30 rounded-2xl p-8 border border-gray-700/50 backdrop-blur-sm animate-cross-chain-glow">
+      {/* ──────────── MAIN ──────────── */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+
+        {/* ── Hero banner ── */}
+        <section className="mb-10" style={{ animation: 'slideInChain 0.5s ease-out both' }}>
+          <div
+            className="rounded-2xl p-8 border border-gray-700/50 backdrop-blur-sm"
+            style={{
+              background: 'linear-gradient(135deg, rgba(31,41,55,0.5), rgba(17,24,39,0.6))',
+              animation: 'crossChainGlow 4s infinite alternate',
+            }}
+          >
             <div className="grid md:grid-cols-2 gap-8 items-center">
+              {/* left copy */}
               <div>
                 <h2 className="text-3xl font-bold mb-4">Unified Control Across Ecosystems</h2>
-                <p className="text-gray-300 mb-6 text-lg">
-                  Experience the power of PAPI multi-chain in action. Monitor relay chains and parachains simultaneously, compare metrics, and visualize the interconnected Polkadot network.
+                <p className="text-gray-300 mb-6 text-base leading-relaxed">
+                  Experience the power of PAPI multi-chain in action. Monitor relay chains and
+                  parachains simultaneously, compare metrics, and visualise the interconnected
+                  Polkadot network — all from one dashboard.
                 </p>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center space-x-2">
-                    <Network className="w-5 h-5 text-primary-500" />
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Network className="w-4 h-4 text-sky-400" />
                     <span>Live multi-chain data</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Cpu className="w-5 h-5 text-green-500" />
+                  <div className="flex items-center gap-2">
+                    <Cpu className="w-4 h-4 text-green-400" />
                     <span>Type-safe across chains</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Shield className="w-5 h-5 text-yellow-500" />
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-yellow-400" />
                     <span>Cross-chain insights</span>
                   </div>
                 </div>
               </div>
-              
+
+              {/* right stats box */}
               <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700">
-                <h3 className="font-semibold mb-4 flex items-center space-x-2">
-                  <Rocket className="w-5 h-5" />
-                  <span>Network Overview</span>
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <Rocket className="w-4 h-4" />
+                  Network Overview
                 </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-                    <div className="text-2xl font-bold text-chain-polkadot">{CHAINS.length}</div>
-                    <div className="text-sm text-gray-400">Chains Available</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-                    <div className="text-2xl font-bold text-chain-kusama">{selectedChains.length}</div>
-                    <div className="text-sm text-gray-400">Active Monitoring</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-                    <div className="text-2xl font-bold text-chain-astar">{crossChainEvents}</div>
-                    <div className="text-sm text-gray-400">Sync Events</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-                    <div className="text-2xl font-bold text-chain-moonbeam">Real-time</div>
-                    <div className="text-sm text-gray-400">Update Frequency</div>
-                  </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: 'Chains Available',  value: CHAINS.length,          color: '#E6007A' },
+                    { label: 'Active Monitoring',  value: selectedChains.length,  color: '#c8c8c8' },
+                    { label: 'Sync Events',        value: crossChainEvents,       color: '#0085FF' },
+                    { label: 'Update Frequency',   value: 'Real-time',            color: '#5A4FCF' },
+                  ].map(({ label, value, color }) => (
+                    <div key={label} className="bg-gray-800/50 rounded-lg p-3 text-center">
+                      <div className="text-xl font-bold" style={{ color }}>{value}</div>
+                      <div className="text-xs text-gray-400 mt-0.5">{label}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold flex items-center space-x-2">
-              <BarChart3 className="w-5 h-5" />
-              <span>Choose Your Chains</span>
-            </h3>
-          </div>
+        {/* ── Chain selector ── */}
+        <section className="mb-8">
+          <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+            <BarChart3 className="w-5 h-5" />
+            Choose Your Chains
+          </h3>
           <ChainSelector
             chains={CHAINS}
             selectedChains={selectedChains}
             onSelectionChange={setSelectedChains}
           />
-        </div>
+        </section>
 
-        <div className="grid lg:grid-cols-3 gap-8 mb-8">
+        {/* ── Main 2/3 + sidebar 1/3 ── */}
+        <div className="grid lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
-            <ChainDashboard
-              selectedChains={selectedChains}
-              isMonitoring={isMonitoring}
-            />
+            <ChainDashboard selectedChains={selectedChains} isMonitoring={isMonitoring} />
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-6">
             <AlertPanel selectedChains={selectedChains} />
-            
-            <div className="bg-gray-800/30 rounded-xl p-6 border border-gray-700">
-              <h3 className="text-xl font-semibold mb-4">PAPI Multi-Chain Power</h3>
-              <div className="space-y-4">
-                <div className="p-4 bg-gray-900/50 rounded-lg">
-                  <h4 className="font-medium mb-2">Unified Interface</h4>
-                  <p className="text-sm text-gray-400">
-                    Same code, same types, multiple chains – PAPI makes it effortless
-                  </p>
-                </div>
-                <div className="p-4 bg-gray-900/50 rounded-lg">
-                  <h4 className="font-medium mb-2">Efficient Connections</h4>
-                  <p className="text-sm text-gray-400">
-                    Optimized WebSocket management across chains
-                  </p>
-                </div>
-                <div className="p-4 bg-gray-900/50 rounded-lg">
-                  <h4 className="font-medium mb-2">Runtime Safety</h4>
-                  <p className="text-sm text-gray-400">
-                    Metadata-driven types prevent runtime surprises
-                  </p>
-                </div>
+
+            {/* PAPI power card */}
+            <div className="bg-gray-800/30 rounded-xl p-5 border border-gray-700">
+              <h3 className="text-base font-semibold mb-3">PAPI Multi-Chain Power</h3>
+              <div className="space-y-3">
+                {[
+                  ['Unified Interface',    'Same code, same types, multiple chains — PAPI makes it effortless.'],
+                  ['Efficient Connections','Optimised WebSocket management shared across chains.'],
+                  ['Runtime Safety',       'Metadata-driven types prevent runtime surprises.'],
+                ].map(([title, desc]) => (
+                  <div key={title} className="p-3 bg-gray-900/50 rounded-lg">
+                    <h4 className="text-sm font-medium mb-1">{title}</h4>
+                    <p className="text-xs text-gray-400">{desc}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mb-8">
+        {/* ── Cross-chain comparison ── */}
+        <section className="mb-8">
           <CrossChainCompare selectedChains={selectedChains} />
-        </div>
+        </section>
 
-        <div className="mb-8">
+        {/* ── Network graph ── */}
+        <section className="mb-8">
           <NetworkGraph selectedChains={selectedChains} />
-        </div>
+        </section>
       </main>
 
-      <footer className="border-t border-gray-800/50 mt-12">
-        <div className="container mx-auto px-6 py-8">
+      {/* ──────────── FOOTER ──────────── */}
+      <footer className="border-t border-gray-800/50 mt-4">
+        <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <h3 className="font-semibold mb-4">Cross-Chain Excellence</h3>
-              <p className="text-gray-400 text-sm">
-                Experience how PAPI enables seamless multi-chain dApps, bringing the full Polkadot ecosystem to your fingertips.
+              <h3 className="font-semibold mb-3">Cross-Chain Excellence</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                PAPI enables seamless multi-chain dApps, bringing the full Polkadot ecosystem
+                to your fingertips with one unified API.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Featured Chains</h3>
+              <h3 className="font-semibold mb-3">Featured Chains</h3>
               <div className="flex flex-wrap gap-2">
                 {CHAINS.map(chain => (
                   <span
                     key={chain.id}
-                    className="px-3 py-1 rounded-full text-sm"
+                    className="px-3 py-0.5 rounded-full text-xs font-medium"
                     style={{
-                      backgroundColor: `${chain.color}20`,
-                      color: chain.color,
-                      border: `1px solid ${chain.color}40`,
+                      backgroundColor: `${chain.color}18`,
+                      color:           chain.color,
+                      border:          `1px solid ${chain.color}35`,
                     }}
                   >
                     {chain.name}
@@ -220,29 +246,27 @@ function App() {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Resources</h3>
+              <h3 className="font-semibold mb-3">Resources</h3>
               <div className="space-y-2 text-sm">
-                <a 
+                <a
                   href="https://papi.how/recipes/connect-to-multiple-chains"
-                  className="text-primary-400 hover:text-primary-300 block"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  className="text-sky-400 hover:text-sky-300 transition-colors block"
+                  target="_blank" rel="noopener noreferrer"
                 >
-                  PAPI Multi-Chain Guide
+                  PAPI Multi-Chain Guide →
                 </a>
-                <a 
+                <a
                   href="https://wiki.polkadot.network/docs/learn-parachains"
-                  className="text-primary-400 hover:text-primary-300 block"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  className="text-sky-400 hover:text-sky-300 transition-colors block"
+                  target="_blank" rel="noopener noreferrer"
                 >
-                  Polkadot Parachains Overview
+                  Polkadot Parachains Overview →
                 </a>
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800/50 mt-8 pt-8 text-center text-gray-500 text-sm">
-            <p>Parachain Control Center • Day 24/30 #PAPI30Days • Unlocking the multi-chain future 🌉</p>
+          <div className="border-t border-gray-800/50 mt-8 pt-6 text-center text-gray-600 text-xs">
+            Parachain Control Center · Day 24/30 #PAPI30Days · Unlocking the multi-chain future 🌉
           </div>
         </div>
       </footer>

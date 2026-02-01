@@ -14,11 +14,11 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'papi-core': ['polkadot-api/client'],
-          'papi-providers': ['polkadot-api/sm-provider'],
-          'vendor': ['react', 'react-dom', 'react-query'],
-          'visualization': ['d3-force', 'd3-zoom'],
-          'ui': ['lucide-react', '@radix-ui/react-tabs'],
+          'papi-core': ['polkadot-api'],
+          'papi-providers': ['@polkadot-api/sm-provider'],
+          'vendor': ['react', 'react-dom'],
+          'visualization': ['d3-force', 'd3-zoom', 'recharts'],
+          'ui': ['lucide-react', 'framer-motion', '@radix-ui/react-tabs'],
         },
       },
     },

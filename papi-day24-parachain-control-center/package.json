@@ -1,7 +1,7 @@
 {
   "name": "papi-day24-parachain-control-center",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -30,8 +30,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@types/d3": "^7.4.3",
     "@types/d3-force": "^3.0.10",
+    "@types/d3-zoom": "^3.0.0",
     "@types/node": "^24.10.9",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
