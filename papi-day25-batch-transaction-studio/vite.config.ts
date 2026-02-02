@@ -14,10 +14,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'papi-core': ['polkadot-api'],
-          'dnd': ['react-dnd', 'react-dnd-html5-backend', '@dnd-kit/core', '@dnd-kit/sortable'],
+          'dnd': ['react-dnd', 'react-dnd-html5-backend'],
           'vendor': ['react', 'react-dom'],
-          'ui': ['lucide-react', '@radix-ui/react-tabs'],
+          'ui': ['lucide-react'],
         },
       },
     },

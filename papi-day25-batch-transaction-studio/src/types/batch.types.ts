@@ -15,7 +15,7 @@ export interface OperationParameter {
   type: string;
   description: string;
   required: boolean;
-  defaultValue?: any;
+  defaultValue?: string | number | null;
 }
 
 export interface BatchTransaction {
@@ -32,7 +32,7 @@ export interface BatchTransaction {
 export interface BatchOperation {
   id: string;
   operation: TransactionOperation;
-  parameters: Record<string, any>;
+  parameters: Record<string, string | number | null>;
   order: number;
   gasUsed: number;
 }
@@ -42,4 +42,31 @@ export interface GasCalculation {
   batchCost: number;
   savings: number;
   savingsPercentage: number;
+}
+
+export interface SimulationResult {
+  success: boolean;
+  individualCost: number;
+  batchCost: number;
+  savings: number;
+  percent: string;
+  steps: SimulationStep[];
+  batchType: string;
+}
+
+export interface SimulationStep {
+  step: number;
+  operation: string;
+  gasUsed: number;
+  status: 'success' | 'pending';
+}
+
+export interface BatchTemplate {
+  id: string;
+  name: string;
+  description: string;
+  operations: TransactionOperation[];
+  useCases: string[];
+  estimatedSavings: number;
+  complexity: 'simple' | 'medium' | 'complex';
 }
