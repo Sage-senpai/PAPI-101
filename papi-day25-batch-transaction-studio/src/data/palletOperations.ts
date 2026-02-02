@@ -1,4 +1,4 @@
-import { TransactionOperation, BatchTemplate } from '../types/batch.types';
+import type { TransactionOperation, BatchTemplate } from '../types/batch.types';
 
 export const PALLET_OPERATIONS: TransactionOperation[] = [
   {

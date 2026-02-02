@@ -1,5 +1,5 @@
 import React from 'react';
-import { BatchTransaction, SimulationResult } from '../types/batch.types';
+import type { BatchTransaction, SimulationResult } from '../types/batch.types';
 import { TrendingDown, Zap, Shield, AlertCircle } from 'lucide-react';
 
 interface GasCalculatorProps {

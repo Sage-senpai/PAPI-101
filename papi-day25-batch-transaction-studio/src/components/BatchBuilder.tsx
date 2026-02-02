@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { PALLET_OPERATIONS } from '../data/palletOperations';
-import { BatchTransaction, BatchOperation, TransactionOperation } from '../types/batch.types';
+import type { BatchTransaction, BatchOperation, TransactionOperation } from '../types/batch.types';
 import { GripVertical, X, Plus, Search, Zap, Clock, Layers } from 'lucide-react';
 
 // ─── Drag item types ──────────────────────────────────────────

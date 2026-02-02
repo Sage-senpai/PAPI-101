@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BatchTransaction, SimulationResult } from '../types/batch.types';
+import type { BatchTransaction, SimulationResult } from '../types/batch.types';
 import { Eye, Code2, Download, CheckCircle, Circle } from 'lucide-react';
 
 interface PreviewPanelProps {

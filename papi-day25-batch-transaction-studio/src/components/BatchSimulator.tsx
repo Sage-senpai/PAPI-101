@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BatchTransaction, SimulationResult } from '../types/batch.types';
+import type { BatchTransaction, SimulationResult } from '../types/batch.types';
 import { Play, RotateCcw, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react';
 
 interface BatchSimulatorProps {
