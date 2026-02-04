@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── base overrides ─── */
+@layer base {
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #111827;
+    color: #f3f4f6;
+  }
+
+  code {
+    font-family: 'Fira Code', 'Courier New', monospace;
+  }
+
+  *:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #3B82F6, 0 0 0 4px #111827;
+  }
+
+  ::selection {
+    background-color: rgba(59, 130, 246, 0.3);
+    color: #fff;
+  }
+}
+
+/* ─── one-off utilities that need raw CSS (background-image, scrollbar pseudo-elements) ─── */
+@layer utilities {
+  .bg-detective-pattern {
+    background-color: #111827;
+    background-image:
+      linear-gradient(45deg,  #1f2937 25%, transparent 25%),
+      linear-gradient(-45deg, #1f2937 25%, transparent 25%),
+      linear-gradient(45deg,  transparent 75%, #1f2937 75%),
+      linear-gradient(-45deg, transparent 75%, #1f2937 75%);
+    background-size: 40px 40px;
+    background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+  }
+
+  .glass {
+    background: rgba(17, 24, 39, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .data-grid {
+    background-image:
+      linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .gradient-text {
+    background: linear-gradient(to right, #3B82F6, #8B5CF6, #10B981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmerAnim 3s infinite;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 1000px 100%;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out both;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar       { width: 6px; }
+  .custom-scrollbar::-webkit-scrollbar-track  { background: rgba(31,41,55,0.5); border-radius: 3px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb  { background: rgba(139,92,246,0.5); border-radius: 3px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,0.8); }
+}
