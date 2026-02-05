@@ -7,9 +7,7 @@ import { HistoricalPanel } from './components/HistoricalPanel';
 import { TrendAnalyzer } from './components/TrendAnalyzer';
 import { AlertSystem } from './components/AlertSystem';
 import { DetectiveVisualization } from './components/DetectiveVisualization';
-import { Search, Brain, Shield, Zap, History, AlertTriangle } from 'lucide-react';
-import './styles/globals.css';
-import './styles/detectiveAnimations.css';
+import { Search, Brain, Shield, Zap, History } from 'lucide-react';
 
 function App() {
   const [account, setAccount] = useState('5FHneW46zG4dKYFcW7dzmhY9Q9b8V6Q3jHcWb2rKvS8XqYt');

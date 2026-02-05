@@ -1,5 +1,5 @@
 import React from 'react';
-import { Detective, Shield, Cpu, Database } from 'lucide-react';
+import { SearchCheck, Shield, Cpu, Database } from 'lucide-react';
 
 interface IntelligenceHeaderProps {
   account: string;
@@ -29,7 +29,7 @@ export const IntelligenceHeader: React.FC<IntelligenceHeaderProps> = ({
             <div className="relative group">
               <div className="absolute -inset-2 bg-gradient-to-r from-detective-realtime via-detective-historical to-detective-fusion rounded-full blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
               <div className="relative p-3 bg-gradient-to-br from-gray-800 to-gray-900 rounded-full">
-                <Detective className="w-8 h-8 text-white animate-pulse" />
+                <SearchCheck className="w-8 h-8 text-white animate-pulse" />
               </div>
             </div>
             <div>
