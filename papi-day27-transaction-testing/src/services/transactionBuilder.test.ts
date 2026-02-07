@@ -67,9 +67,9 @@ describe('Transaction Builder Service', () => {
 
   describe('calculateFee', () => {
     it('should correctly calculate 1% fee', () => {
-      const amount = 1000000000n; // 10 DOT (assuming 10^8 precision)
+      const amount = 1000000000n;
       const fee = calculateFee(amount, 1);
-      expect(fee).toBe(10000000n); // 0.1 DOT
+      expect(fee).toBe(10000000n);
     });
 
     it('should throw error for invalid fee percentage', () => {

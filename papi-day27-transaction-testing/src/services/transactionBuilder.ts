@@ -1,5 +1,5 @@
 import { TypedApi } from 'polkadot-api';
-import { dot } from '@polkadot-api/descriptors';
+import { dot } from 'polkadot-api/descrioptors';
 
 export interface TransferParams {
   dest: string;

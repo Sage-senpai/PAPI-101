@@ -2,6 +2,8 @@
 node_modules/
 .pnpm-store/
 package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # PAPI Auto-generated
 .papi/

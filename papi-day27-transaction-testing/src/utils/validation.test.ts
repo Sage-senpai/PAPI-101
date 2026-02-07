@@ -9,7 +9,7 @@ describe('Validation Utilities', () => {
 
     it('rejects invalid addresses', () => {
       expect(isValidAddress('not-an-address')).toBe(false);
-      expect(isValidAddress('5FHneW46xGXgs5mUiveU4sb')).toBe(false); // Too short
+      expect(isValidAddress('5FHneW46xGXgs5mUiveU4sb')).toBe(false);
       expect(isValidAddress('')).toBe(false);
     });
   });
@@ -29,12 +29,12 @@ describe('Validation Utilities', () => {
 
   describe('validateTransferAmount', () => {
     it('validates transfer amounts correctly', () => {
-      expect(validateTransferAmount(1000000n, 1000000n, 100000000n)).toEqual({
+      expect(validateTransferAmount(1000000n, 100000000n, 1000000n)).toEqual({
         valid: true,
         message: '',
       });
 
-      expect(validateTransferAmount(0n, 1000000n, 100000000n)).toEqual({
+      expect(validateTransferAmount(0n, 100000000n, 1000000n)).toEqual({
         valid: false,
         message: 'Amount must be greater than zero',
       });
