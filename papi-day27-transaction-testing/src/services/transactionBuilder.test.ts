@@ -1,22 +1,21 @@
-import { buildTransferTransaction, calculateFee } from './transactionBuilder';
-import { dot } from '@polkadot-api/descriptors';
-import { TypedApi } from 'polkadot-api';
+import { buildTransferTransaction, calculateFee, type DotDescriptor } from './transactionBuilder';
+import type { TypedApi } from 'polkadot-api';
 
 // Mock the entire PAPI TypedApi
 const createMockApi = () => ({
   tx: {
     Balances: {
-      transfer_keep_alive: jest.fn((params: any) => ({
+      transfer_keep_alive: jest.fn((_params: any) => ({
         sign: jest.fn(),
         submit: jest.fn(),
         callData: '0xmockCallData',
       })),
     },
   },
-} as unknown as TypedApi<typeof dot>);
+} as unknown as TypedApi<DotDescriptor>);
 
 describe('Transaction Builder Service', () => {
-  let mockApi: TypedApi<typeof dot>;
+  let mockApi: TypedApi<DotDescriptor>;
 
   beforeEach(() => {
     mockApi = createMockApi();

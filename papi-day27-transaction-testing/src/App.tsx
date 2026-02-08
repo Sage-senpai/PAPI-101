@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BalanceDisplay } from './components/BalanceeDisplay';
+import { useState } from 'react';
+import { BalanceDisplay } from './components/BalanceDisplay';
 import './App.css';
 
 interface TestResult {

@@ -1,10 +1,12 @@
-import { TypedApi } from 'polkadot-api';
-import { dot } from 'polkadot-api/descrioptors';
+import type { TypedApi } from 'polkadot-api';
+
+// Mock dot type for testing - in production you'd generate this from chain metadata
+export type DotDescriptor = any;
 
 export interface TransferParams {
   dest: string;
   value: bigint;
-  api: TypedApi<typeof dot>;
+  api: TypedApi<DotDescriptor>;
 }
 
 export function buildTransferTransaction({ dest, value, api }: TransferParams) {

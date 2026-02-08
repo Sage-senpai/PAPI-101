@@ -1,4 +1,3 @@
-import React from 'react';
 import { useBalance } from '../hooks/useChainData';
 import { formatBalance } from '../utils/validation';
 
