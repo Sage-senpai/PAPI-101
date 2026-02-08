@@ -1,3 +1,5 @@
 # Claude temporary files
 tmpclaude-*/
 .claude/
+node_modules
+package-lock.json
