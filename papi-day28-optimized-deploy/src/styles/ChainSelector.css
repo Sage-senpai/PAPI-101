@@ -1,0 +1,171 @@
+.chain-selector {
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  height: fit-content;
+  position: sticky;
+  top: 2rem;
+}
+
+.selector-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.selector-header svg {
+  color: var(--primary);
+}
+
+.selector-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  flex: 1;
+}
+
+.optimized-badge {
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chain-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.chain-button {
+  background: var(--bg-tertiary);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+  font-family: inherit;
+  color: var(--text-primary);
+}
+
+.chain-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--primary);
+}
+
+.chain-button.active {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3);
+}
+
+.chain-button.polkadot .chain-dot {
+  background: #e6007a;
+  box-shadow: 0 0 20px rgba(230, 0, 122, 0.5);
+}
+
+.chain-button.kusama .chain-dot {
+  background: #000;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.chain-button.clear {
+  background: transparent;
+  border: 2px dashed var(--border);
+  justify-content: center;
+}
+
+.chain-button.clear:hover {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.chain-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.chain-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.chain-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.chain-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.optimization-info {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.info-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .chain-selector {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .chain-selector {
+    padding: 1.5rem;
+  }
+
+  .selector-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .chain-button {
+    padding: 1rem;
+  }
+}

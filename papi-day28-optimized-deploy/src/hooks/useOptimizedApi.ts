@@ -2,15 +2,26 @@ import { useState, useEffect, useCallback } from 'react';
 
 export type Chain = 'polkadot' | 'kusama' | null;
 
+interface Metrics {
+  loadTime: number;
+  estimatedSizeKB: number;
+  timestamp: number;
+}
+
 export function useOptimizedApi(selectedChain: Chain) {
   const [api, setApi] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [metrics, setMetrics] = useState({ loadTime: 0, estimatedSizeKB: 0 });
+  const [metrics, setMetrics] = useState<Metrics>({
+    loadTime: 0,
+    estimatedSizeKB: 0,
+    timestamp: 0,
+  });
 
   const loadApi = useCallback(async (chain: Chain) => {
     if (!chain) {
       setApi(null);
+      setMetrics({ loadTime: 0, estimatedSizeKB: 0, timestamp: 0 });
       return;
     }
 
@@ -19,34 +30,58 @@ export function useOptimizedApi(selectedChain: Chain) {
     const start = performance.now();
 
     try {
-      // Dynamic import – only loads when chain is selected
-      const { [chain]: descriptor } = await import(
-        /* webpackChunkName: "descriptor-[request]" */
-        `@polkadot-api/descriptors/${chain}`
-      );
+      console.log(`🔄 Loading ${chain.toUpperCase()} API...`);
 
+      // Dynamically import PAPI and Smoldot
       const { createClient } = await import('polkadot-api');
       const { getSmProvider } = await import('@polkadot-api/sm-provider');
+      const { start: startSmoldot } = await import('smoldot');
 
-      const endpoint = chain === 'polkadot'
-        ? 'wss://rpc.polkadot.io'
-        : 'wss://kusama-rpc.polkadot.io';
+      const smoldot = startSmoldot();
 
-      const client = createClient(getSmProvider(endpoint));
-      const typedApi = client.getTypedApi(descriptor);
+      const endpoint =
+        chain === 'polkadot'
+          ? 'wss://rpc.polkadot.io'
+          : 'wss://kusama-rpc.polkadot.io';
+
+      console.log(`📡 Connecting to ${endpoint}...`);
+
+      // Fetch chain spec from public repository
+      const chainSpecUrl = chain === 'polkadot'
+        ? 'https://raw.githubusercontent.com/paritytech/polkadot-sdk/master/polkadot/node/service/chain-specs/polkadot.json'
+        : 'https://raw.githubusercontent.com/paritytech/polkadot-sdk/master/polkadot/node/service/chain-specs/kusama.json';
+
+      console.log(`📥 Fetching chainspec from ${chainSpecUrl}...`);
+      const chainSpecResponse = await fetch(chainSpecUrl);
+      const chainSpec = await chainSpecResponse.text();
+
+      const smoldotChain = await smoldot.addChain({
+        chainSpec,
+      });
+
+      const client = createClient(getSmProvider(smoldotChain));
+      
+      // Get the untyped API (no descriptors needed)
+      const untypedApi = client.getUntypedApi();
 
       const loadTime = performance.now() - start;
-      // Rough but useful size estimation
+      // Rough but useful size estimation based on load time
       const sizeKB = Math.round(45 + loadTime / 8);
 
-      setMetrics({ loadTime: Math.round(loadTime), estimatedSizeKB: sizeKB });
-      setApi(typedApi);
+      setMetrics({
+        loadTime: Math.round(loadTime),
+        estimatedSizeKB: sizeKB,
+        timestamp: Date.now(),
+      });
+      setApi(untypedApi);
 
-      console.log(`🚀 ${chain.toUpperCase()} loaded in ${loadTime.toFixed(0)} ms (~${sizeKB} KB)`);
+      console.log(
+        `✅ ${chain.toUpperCase()} loaded in ${loadTime.toFixed(0)}ms (~${sizeKB}KB)`
+      );
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
-      setError(msg);
-      console.error('Chain load failed:', msg);
+      setError(`Failed to connect to ${chain}: ${msg}`);
+      console.error('❌ Chain load failed:', err);
     } finally {
       setLoading(false);
     }
