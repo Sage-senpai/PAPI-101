@@ -43,7 +43,7 @@ export const ChainInfo: React.FC<ChainInfoProps> = ({ api, bundleSize }) => {
       try {
         console.log('📊 Fetching chain metadata...');
 
-        // Get current block number using RPC calls
+        // Get current block number and chain info using RPC calls
         const [blockHash, chainName, version] = await Promise.all([
           api.call('chain_getBlockHash', []),
           api.call('system_chain', []).catch(() => 'Polkadot'),

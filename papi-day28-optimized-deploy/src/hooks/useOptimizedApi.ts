@@ -1,4 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
+import { createClient } from 'polkadot-api';
+import { getSmProvider } from 'polkadot-api/sm-provider';
+import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
+import SmWorker from 'polkadot-api/smoldot/worker?worker';
+import { chainSpec as polkadotChainSpec } from 'polkadot-api/chains/polkadot';
+import { chainSpec as kusamaChainSpec } from 'polkadot-api/chains/ksmcc3';
 
 export type Chain = 'polkadot' | 'kusama' | null;
 
@@ -32,40 +38,26 @@ export function useOptimizedApi(selectedChain: Chain) {
     try {
       console.log(`🔄 Loading ${chain.toUpperCase()} API...`);
 
-      // Dynamically import PAPI and Smoldot
-      const { createClient } = await import('polkadot-api');
-      const { getSmProvider } = await import('@polkadot-api/sm-provider');
-      const { start: startSmoldot } = await import('smoldot');
+      // Start Smoldot worker
+      const smoldot = startFromWorker(new SmWorker());
 
-      const smoldot = startSmoldot();
-
-      const endpoint =
-        chain === 'polkadot'
-          ? 'wss://rpc.polkadot.io'
-          : 'wss://kusama-rpc.polkadot.io';
-
-      console.log(`📡 Connecting to ${endpoint}...`);
-
-      // Fetch chain spec from public repository
-      const chainSpecUrl = chain === 'polkadot'
-        ? 'https://raw.githubusercontent.com/paritytech/polkadot-sdk/master/polkadot/node/service/chain-specs/polkadot.json'
-        : 'https://raw.githubusercontent.com/paritytech/polkadot-sdk/master/polkadot/node/service/chain-specs/kusama.json';
-
-      console.log(`📥 Fetching chainspec from ${chainSpecUrl}...`);
-      const chainSpecResponse = await fetch(chainSpecUrl);
-      const chainSpec = await chainSpecResponse.text();
-
-      const smoldotChain = await smoldot.addChain({
-        chainSpec,
-      });
-
-      const client = createClient(getSmProvider(smoldotChain));
+      // Get chainspec based on selected chain
+      const chainSpec = chain === 'polkadot' ? polkadotChainSpec : kusamaChainSpec;
       
-      // Get the untyped API (no descriptors needed)
+      console.log(`📡 Connecting to ${chain}...`);
+
+      // Add chain to Smoldot
+      const smoldotChain = await smoldot.addChain({ chainSpec });
+
+      // Create PAPI client
+      const client = createClient(getSmProvider(smoldotChain));
+
+      console.log(`🎯 Creating untyped API for ${chain}...`);
+      
+      // Get untyped API (works without descriptors!)
       const untypedApi = client.getUntypedApi();
 
       const loadTime = performance.now() - start;
-      // Rough but useful size estimation based on load time
       const sizeKB = Math.round(45 + loadTime / 8);
 
       setMetrics({

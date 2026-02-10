@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "descriptors": {
+    "dot": {
+      "chain": "wss://rpc.polkadot.io",
+      "metadata": "https://paritytech.github.io/polkadot-staking-dashboard/metadata/polkadot.json"
+    },
+    "ksm": {
+      "chain": "wss://kusama-rpc.polkadot.io",
+      "metadata": "https://paritytech.github.io/polkadot-staking-dashboard/metadata/kusama.json"
+    }
+  }
+}
