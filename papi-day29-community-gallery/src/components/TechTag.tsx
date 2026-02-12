@@ -1,6 +1,4 @@
-import React from 'react';
 import { TechStack } from '../types/project.types';
-import './TechTag.css';
 
 const techIcons: Record<TechStack, string> = {
   react: '⚛️',
@@ -32,14 +30,25 @@ interface TechTagProps {
   tech: TechStack;
 }
 
-export const TechTag: React.FC<TechTagProps> = ({ tech }) => {
+export const TechTag = ({ tech }: TechTagProps) => {
+  const color = techColors[tech];
+
   return (
-    <span 
+    <span
       className="tech-tag"
-      style={{ 
-        backgroundColor: `${techColors[tech]}20`,
-        color: techColors[tech],
-        borderColor: techColors[tech]
+      style={{
+        backgroundColor: `${color}20`,
+        color: color,
+        borderColor: color,
+        border: `1px solid ${color}40`,
+        padding: '0.375rem 0.75rem',
+        borderRadius: '20px',
+        fontSize: '0.8125rem',
+        fontWeight: 600,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '0.375rem',
+        transition: 'all 0.2s ease'
       }}
     >
       <span className="tech-icon">{techIcons[tech]}</span>

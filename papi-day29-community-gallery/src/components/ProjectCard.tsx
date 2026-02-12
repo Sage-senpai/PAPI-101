@@ -1,12 +1,11 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Github, 
-  ExternalLink, 
-  Heart, 
-  Star, 
+import {
+  Github,
+  ExternalLink,
+  Heart,
+  Star,
   Calendar,
-  Twitter
+  AtSign
 } from 'lucide-react';
 import { Project } from '../types/project.types';
 import { TechTag } from './TechTag';
@@ -18,11 +17,11 @@ interface ProjectCardProps {
   onShare: (project: Project) => void;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ 
-  project, 
-  onLike, 
-  onShare 
-}) => {
+export const ProjectCard = ({
+  project,
+  onLike,
+  onShare
+}: ProjectCardProps) => {
   const formattedDate = new Date(project.createdAt).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -46,8 +45,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
       <div className="card-header">
         <div className="project-image">
-          <img 
-            src={project.imageUrl} 
+          <img
+            src={project.imageUrl}
             alt={project.name}
             loading="lazy"
           />
@@ -55,13 +54,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             <span>Day {project.submissionDay}</span>
           </div>
         </div>
-        
+
         <div className="project-meta">
           <h3 className="project-title">{project.name}</h3>
           <div className="developer-info">
-            <Twitter size={14} />
+            <AtSign size={14} />
             <span className="developer-name">{project.developer}</span>
-            <a 
+            <a
               href={`https://twitter.com/${project.twitterHandle.replace('@', '')}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -91,7 +90,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
       <div className="card-footer">
         <div className="stats">
-          <button 
+          <button
             className="like-button"
             onClick={() => onLike(project.id)}
             aria-label={`Like ${project.name}`}
@@ -99,7 +98,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             <Heart size={18} fill={project.likes > 0 ? '#E6007A' : 'none'} />
             <span>{project.likes}</span>
           </button>
-          
+
           <div className="date">
             <Calendar size={14} />
             <span>{formattedDate}</span>
@@ -118,7 +117,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               <Github size={20} />
             </a>
           )}
-          
+
           {project.liveUrl && (
             <a
               href={project.liveUrl}

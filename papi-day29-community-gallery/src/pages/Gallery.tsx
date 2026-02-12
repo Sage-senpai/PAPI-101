@@ -1,29 +1,24 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Filter, 
-  TrendingUp, 
-  Users, 
-  Code2, 
+import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import {
+  Filter,
+  TrendingUp,
+  Users,
+  Code2,
   Plus,
-  Twitter
+  MessageCircle
 } from 'lucide-react';
 import { ProjectCard } from '../components/ProjectCard';
 import { SubmissionForm } from '../components/SubmissionForm';
 import { ProjectFilters } from '../components/ProjectFilters';
 import { sampleProjects, projectStats } from '../data/projects';
-import { Project, ProjectCategory, TechStack } from '../types/project.types';
+import { Project, FilterState } from '../types/project.types';
 import './Gallery.css';
 
-export const Gallery: React.FC = () => {
+export const Gallery = () => {
   const [projects, setProjects] = useState<Project[]>(sampleProjects);
   const [showForm, setShowForm] = useState(false);
-  const [filters, setFilters] = useState<{
-    categories: ProjectCategory[];
-    tech: TechStack[];
-    featuredOnly: boolean;
-    search: string;
-  }>({
+  const [filters, setFilters] = useState<FilterState>({
     categories: [],
     tech: [],
     featuredOnly: false,
@@ -32,14 +27,14 @@ export const Gallery: React.FC = () => {
 
   const filteredProjects = projects.filter(project => {
     if (filters.categories.length > 0) {
-      const hasCategory = filters.categories.some(cat => 
+      const hasCategory = filters.categories.some(cat =>
         project.categories.includes(cat)
       );
       if (!hasCategory) return false;
     }
 
     if (filters.tech.length > 0) {
-      const hasTech = filters.tech.some(tech => 
+      const hasTech = filters.tech.some(tech =>
         project.techStack.includes(tech)
       );
       if (!hasTech) return false;
@@ -61,8 +56,8 @@ export const Gallery: React.FC = () => {
   });
 
   const handleLike = (projectId: string) => {
-    setProjects(prev => prev.map(project => 
-      project.id === projectId 
+    setProjects(prev => prev.map(project =>
+      project.id === projectId
         ? { ...project, likes: project.likes + 1 }
         : project
     ));
@@ -78,16 +73,16 @@ export const Gallery: React.FC = () => {
     console.log('Share URL:', tweetUrl);
   };
 
-  const handleSubmit = (newProject: any) => {
+  const handleSubmit = (newProject: Record<string, unknown>) => {
     const projectWithId = {
       ...newProject,
       id: `user-${Date.now()}`,
       imageUrl: newProject.imageUrl || 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80'
     };
-    
-    setProjects(prev => [projectWithId, ...prev]);
+
+    setProjects(prev => [projectWithId as Project, ...prev]);
     setShowForm(false);
-    
+
     console.log('✅ Project added to local gallery!');
     console.log('Total projects now:', projects.length + 1);
   };
@@ -104,7 +99,7 @@ export const Gallery: React.FC = () => {
           <p className="subtitle">
             Showcasing amazing projects built with Polkadot-API during our 30-day campaign
           </p>
-          
+
           <div className="header-stats">
             <div className="stat">
               <Code2 size={24} />
@@ -130,7 +125,7 @@ export const Gallery: React.FC = () => {
           </div>
         </div>
 
-        <button 
+        <button
           className="cta-button"
           onClick={() => setShowForm(true)}
         >
@@ -164,11 +159,11 @@ export const Gallery: React.FC = () => {
 
       <div className="share-banner">
         <div className="banner-content">
-          <Twitter size={32} />
+          <MessageCircle size={32} />
           <div>
             <h3>Share Your Journey!</h3>
             <p>
-              Tweet about your #PAPI30Days experience and tag 
+              Tweet about your #PAPI30Days experience and tag
               <strong> @Polkadot</strong> for a chance to be featured
             </p>
           </div>
@@ -195,11 +190,11 @@ export const Gallery: React.FC = () => {
       <div className="console-section">
         <h4>Developer Console</h4>
         <div className="console-output">
-          <div className="console-line info">✅ Gallery loaded with {projects.length} projects</div>
-          <div className="console-line info">🔍 {filteredProjects.length} projects match current filters</div>
-          <div className="console-line success">🚀 Ready to showcase your project!</div>
+          <div className="console-line info">Gallery loaded with {projects.length} projects</div>
+          <div className="console-line info">{filteredProjects.length} projects match current filters</div>
+          <div className="console-line success">Ready to showcase your project!</div>
           <div className="console-line">
-            💡 <strong>Pro Tip:</strong> Open browser console to see detailed submission logs
+            <strong>Pro Tip:</strong> Open browser console to see detailed submission logs
           </div>
         </div>
       </div>

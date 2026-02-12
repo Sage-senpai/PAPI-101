@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { Send, X, Loader2 } from 'lucide-react';
 import { ProjectCategory, TechStack } from '../types/project.types';
 import './SubmissionForm.css';
 
 interface SubmissionFormProps {
-  onSubmit: (project: any) => void;
+  onSubmit: (project: Record<string, unknown>) => void;
   onClose: () => void;
 }
 
 const allCategories: ProjectCategory[] = ['defi', 'nft', 'governance', 'tools', 'education', 'social', 'gaming'];
 const allTech: TechStack[] = ['react', 'vue', 'nextjs', 'typescript', 'papi', 'smoldot', 'tailwind', 'graphql', 'subql', 'rust'];
 
-export const SubmissionForm: React.FC<SubmissionFormProps> = ({ onSubmit, onClose }) => {
+export const SubmissionForm = ({ onSubmit, onClose }: SubmissionFormProps) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -22,12 +22,12 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ onSubmit, onClos
     liveUrl: '',
     imageUrl: ''
   });
-  
+
   const [selectedCategories, setSelectedCategories] = useState<ProjectCategory[]>([]);
   const [selectedTech, setSelectedTech] = useState<TechStack[]>(['typescript', 'papi']);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -41,7 +41,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ onSubmit, onClos
       createdAt: new Date(),
       likes: 0,
       featured: false,
-      submissionDay: 29 // Current day
+      submissionDay: 29
     };
 
     console.log('🎉 Project Submitted!');
@@ -82,17 +82,18 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ onSubmit, onClos
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="submission-form-container"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      onClick={onClose}
     >
-      <div className="submission-form">
+      <div className="submission-form" onClick={(e) => e.stopPropagation()}>
         <div className="form-header">
           <h2>Submit Your Project</h2>
           <p>Share what you built during #PAPI30Days!</p>
-          <button className="close-button" onClick={onClose}>
+          <button className="close-button" onClick={onClose} type="button">
             <X size={20} />
           </button>
         </div>

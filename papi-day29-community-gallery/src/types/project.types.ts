@@ -43,3 +43,10 @@ export interface ProjectStats {
   mostPopularTech: TechStack;
   featuredProjects: number;
 }
+
+export interface FilterState {
+  categories: ProjectCategory[];
+  tech: TechStack[];
+  featuredOnly: boolean;
+  search: string;
+}
